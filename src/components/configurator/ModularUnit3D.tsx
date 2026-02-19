@@ -1,332 +1,394 @@
-import { useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { RoundedBox } from "@react-three/drei";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { ConfigState } from "@/hooks/useConfigurator";
 
-interface ModularUnit3DProps {
-  config: ConfigState;
-}
-
-// Facade → material properties
-function getFacadeMaterial(facade: ConfigState["facade"]) {
+// ─── Facade colour map ────────────────────────────────────────────────────────
+function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":
-      return { color: "#1a1814", roughness: 0.92, metalness: 0.0, woodGrain: true };
+      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
     case "thermowood-natural":
-      return { color: "#8a6637", roughness: 0.88, metalness: 0.0, woodGrain: true };
+      return { color: "#7a5728", roughness: 0.88, metalness: 0.0, isWood: true };
     case "composite-white":
-      return { color: "#f0eeec", roughness: 0.55, metalness: 0.05, woodGrain: false };
+      return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
-      return { color: "#1c1c1e", roughness: 0.60, metalness: 0.05, woodGrain: false };
+      return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium-anthracite":
-      return { color: "#3a3b3c", roughness: 0.30, metalness: 0.75, woodGrain: false };
+      return { color: "#383a3b", roughness: 0.28, metalness: 0.80, isWood: false };
     case "aluminium-bronze":
-      return { color: "#7a5c3a", roughness: 0.28, metalness: 0.80, woodGrain: false };
+      return { color: "#6e4e2e", roughness: 0.26, metalness: 0.82, isWood: false };
     default:
-      return { color: "#1a1814", roughness: 0.9, metalness: 0.0, woodGrain: true };
+      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
   }
 }
 
-function getRoofColor(roofEdge: ConfigState["roofEdge"]) {
-  return roofEdge === "white" ? "#e8e6e4" : "#111110";
-}
-
-// Wood-grain texture via canvas
-function useWoodTexture(color: string, enabled: boolean) {
-  return useMemo(() => {
-    if (!enabled) return null;
-    const size = 256;
-    const canvas = document.createElement("canvas");
-    canvas.width = size;
-    canvas.height = size;
-    const ctx = canvas.getContext("2d")!;
-
-    const base = new THREE.Color(color);
-    ctx.fillStyle = `#${base.getHexString()}`;
-    ctx.fillRect(0, 0, size, size);
-
-    // Vertical grain lines
-    const lighter = base.clone().lerp(new THREE.Color("#ffffff"), 0.12);
-    const darker = base.clone().lerp(new THREE.Color("#000000"), 0.18);
-
-    for (let i = 0; i < 40; i++) {
-      const x = Math.random() * size;
-      const w = 1 + Math.random() * 3;
-      ctx.fillStyle = Math.random() > 0.5
-        ? `#${lighter.getHexString()}`
-        : `#${darker.getHexString()}`;
-      ctx.globalAlpha = 0.25 + Math.random() * 0.3;
-      ctx.fillRect(x, 0, w, size);
-    }
-    ctx.globalAlpha = 1;
-
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.wrapS = THREE.RepeatWrapping;
-    tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(4, 2);
-    return tex;
-  }, [color, enabled]);
-}
-
-// A single vertical cladding panel strip
-function CladdingStrips({
+// ─── Narrow vertical plank strip ─────────────────────────────────────────────
+function PlankWall({
   width,
   height,
-  depth,
-  color,
+  posX = 0,
+  posY = 0,
+  posZ = 0,
+  rotY = 0,
+  baseColor,
   roughness,
   metalness,
-  texture,
+  isWood,
 }: {
-  width: number;
-  height: number;
-  depth: number;
-  color: string;
-  roughness: number;
-  metalness: number;
-  texture: THREE.Texture | null;
+  width: number; height: number;
+  posX?: number; posY?: number; posZ?: number; rotY?: number;
+  baseColor: string; roughness: number; metalness: number; isWood: boolean;
 }) {
-  const stripCount = Math.floor(width / 0.09);
+  // Each plank: ~65 mm wide, ~8 mm gap
+  const plankW = 0.065;
+  const gapW = 0.008;
+  const pitch = plankW + gapW;
+  const count = Math.round(width / pitch);
+
+  const base = useMemo(() => new THREE.Color(baseColor), [baseColor]);
+
+  const planks = useMemo(() => {
+    const arr: { x: number; col: THREE.Color }[] = [];
+    for (let i = 0; i < count; i++) {
+      const x = -width / 2 + (i + 0.5) * pitch;
+      const variance = (Math.sin(i * 7.3) * 0.5 + Math.cos(i * 3.1) * 0.5) * (isWood ? 0.10 : 0.02);
+      const col = base.clone().lerp(
+        variance > 0 ? new THREE.Color("#ffffff") : new THREE.Color("#000000"),
+        Math.abs(variance)
+      );
+      arr.push({ x, col });
+    }
+    return arr;
+  }, [count, width, pitch, base, isWood]);
+
   return (
-    <group>
-      {Array.from({ length: stripCount }).map((_, i) => {
-        const x = -width / 2 + (i + 0.5) * (width / stripCount);
-        return (
-          <mesh key={i} position={[x, 0, depth / 2 + 0.002]}>
-            <boxGeometry
-              args={[width / stripCount - 0.008, height - 0.01, 0.016]}
-            />
-            <meshStandardMaterial
-              color={color}
-              roughness={roughness}
-              metalness={metalness}
-              map={texture}
-            />
-          </mesh>
-        );
-      })}
+    <group position={[posX, posY, posZ]} rotation={[0, rotY, 0]}>
+      {planks.map(({ x, col }, i) => (
+        <mesh key={i} position={[x, 0, 0]} castShadow>
+          <boxGeometry args={[plankW, height, 0.022]} />
+          <meshStandardMaterial
+            color={col}
+            roughness={roughness + (isWood ? (Math.sin(i * 4.1) * 0.04) : 0)}
+            metalness={metalness}
+          />
+        </mesh>
+      ))}
     </group>
   );
 }
 
-// Glass pane
-function GlassPane({
-  width,
-  height,
-  depth,
-}: {
-  width: number;
-  height: number;
-  depth: number;
-}) {
-  return (
-    <mesh position={[0, 0, depth / 2]}>
-      <boxGeometry args={[width, height, 0.012]} />
-      <meshPhysicalMaterial
-        color="#c8dde8"
-        roughness={0.04}
-        metalness={0.0}
-        transmission={0.82}
-        thickness={0.3}
-        transparent
-        opacity={0.55}
-        envMapIntensity={1.2}
-      />
-    </mesh>
-  );
-}
-
-// Window frame + glass
-function Window({
+// ─── Window/door opening with frame + physical glass ─────────────────────────
+function GlazingUnit({
   width,
   height,
   posX,
   posY,
   posZ,
-  frameColor = "#111110",
-  isSlidingDoor = false,
+  frameColor,
+  hasDivider = false,
 }: {
-  width: number;
-  height: number;
-  posX: number;
-  posY: number;
-  posZ: number;
-  frameColor?: string;
-  isSlidingDoor?: boolean;
+  width: number; height: number;
+  posX: number; posY: number; posZ: number;
+  frameColor: string; hasDivider?: boolean;
 }) {
-  const fw = 0.04; // frame width
+  const fw = 0.038; // frame thickness
+
   return (
     <group position={[posX, posY, posZ]}>
-      {/* Frame top */}
+      {/* Outer frame - top */}
       <mesh position={[0, height / 2 - fw / 2, 0]}>
-        <boxGeometry args={[width, fw, 0.05]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.6} />
+        <boxGeometry args={[width, fw, 0.055]} />
+        <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.65} />
       </mesh>
-      {/* Frame bottom */}
+      {/* bottom */}
       <mesh position={[0, -height / 2 + fw / 2, 0]}>
-        <boxGeometry args={[width, fw, 0.05]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.6} />
+        <boxGeometry args={[width, fw, 0.055]} />
+        <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.65} />
       </mesh>
-      {/* Frame left */}
+      {/* left */}
       <mesh position={[-width / 2 + fw / 2, 0, 0]}>
-        <boxGeometry args={[fw, height, 0.05]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.6} />
+        <boxGeometry args={[fw, height, 0.055]} />
+        <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.65} />
       </mesh>
-      {/* Frame right */}
+      {/* right */}
       <mesh position={[width / 2 - fw / 2, 0, 0]}>
-        <boxGeometry args={[fw, height, 0.05]} />
-        <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.6} />
+        <boxGeometry args={[fw, height, 0.055]} />
+        <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.65} />
       </mesh>
-      {/* Center divider for sliding door */}
-      {isSlidingDoor && (
+      {/* center divider (sliding) */}
+      {hasDivider && (
         <mesh position={[0, 0, 0.005]}>
-          <boxGeometry args={[fw, height - fw * 2, 0.04]} />
-          <meshStandardMaterial color={frameColor} roughness={0.4} metalness={0.6} />
+          <boxGeometry args={[fw, height - fw * 2, 0.045]} />
+          <meshStandardMaterial color={frameColor} roughness={0.35} metalness={0.65} />
         </mesh>
       )}
-      {/* Glass */}
-      <GlassPane width={width - fw * 2} height={height - fw * 2} depth={0.01} />
+      {/* Glass pane */}
+      <mesh position={[0, 0, 0.002]}>
+        <boxGeometry args={[width - fw * 2, height - fw * 2, 0.008]} />
+        <meshPhysicalMaterial
+          color="#b8cfd8"
+          roughness={0.02}
+          metalness={0.0}
+          transmission={0.92}
+          thickness={0.15}
+          ior={1.5}
+          transparent
+          opacity={0.30}
+          envMapIntensity={1.8}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
     </group>
   );
 }
 
-// Main modular unit mesh
-export function ModularUnit3D({ config }: ModularUnit3DProps) {
-  const groupRef = useRef<THREE.Group>(null);
+// ─── Interior room visible through glass ─────────────────────────────────────
+function Interior({ w, h, d }: { w: number; h: number; d: number }) {
+  const inset = 0.04;
+  const iw = w - inset * 2;
+  const ih = h - inset;
+  const id = d - inset;
 
-  const facadeMat = getFacadeMaterial(config.facade);
-  const roofColor = getRoofColor(config.roofEdge);
-  const woodTex = useWoodTexture(facadeMat.color, facadeMat.woodGrain);
+  return (
+    <group position={[0, -inset / 2, 0]}>
+      {/* Floor - light timber colour */}
+      <mesh position={[0, -ih / 2 + 0.01, 0]} receiveShadow>
+        <boxGeometry args={[iw, 0.018, id]} />
+        <meshStandardMaterial color="#c8a97e" roughness={0.65} metalness={0.0} />
+      </mesh>
 
-  // Dimensions based on model
+      {/* Ceiling */}
+      <mesh position={[0, ih / 2, 0]}>
+        <boxGeometry args={[iw, 0.015, id]} />
+        <meshStandardMaterial color="#f0eeeb" roughness={0.9} metalness={0.0} />
+      </mesh>
+
+      {/* Back wall */}
+      <mesh position={[0, 0, -id / 2 + 0.015]}>
+        <boxGeometry args={[iw, ih, 0.02]} />
+        <meshStandardMaterial color="#ebe9e4" roughness={0.92} metalness={0.0} />
+      </mesh>
+
+      {/* Left wall */}
+      <mesh position={[-iw / 2 + 0.015, 0, 0]}>
+        <boxGeometry args={[0.02, ih, id]} />
+        <meshStandardMaterial color="#e8e6e1" roughness={0.92} metalness={0.0} />
+      </mesh>
+
+      {/* Right wall */}
+      <mesh position={[iw / 2 - 0.015, 0, 0]}>
+        <boxGeometry args={[0.02, ih, id]} />
+        <meshStandardMaterial color="#e8e6e1" roughness={0.92} metalness={0.0} />
+      </mesh>
+
+      {/* Sofa silhouette */}
+      <group position={[iw * 0.05, -ih / 2 + 0.01, -id * 0.28]}>
+        {/* Seat */}
+        <mesh position={[0, 0.22, 0]} castShadow>
+          <boxGeometry args={[iw * 0.52, 0.18, id * 0.30]} />
+          <meshStandardMaterial color="#b8afa5" roughness={0.85} metalness={0.0} />
+        </mesh>
+        {/* Back cushion */}
+        <mesh position={[0, 0.46, -id * 0.13]} castShadow>
+          <boxGeometry args={[iw * 0.52, 0.34, 0.12]} />
+          <meshStandardMaterial color="#b0a79d" roughness={0.85} metalness={0.0} />
+        </mesh>
+        {/* Left arm */}
+        <mesh position={[-iw * 0.27, 0.32, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.22, id * 0.30]} />
+          <meshStandardMaterial color="#a89f95" roughness={0.85} metalness={0.0} />
+        </mesh>
+        {/* Right arm */}
+        <mesh position={[iw * 0.27, 0.32, 0]} castShadow>
+          <boxGeometry args={[0.08, 0.22, id * 0.30]} />
+          <meshStandardMaterial color="#a89f95" roughness={0.85} metalness={0.0} />
+        </mesh>
+      </group>
+
+      {/* Coffee table */}
+      <group position={[iw * 0.05, -ih / 2 + 0.01, id * 0.08]}>
+        <mesh position={[0, 0.22, 0]} castShadow>
+          <boxGeometry args={[iw * 0.22, 0.04, id * 0.12]} />
+          <meshStandardMaterial color="#8a7560" roughness={0.6} metalness={0.05} />
+        </mesh>
+        {/* Legs */}
+        {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([lx, lz], i) => (
+          <mesh key={i} position={[lx * iw * 0.09, 0.12, lz * id * 0.045]} castShadow>
+            <boxGeometry args={[0.025, 0.24, 0.025]} />
+            <meshStandardMaterial color="#5a4a38" roughness={0.5} metalness={0.1} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Warm interior point light */}
+      <pointLight position={[0, ih * 0.38, -id * 0.1]} intensity={1.2} color="#fff3e0" distance={8} decay={2} />
+      {/* Ceiling strip light */}
+      <pointLight position={[0, ih * 0.44, id * 0.2]} intensity={0.6} color="#fffaf0" distance={6} decay={2} />
+    </group>
+  );
+}
+
+// ─── Front face wall segments (with cutouts for windows) ─────────────────────
+function FrontWallWithOpenings({
+  w, h,
+  posZ,
+  openings,
+  baseColor, roughness, metalness, isWood,
+}: {
+  w: number; h: number; posZ: number;
+  openings: { x: number; width: number; height: number; y: number }[];
+  baseColor: string; roughness: number; metalness: number; isWood: boolean;
+}) {
+  // Sort openings by x
+  const sorted = [...openings].sort((a, b) => a.x - b.x);
+
+  // Build vertical wall segments between/around window openings
+  const segments: { x: number; width: number; y: number; height: number }[] = [];
+
+  // Above all openings (full width top band)
+  const maxTop = Math.max(...sorted.map(o => o.y + o.height / 2));
+  const topBandH = h / 2 - maxTop;
+  if (topBandH > 0.01) {
+    segments.push({ x: 0, width: w, y: maxTop + topBandH / 2, height: topBandH });
+  }
+
+  // Below all openings (sill band)
+  const minBottom = Math.min(...sorted.map(o => o.y - o.height / 2));
+  const bottomBandH = minBottom + h / 2;
+  if (bottomBandH > 0.01) {
+    segments.push({ x: 0, width: w, y: -h / 2 + bottomBandH / 2, height: bottomBandH });
+  }
+
+  // Vertical segments beside/between openings (at the opening height band)
+  let cursor = -w / 2;
+  for (let i = 0; i <= sorted.length; i++) {
+    const nextEdge = i < sorted.length ? sorted[i].x - sorted[i].width / 2 : w / 2;
+    const segW = nextEdge - cursor;
+    if (segW > 0.01) {
+      const midY = (maxTop + minBottom) / 2;
+      const midH = maxTop - minBottom;
+      segments.push({ x: cursor + segW / 2, width: segW, y: midY, height: midH });
+    }
+    if (i < sorted.length) cursor = sorted[i].x + sorted[i].width / 2;
+  }
+
+  return (
+    <group position={[0, 0, posZ]}>
+      {segments.map((seg, i) => (
+        <PlankWall
+          key={i}
+          width={seg.width}
+          height={seg.height}
+          posX={seg.x}
+          posY={seg.y}
+          posZ={0}
+          baseColor={baseColor}
+          roughness={roughness}
+          metalness={metalness}
+          isWood={isWood}
+        />
+      ))}
+    </group>
+  );
+}
+
+// ─── Main exported 3D unit ────────────────────────────────────────────────────
+export function ModularUnit3D({ config }: { config: ConfigState }) {
+  const fp = getFacadeProps(config.facade);
+  const roofColor = config.roofEdge === "white" ? "#e2e0dc" : "#0e0d0b";
+
   const dims = useMemo(() => {
     switch (config.model) {
-      case "compact":  return { w: 3.6, h: 2.7, d: 2.4 };
-      case "standard": return { w: 6.0, h: 2.7, d: 2.9 };
-      case "large":    return { w: 8.4, h: 2.7, d: 3.2 };
+      case "compact":  return { w: 3.8, h: 2.75, d: 2.5 };
+      case "standard": return { w: 6.2, h: 2.75, d: 3.0 };
+      case "large":    return { w: 8.6, h: 2.75, d: 3.3 };
     }
   }, [config.model]);
 
   const { w, h, d } = dims;
+  const frameColor = fp.color === "#ededea" ? "#222222" : "#080807";
 
-  // Window layout based on windowType
-  const windows = useMemo(() => {
-    const list: { wx: number; wh: number; px: number; py: number; sliding?: boolean }[] = [];
-    const frameY = 0.0; // center height
+  // Window/door openings on the front face
+  const openings = useMemo(() => {
+    const doorH = h * 0.78;
+    const winH = h * (config.windowType === "panoramic" ? 0.82 : config.windowType === "minimal" ? 0.58 : 0.74);
+    const winW = w * (config.windowType === "panoramic" ? 0.50 : config.windowType === "minimal" ? 0.28 : 0.42);
+    const doorW = config.windowType === "minimal" ? 0.82 : 0.96;
+    const doorX = -w * 0.28;
+    const winX  = w * 0.10;
 
-    if (config.windowType === "standard") {
-      // Door left + single window right
-      list.push({ wx: 0.95, wh: h * 0.72, px: -w * 0.28, py: frameY, sliding: false });
-      list.push({ wx: w * 0.38, wh: h * 0.72, px: w * 0.18, py: frameY, sliding: true });
-    } else if (config.windowType === "panoramic") {
-      // Full-width panoramic
-      list.push({ wx: 0.85, wh: h * 0.78, px: -w * 0.32, py: frameY, sliding: false });
-      list.push({ wx: w * 0.52, wh: h * 0.78, px: w * 0.08, py: frameY, sliding: true });
-    } else {
-      // Minimal - smaller, more negative space
-      list.push({ wx: 0.80, wh: h * 0.60, px: -w * 0.20, py: frameY, sliding: false });
-      list.push({ wx: w * 0.28, wh: h * 0.60, px: w * 0.22, py: frameY, sliding: true });
-    }
-    return list;
+    return [
+      { x: doorX, width: doorW, height: doorH, y: 0 },
+      { x: winX,  width: winW,  height: winH,  y: 0, hasDivider: true },
+    ];
   }, [config.windowType, w, h]);
 
   const scaleX = config.mirrorPlan ? -1 : 1;
-
-  // Frame color based on facade
-  const frameColor = facadeMat.color === "#f0eeec" ? "#2a2a2a" : "#0a0a0a";
+  const shellThick = 0.14; // wall thickness
 
   return (
-    <group ref={groupRef} scale={[scaleX, 1, 1]}>
-      {/* Base / foundation plate */}
-      <mesh position={[0, -h / 2 - 0.06, 0]}>
-        <boxGeometry args={[w + 0.12, 0.12, d + 0.12]} />
-        <meshStandardMaterial color={roofColor} roughness={0.5} metalness={0.3} />
-      </mesh>
+    <group scale={[scaleX, 1, 1]}>
 
-      {/* Main body – back/sides/top solid */}
-      <mesh position={[0, 0, 0]}>
-        <boxGeometry args={[w, h, d]} />
-        <meshStandardMaterial
-          color={facadeMat.color}
-          roughness={facadeMat.roughness}
-          metalness={facadeMat.metalness}
-          map={woodTex}
-        />
-      </mesh>
+      {/* ── Interior (rendered first so glass is see-through) ── */}
+      <Interior w={w - shellThick * 2} h={h - shellThick} d={d - shellThick} />
 
-      {/* Front face cladding strips */}
-      <CladdingStrips
-        width={w}
-        height={h}
-        depth={d}
-        color={facadeMat.color}
-        roughness={facadeMat.roughness}
-        metalness={facadeMat.metalness}
-        texture={woodTex}
+      {/* ── Exterior shell – 5 solid faces (no front) ── */}
+      {/* Back wall */}
+      <group position={[0, 0, -d / 2 + shellThick / 2]}>
+        <PlankWall width={w} height={h} posZ={0} baseColor={fp.color} roughness={fp.roughness} metalness={fp.metalness} isWood={fp.isWood} />
+      </group>
+
+      {/* Left wall */}
+      <PlankWall
+        width={d} height={h}
+        posX={-w / 2 + shellThick / 2} posZ={0}
+        rotY={Math.PI / 2}
+        baseColor={fp.color} roughness={fp.roughness} metalness={fp.metalness} isWood={fp.isWood}
       />
 
-      {/* Right side cladding strips (rotated) */}
-      <group rotation={[0, -Math.PI / 2, 0]} position={[w / 2, 0, 0]}>
-        <CladdingStrips
-          width={d}
-          height={h}
-          depth={0}
-          color={facadeMat.color}
-          roughness={facadeMat.roughness}
-          metalness={facadeMat.metalness}
-          texture={woodTex}
-        />
-      </group>
+      {/* Right wall */}
+      <PlankWall
+        width={d} height={h}
+        posX={w / 2 - shellThick / 2} posZ={0}
+        rotY={-Math.PI / 2}
+        baseColor={fp.color} roughness={fp.roughness} metalness={fp.metalness} isWood={fp.isWood}
+      />
 
-      {/* Left side cladding strips */}
-      <group rotation={[0, Math.PI / 2, 0]} position={[-w / 2, 0, 0]}>
-        <CladdingStrips
-          width={d}
-          height={h}
-          depth={0}
-          color={facadeMat.color}
-          roughness={facadeMat.roughness}
-          metalness={facadeMat.metalness}
-          texture={woodTex}
-        />
-      </group>
-
-      {/* Roof trim edge (thin strip on top front) */}
-      <mesh position={[0, h / 2 + 0.035, d / 2 - 0.01]}>
-        <boxGeometry args={[w + 0.06, 0.07, 0.06]} />
-        <meshStandardMaterial color={roofColor} roughness={0.4} metalness={0.4} />
-      </mesh>
-      {/* Roof trim full */}
-      <mesh position={[0, h / 2 + 0.035, 0]}>
-        <boxGeometry args={[w + 0.06, 0.07, d + 0.06]} />
-        <meshStandardMaterial color={roofColor} roughness={0.4} metalness={0.4} />
+      {/* Ceiling */}
+      <mesh position={[0, h / 2 - shellThick / 2, 0]}>
+        <boxGeometry args={[w, shellThick, d]} />
+        <meshStandardMaterial color={fp.color} roughness={fp.roughness} metalness={fp.metalness} />
       </mesh>
 
-      {/* Windows on front face */}
-      {windows.map((win, i) => (
-        <Window
+      {/* Floor slab */}
+      <mesh position={[0, -h / 2 + shellThick / 2 - 0.02, 0]} receiveShadow>
+        <boxGeometry args={[w + 0.06, shellThick + 0.04, d + 0.06]} />
+        <meshStandardMaterial color={roofColor} roughness={0.5} metalness={0.35} />
+      </mesh>
+
+      {/* ── Front face – wall segments around windows ── */}
+      <FrontWallWithOpenings
+        w={w} h={h}
+        posZ={d / 2 - shellThick / 2}
+        openings={openings}
+        baseColor={fp.color} roughness={fp.roughness} metalness={fp.metalness} isWood={fp.isWood}
+      />
+
+      {/* ── Glazing units ── */}
+      {openings.map((o, i) => (
+        <GlazingUnit
           key={i}
-          width={win.wx}
-          height={win.wh}
-          posX={win.px}
-          posY={win.py}
-          posZ={d / 2 + 0.01}
+          width={o.width} height={o.height}
+          posX={o.x} posY={o.y} posZ={d / 2}
           frameColor={frameColor}
-          isSlidingDoor={win.sliding}
+          hasDivider={(o as any).hasDivider}
         />
       ))}
 
-      {/* Interior glow behind windows (warm light) */}
-      <mesh position={[0, 0, d / 2 - 0.15]}>
-        <boxGeometry args={[w * 0.85, h * 0.85, 0.01]} />
-        <meshStandardMaterial
-          color="#e8ddd0"
-          roughness={1}
-          metalness={0}
-          emissive="#c8b89a"
-          emissiveIntensity={0.35}
-        />
+      {/* ── Roof trim edge ── */}
+      <mesh position={[0, h / 2 + 0.04, 0]}>
+        <boxGeometry args={[w + 0.08, 0.08, d + 0.08]} />
+        <meshStandardMaterial color={roofColor} roughness={0.38} metalness={0.45} />
       </mesh>
     </group>
   );

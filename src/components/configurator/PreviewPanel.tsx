@@ -13,20 +13,22 @@ function SceneContent({ config }: { config: ConfigState }) {
   return (
     <>
       {/* Lighting */}
-      <ambientLight intensity={0.6} />
+      <ambientLight intensity={0.45} color="#f0ece8" />
       <directionalLight
-        position={[6, 8, 5]}
-        intensity={1.8}
+        position={[7, 9, 6]}
+        intensity={2.2}
         castShadow
         shadow-mapSize={[2048, 2048]}
-        shadow-camera-far={30}
-        shadow-camera-left={-10}
-        shadow-camera-right={10}
+        shadow-camera-far={35}
+        shadow-camera-left={-12}
+        shadow-camera-right={12}
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      <directionalLight position={[-4, 4, -3]} intensity={0.5} />
-      <pointLight position={[0, 3, 6]} intensity={0.4} color="#fff5e0" />
+      {/* Fill light from left */}
+      <directionalLight position={[-5, 3, 4]} intensity={0.6} color="#e8f0f8" />
+      {/* Bounce from ground */}
+      <directionalLight position={[0, -3, 3]} intensity={0.25} color="#f5f0ea" />
 
       {/* Environment for reflections */}
       <Environment preset="city" />
@@ -105,7 +107,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         <Canvas
           shadows
           camera={{ position: [7, 3.5, 7], fov: 38 }}
-          gl={{ antialias: true, toneMapping: 3 /* ACESFilmicToneMapping */ }}
+          gl={{ antialias: true, toneMapping: 4 /* ReinhardToneMapping */, toneMappingExposure: 1.1 }}
           style={{ width: "100%", height: "100%" }}
         >
           <SceneContent config={config} />
