@@ -2,14 +2,20 @@ import { useState, useCallback, useMemo } from "react";
 
 export interface ConfigState {
   // Step 1
-  model: "compact" | "standard" | "large";
-  layout: "office" | "studio" | "living";
-  // Step 2
-  facade: "thermowood-black" | "thermowood-natural" | "composite-white" | "composite-black" | "aluminium-anthracite" | "aluminium-bronze";
-  roofEdge: "black" | "white";
+  model: "start" | "flow" | "hub" | "base";
   roundedCorners: boolean;
+  // Step 2
+  facade:
+    | "thermowood-black"
+    | "thermowood-natural"
+    | "composite-white"
+    | "composite-black"
+    | "aluminium-anthracite"
+    | "aluminium-bronze"
+    | "aluminium-white"
+    | "brick-grey";
   // Step 3
-  windowType: "standard" | "panoramic" | "minimal";
+  floorPlan: "a" | "b";
   tiltTurnWindow: boolean;
   mirrorPlan: boolean;
   // Step 4
@@ -36,12 +42,10 @@ export interface ConfigState {
 }
 
 const defaultConfig: ConfigState = {
-  model: "standard",
-  layout: "office",
-  facade: "thermowood-black",
-  roofEdge: "black",
+  model: "flow",
   roundedCorners: false,
-  windowType: "standard",
+  facade: "thermowood-black",
+  floorPlan: "a",
   tiltTurnWindow: false,
   mirrorPlan: false,
   finishLevel: "shell",
@@ -64,20 +68,21 @@ const defaultConfig: ConfigState = {
 
 const STEP_LABELS = [
   "Unit",
-  "Exterior",
-  "Windows",
-  "Interior",
-  "Lighting",
-  "Extras",
+  "Exterieur",
+  "Ramen",
+  "Interieur",
+  "Verlichting",
+  "Extra's",
   "Transport",
   "Contact",
 ] as const;
 
-// Mock pricing
+// Pricing
 const basePrices: Record<string, number> = {
-  compact: 29500,
-  standard: 42000,
-  large: 58500,
+  start: 29500,
+  flow: 42000,
+  hub: 58500,
+  base: 79000,
 };
 
 const facadePrices: Record<string, number> = {
@@ -87,6 +92,8 @@ const facadePrices: Record<string, number> = {
   "composite-black": 1200,
   "aluminium-anthracite": 2400,
   "aluminium-bronze": 2800,
+  "aluminium-white": 2400,
+  "brick-grey": 3200,
 };
 
 const finishPrices: Record<string, number> = {
@@ -95,19 +102,19 @@ const finishPrices: Record<string, number> = {
   "fully-finished": 16500,
 };
 
+/** Roof is auto-derived: white facades → white roof, else black */
+export function getRoofColor(facade: ConfigState["facade"]) {
+  return facade === "composite-white" || facade === "aluminium-white"
+    ? "#e0deda"
+    : "#0e0d0b";
+}
+
 export function useConfigurator() {
   const [currentStep, setCurrentStep] = useState(0);
   const [config, setConfig] = useState<ConfigState>(defaultConfig);
 
   const updateConfig = useCallback(<K extends keyof ConfigState>(key: K, value: ConfigState[K]) => {
-    setConfig((prev) => {
-      const next = { ...prev, [key]: value };
-      // Auto-rule: white facade → white roof edge
-      if (key === "facade" && value === "composite-white") {
-        next.roofEdge = "white";
-      }
-      return next;
-    });
+    setConfig((prev) => ({ ...prev, [key]: value }));
   }, []);
 
   const updateContact = useCallback((field: keyof ConfigState["contact"], value: string) => {
@@ -122,15 +129,12 @@ export function useConfigurator() {
     price += facadePrices[config.facade] ?? 0;
     price += finishPrices[config.finishLevel] ?? 0;
     if (config.roundedCorners) price += 1500;
-    if (config.windowType === "panoramic") price += 2200;
-    if (config.windowType === "minimal") price += 1600;
     if (config.tiltTurnWindow) price += 450;
     if (config.lightingPackage === "full") price += 1800;
     if (config.awning) price += 2400;
     if (config.solarPanels) price += 4800;
     if (config.batterySystem) price += 3200;
     if (config.foundation) price += 3500;
-    // Transport: €8/km
     price += config.transportDistance * 8;
     return price;
   }, [config]);

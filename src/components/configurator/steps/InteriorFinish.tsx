@@ -8,23 +8,23 @@ interface Props {
 }
 
 const finishLevels = [
-  { id: "shell" as const, label: "Shell", desc: "OSB ready · DIY finishing", price: "included" },
-  { id: "finished" as const, label: "Finished", desc: "Walls & floor done, no furniture", price: "+€8.500" },
-  { id: "fully-finished" as const, label: "Fully finished", desc: "Including desk & cabinets", price: "+€16.500" },
+  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten (toestellen en stoelen niet inbegrepen)", price: "+€16.500" },
 ];
 
 const floorOptions = [
-  { id: "light-vinyl" as const, label: "Light click vinyl", color: "hsl(40,20%,85%)" },
-  { id: "dark-vinyl" as const, label: "Dark click vinyl", color: "hsl(25,15%,35%)" },
-  { id: "stone-vinyl" as const, label: "Stone look vinyl", color: "hsl(30,5%,65%)" },
+  { id: "light-vinyl" as const, label: "Licht hout", color: "hsl(40,20%,85%)" },
+  { id: "dark-vinyl" as const, label: "Donker hout", color: "hsl(25,15%,35%)" },
+  { id: "stone-vinyl" as const, label: "Steenlook", color: "hsl(30,5%,65%)" },
 ];
 
 export function InteriorFinish({ config, updateConfig }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <div>
-        <h3 className="text-lg font-display font-semibold mb-1">Interior finish</h3>
-        <p className="text-sm text-muted-foreground mb-4">Select your finish level and flooring</p>
+        <h3 className="text-lg font-display font-semibold mb-1">Interieur & afwerking</h3>
+        <p className="text-sm text-muted-foreground mb-4">Kies je afwerkingsniveau en vloer</p>
         <div className="grid gap-3">
           {finishLevels.map((f) => (
             <button
@@ -37,7 +37,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
                   <p className="font-medium">{f.label}</p>
                   <p className="text-sm text-muted-foreground">{f.desc}</p>
                 </div>
-                <p className="text-sm font-medium">{f.price}</p>
+                <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
               </div>
             </button>
           ))}
@@ -45,7 +45,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
       </div>
 
       <div className="mt-6">
-        <p className="config-label mb-3">Floor material</p>
+        <p className="config-label mb-3">Vloerkeuze (Clickvinyl)</p>
         <div className="grid grid-cols-3 gap-3">
           {floorOptions.map((f) => (
             <button
