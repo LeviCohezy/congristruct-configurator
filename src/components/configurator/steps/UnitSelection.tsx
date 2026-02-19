@@ -62,6 +62,34 @@ export function UnitSelection({ config, updateConfig }: Props) {
           ))}
         </div>
       </div>
+
+      <div className="mt-6">
+        <p className="config-label mb-3">Corner style</p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => updateConfig("roundedCorners", false)}
+            className={cn("option-card text-center py-5", !config.roundedCorners && "option-card-active")}
+          >
+            {/* Straight corner icon */}
+            <svg className="mx-auto mb-2" width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect x="6" y="6" width="24" height="24" rx="0" stroke="currentColor" strokeWidth="2.2" fill="none"/>
+            </svg>
+            <p className="font-medium text-sm">Straight</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Sharp angular corners</p>
+          </button>
+          <button
+            onClick={() => updateConfig("roundedCorners", true)}
+            className={cn("option-card text-center py-5", config.roundedCorners && "option-card-active")}
+          >
+            {/* Rounded corner icon */}
+            <svg className="mx-auto mb-2" width="36" height="36" viewBox="0 0 36 36" fill="none">
+              <rect x="6" y="6" width="24" height="24" rx="7" stroke="currentColor" strokeWidth="2.2" fill="none"/>
+            </svg>
+            <p className="font-medium text-sm">Rounded</p>
+            <p className="text-[11px] text-muted-foreground mt-1">Soft curved corners</p>
+          </button>
+        </div>
+      </div>
     </motion.div>
   );
 }
