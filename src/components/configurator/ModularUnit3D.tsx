@@ -65,28 +65,6 @@ function roundedRect(w: number, d: number, r: number) {
 }
 
 
-// ─── Corner piece – solid filled quarter-cylinder ─────────────────────────────
-function CornerPiece({
-  posX, posZ, startAngle, endAngle,
-  radius, height, posY, mat,
-}: {
-  posX: number; posZ: number; startAngle: number; endAngle: number;
-  radius: number; height: number; posY: number;
-  mat: JSX.IntrinsicElements["meshStandardMaterial"];
-}) {
-  // Build shape inline (no hooks – this is a pure mesh component)
-  const shape = new THREE.Shape();
-  shape.moveTo(0, 0);
-  shape.absarc(0, 0, radius, startAngle, endAngle, false);
-  shape.lineTo(0, 0);
-
-  return (
-    <mesh position={[posX, posY, posZ]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
-      <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
-      <meshStandardMaterial {...mat} />
-    </mesh>
-  );
-}
 
 
 // ─── Main unit ────────────────────────────────────────────────────────────────
@@ -141,6 +119,26 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     () => (cornerRadius > 0 ? roundedRect(width, depth, cornerRadius) : null),
     [width, depth, cornerRadius]
   );
+
+  // Corner wedge shapes (pie-slice solid quarter cylinders)
+  const cornerShapes = useMemo(() => {
+    if (cornerRadius <= 0) return null;
+    const make = (start: number, end: number) => {
+      const s = new THREE.Shape();
+      s.moveTo(0, 0);
+      s.absarc(0, 0, cornerRadius, start, end, false);
+      s.lineTo(0, 0);
+      return s;
+    };
+    return [
+      // Rx(+PI/2): shape XY → world XZ; shape Y → world Z; extrudes downward
+      // Angles chosen so each wedge fills the correct world quadrant
+      { shape: make(0,           Math.PI * 0.5), posX:  width/2-cornerRadius, posZ:  depth/2-cornerRadius }, // front-right
+      { shape: make(Math.PI*0.5, Math.PI),       posX: -width/2+cornerRadius, posZ:  depth/2-cornerRadius }, // front-left
+      { shape: make(Math.PI,     Math.PI*1.5),   posX: -width/2+cornerRadius, posZ: -depth/2+cornerRadius }, // back-left
+      { shape: make(Math.PI*1.5, Math.PI*2),     posX:  width/2-cornerRadius, posZ: -depth/2+cornerRadius }, // back-right
+    ];
+  }, [cornerRadius, width, depth]);
 
   const claddingProps = {
     color: fp.color,
@@ -206,15 +204,14 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         <meshStandardMaterial {...claddingProps} />
       </mesh>
 
-      {/* ── Rounded corners ───────────────────────────────────── */}
-      {cornerRadius > 0 && (
-        <>
-          <CornerPiece posX={ width/2-cornerRadius} posZ={ depth/2-cornerRadius} startAngle={0}           endAngle={Math.PI*0.5} radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
-          <CornerPiece posX={-width/2+cornerRadius} posZ={ depth/2-cornerRadius} startAngle={Math.PI*0.5} endAngle={Math.PI}     radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
-          <CornerPiece posX={ width/2-cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI*1.5} endAngle={Math.PI*2}   radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
-          <CornerPiece posX={-width/2+cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI}     endAngle={Math.PI*1.5} radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
-        </>
-      )}
+      {/* ── Rounded corners (solid wedge per corner) ──────────── */}
+      {cornerShapes && cornerShapes.map(({ shape, posX, posZ }, i) => (
+        // Rx(+PI/2): shape XY → XZ plane; extrusion goes from floorThick+height DOWN to floorThick
+        <mesh key={i} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      ))}
 
       {/* ── Interior ceiling ──────────────────────────────────── */}
       <mesh position={[0, height + floorThick - 0.01, 0]}>
