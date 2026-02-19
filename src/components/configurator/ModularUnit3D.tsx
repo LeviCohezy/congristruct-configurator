@@ -175,12 +175,12 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
       {/* ── Roof slab ─────────────────────────────────────────── */}
       {slabShape ? (
-        <mesh position={[0, height, 0]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
+        <mesh position={[0, height + 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
           <extrudeGeometry args={[slabShape, { depth: roofThick, bevelEnabled: false }]} />
           <meshStandardMaterial {...claddingProps} />
         </mesh>
       ) : (
-        <mesh position={[0, height + roofThick / 2, 0]} castShadow>
+        <mesh position={[0, height + roofThick / 2 + 0.003, 0]} castShadow>
           <boxGeometry args={[width, roofThick, depth]} />
           <meshStandardMaterial {...claddingProps} />
         </mesh>
