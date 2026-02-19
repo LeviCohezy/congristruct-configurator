@@ -64,104 +64,6 @@ function roundedRect(w: number, d: number, r: number) {
   return s;
 }
 
-// ─── Furniture ────────────────────────────────────────────────────────────────
-function Chair({ position, rotY = 0 }: { position: [number, number, number]; rotY?: number }) {
-  return (
-    <group position={position} rotation={[0, rotY, 0]}>
-      <mesh position={[0, 0.45, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.05, 0.5]} />
-        <meshStandardMaterial color="#2a2a2a" roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 0.72, -0.22]} castShadow>
-        <boxGeometry args={[0.5, 0.5, 0.05]} />
-        <meshStandardMaterial color="#2a2a2a" roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 0.22, 0]} castShadow>
-        <cylinderGeometry args={[0.04, 0.04, 0.44]} />
-        <meshStandardMaterial color="#888" metalness={0.8} roughness={0.3} />
-      </mesh>
-      <mesh position={[0, 0.02, 0]} castShadow>
-        <cylinderGeometry args={[0.24, 0.24, 0.04]} />
-        <meshStandardMaterial color="#888" metalness={0.8} roughness={0.3} />
-      </mesh>
-    </group>
-  );
-}
-
-function OfficeDesk({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.73, 0]} castShadow>
-        <boxGeometry args={[1.6, 0.04, 0.75]} />
-        <meshStandardMaterial color="#f8f8f8" roughness={0.2} />
-      </mesh>
-      {[[-0.72, -0.3], [0.72, -0.3], [-0.72, 0.3], [0.72, 0.3]].map(([lx, lz], i) => (
-        <mesh key={i} position={[lx, 0.36, lz]} castShadow>
-          <boxGeometry args={[0.04, 0.72, 0.04]} />
-          <meshStandardMaterial color="#111" />
-        </mesh>
-      ))}
-      {/* Monitor */}
-      <mesh position={[0, 0.97, -0.28]} castShadow>
-        <boxGeometry args={[0.58, 0.36, 0.02]} />
-        <meshStandardMaterial color="#111" />
-      </mesh>
-    </group>
-  );
-}
-
-function MeetingTable({ position, w }: { position: [number, number, number]; w: number }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.73, 0]} castShadow>
-        <boxGeometry args={[w, 0.05, 0.95]} />
-        <meshStandardMaterial color="#d9c4a2" roughness={0.5} />
-      </mesh>
-      <mesh position={[0, 0.36, 0]} castShadow>
-        <boxGeometry args={[w * 0.5, 0.72, 0.32]} />
-        <meshStandardMaterial color="#111" />
-      </mesh>
-    </group>
-  );
-}
-
-function Sofa({ position, w }: { position: [number, number, number]; w: number }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.28, 0]} castShadow>
-        <boxGeometry args={[w, 0.22, 0.85]} />
-        <meshStandardMaterial color="#a89f95" roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0.50, -0.36]} castShadow>
-        <boxGeometry args={[w, 0.36, 0.10]} />
-        <meshStandardMaterial color="#a0978d" roughness={0.85} />
-      </mesh>
-      {[-w / 2 + 0.06, w / 2 - 0.06].map((lx, i) => (
-        <mesh key={i} position={[lx, 0.40, 0]} castShadow>
-          <boxGeometry args={[0.10, 0.32, 0.85]} />
-          <meshStandardMaterial color="#98908a" roughness={0.85} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function CoffeeTable({ position }: { position: [number, number, number] }) {
-  return (
-    <group position={position}>
-      <mesh position={[0, 0.36, 0]} castShadow>
-        <boxGeometry args={[0.9, 0.04, 0.45]} />
-        <meshStandardMaterial color="#7a6248" roughness={0.55} />
-      </mesh>
-      {[[-0.38, -0.18], [0.38, -0.18], [-0.38, 0.18], [0.38, 0.18]].map(([lx, lz], i) => (
-        <mesh key={i} position={[lx, 0.18, lz]} castShadow>
-          <boxGeometry args={[0.03, 0.36, 0.03]} />
-          <meshStandardMaterial color="#5a4a38" roughness={0.5} metalness={0.1} />
-        </mesh>
-      ))}
-    </group>
-  );
-}
 
 // ─── Corner arc piece ─────────────────────────────────────────────────────────
 function CornerPiece({
@@ -408,18 +310,6 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         </mesh>
       )}
 
-      {/* ── Furniture ─────────────────────────────────────────── */}
-      <FurnitureLayout
-        layout={config.layout}
-        floorY={floorThick}
-        room1CX={room1CX}
-        room1Width={room1Width}
-        room2StartX={room2StartX}
-        room2Width={room2Width}
-        depth={depth}
-        wallThick={wallThick}
-        roomSplit={roomSplit}
-      />
     </group>
   );
 }
@@ -433,7 +323,6 @@ function GlassPane({
   const fw = 0.036;
   return (
     <group position={[posX, posY, 0]}>
-      {/* Frame bars */}
       {(
         [
           [0,  height / 2 - fw / 2, 0, width, fw, 0.06],
@@ -522,53 +411,6 @@ function Room2Facade({
         <boxGeometry args={[PILLAR_W, height, wallThick]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
-    </>
-  );
-}
-
-// ─── Furniture layout by room type ───────────────────────────────────────────
-function FurnitureLayout({
-  layout, floorY, room1CX, room1Width, room2StartX, room2Width,
-  depth, wallThick, roomSplit,
-}: {
-  layout: ConfigState["layout"]; floorY: number;
-  room1CX: number; room1Width: number;
-  room2StartX: number; room2Width: number;
-  depth: number; wallThick: number; roomSplit: number;
-}) {
-  const midZ = 0;
-  const backZ = -(depth / 2 - wallThick - 0.6);
-
-  if (layout === "studio" || roomSplit === 100) {
-    return (
-      <>
-        <Sofa position={[room1CX - room1Width * 0.1, floorY, backZ + 0.1]} w={room1Width * 0.6} />
-        <CoffeeTable position={[room1CX - room1Width * 0.1, floorY, backZ + 0.9]} />
-      </>
-    );
-  }
-
-  if (layout === "office") {
-    return (
-      <>
-        <OfficeDesk position={[room1CX, floorY, backZ]} />
-        <Chair position={[room1CX, floorY, backZ + 0.65]} rotY={Math.PI} />
-        <MeetingTable position={[room2StartX + room2Width / 2, floorY, midZ]} w={room2Width * 0.7} />
-        <Chair position={[room2StartX + room2Width / 2 - 0.7, floorY, midZ]} rotY={Math.PI / 2} />
-        <Chair position={[room2StartX + room2Width / 2 + 0.7, floorY, midZ]} rotY={-Math.PI / 2} />
-        <Chair position={[room2StartX + room2Width / 2, floorY, midZ - 0.6]} />
-        <Chair position={[room2StartX + room2Width / 2, floorY, midZ + 0.6]} rotY={Math.PI} />
-      </>
-    );
-  }
-
-  // living
-  return (
-    <>
-      <Sofa position={[room1CX, floorY, backZ + 0.1]} w={room1Width * 0.72} />
-      <CoffeeTable position={[room1CX, floorY, backZ + 0.95]} />
-      <OfficeDesk position={[room2StartX + room2Width / 2, floorY, backZ]} />
-      <Chair position={[room2StartX + room2Width / 2, floorY, backZ + 0.65]} rotY={Math.PI} />
     </>
   );
 }
