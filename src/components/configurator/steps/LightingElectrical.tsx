@@ -11,16 +11,16 @@ interface Props {
 const packages = [
   {
     id: "base" as const,
-    label: "Base package",
+    label: "Verlichtingspunten",
     icon: Zap,
-    desc: "3 lighting points · prepared cable connections",
-    price: "included",
+    desc: "Enkel de aansluitpunten voorzien (kabels klaar voor montage)",
+    price: "inbegrepen",
   },
   {
     id: "full" as const,
-    label: "Full lighting",
+    label: "Verlichtingspakket",
     icon: Lightbulb,
-    desc: "Complete LED package · dimming · matched to your unit",
+    desc: "Een compleet pakket afgestemd op jouw BLOQ-model",
     price: "+€1.800",
   },
 ];
@@ -28,8 +28,8 @@ const packages = [
 export function LightingElectrical({ config, updateConfig }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Lighting & electrical</h3>
-      <p className="text-sm text-muted-foreground mb-4">Choose your lighting setup</p>
+      <h3 className="text-lg font-display font-semibold mb-1">Verlichting</h3>
+      <p className="text-sm text-muted-foreground mb-4">Kies je verlichtingsopstelling</p>
       <div className="grid gap-3">
         {packages.map((p) => (
           <button

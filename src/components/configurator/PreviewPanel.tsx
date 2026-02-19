@@ -1,4 +1,4 @@
-import { Suspense, useRef } from "react";
+import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { ModularUnit3D } from "./ModularUnit3D";
@@ -12,7 +12,6 @@ interface PreviewPanelProps {
 function SceneContent({ config }: { config: ConfigState }) {
   return (
     <>
-      {/* Lighting */}
       <ambientLight intensity={0.45} color="#f0ece8" />
       <directionalLight
         position={[7, 9, 6]}
@@ -25,28 +24,11 @@ function SceneContent({ config }: { config: ConfigState }) {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      {/* Fill light from left */}
       <directionalLight position={[-5, 3, 4]} intensity={0.6} color="#e8f0f8" />
-      {/* Bounce from ground */}
       <directionalLight position={[0, -3, 3]} intensity={0.25} color="#f5f0ea" />
-
-      {/* Environment for reflections */}
       <Environment preset="city" />
-
-      {/* The unit */}
       <ModularUnit3D config={config} />
-
-      {/* Ground shadow */}
-      <ContactShadows
-        position={[0, -1.41, 0]}
-        opacity={0.35}
-        scale={20}
-        blur={2.5}
-        far={4}
-        color="#000000"
-      />
-
-      {/* Ground plane */}
+      <ContactShadows position={[0, -1.41, 0]} opacity={0.35} scale={20} blur={2.5} far={4} color="#000000" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.42, 0]} receiveShadow>
         <planeGeometry args={[40, 40]} />
         <meshStandardMaterial color="#f4f2ef" roughness={1} metalness={0} />
@@ -66,20 +48,20 @@ function LoadingFallback() {
   );
 }
 
-export function PreviewPanel({ config }: PreviewPanelProps) {
-  const modelLabel =
-    config.model === "compact"
-      ? "Compact · 15m²"
-      : config.model === "standard"
-      ? "Standard · 25m²"
-      : "Large · 40m²";
+const modelLabels: Record<ConfigState["model"], string> = {
+  start: "BLOQ START · 14m²",
+  flow: "BLOQ FLOW · 21–28m²",
+  hub: "BLOQ HUB · 35m²",
+  base: "BLOQ BASE · 50m²",
+};
 
+export function PreviewPanel({ config }: PreviewPanelProps) {
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
-      {/* Floating model badge */}
+      {/* Model badge */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 pointer-events-none">
         <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm border border-border text-xs font-medium text-foreground">
-          {modelLabel}
+          {modelLabels[config.model]}
         </span>
       </div>
 
@@ -87,7 +69,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
       {config.mirrorPlan && (
         <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 pointer-events-none">
           <span className="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
-            Mirrored
+            Gespiegeld
           </span>
         </div>
       )}
@@ -98,7 +80,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
           </svg>
-          Drag to rotate · Scroll to zoom
+          Sleep om te draaien · Scroll om te zoomen
         </span>
       </div>
 
@@ -107,7 +89,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         <Canvas
           shadows
           camera={{ position: [7, 3.5, 7], fov: 38 }}
-          gl={{ antialias: true, toneMapping: 4 /* ReinhardToneMapping */, toneMappingExposure: 1.1 }}
+          gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1.1 }}
           style={{ width: "100%", height: "100%" }}
         >
           <SceneContent config={config} />
@@ -126,7 +108,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
       {/* Config chips */}
       <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2 justify-center pointer-events-none">
         <Chip label={config.facade.replace(/-/g, " ")} />
-        <Chip label={config.windowType + " windows"} />
+        <Chip label={config.floorPlan === "a" ? "Plan A" : "Plan B"} />
         <Chip label={config.finishLevel.replace(/-/g, " ")} />
       </div>
     </div>
