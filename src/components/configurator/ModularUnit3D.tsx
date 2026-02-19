@@ -65,29 +65,29 @@ function roundedRect(w: number, d: number, r: number) {
 }
 
 
-// ─── Corner arc piece ─────────────────────────────────────────────────────────
+// ─── Corner piece – solid filled quarter-cylinder ─────────────────────────────
 function CornerPiece({
   posX, posZ, startAngle, endAngle,
-  radius, wallThickness, height, mat,
+  radius, height, posY, mat,
 }: {
   posX: number; posZ: number; startAngle: number; endAngle: number;
-  radius: number; wallThickness: number; height: number;
+  radius: number; height: number; posY: number;
   mat: JSX.IntrinsicElements["meshStandardMaterial"];
 }) {
-  const shape = useMemo(() => {
-    const s = new THREE.Shape();
-    s.absarc(0, 0, radius, startAngle, endAngle);
-    s.absarc(0, 0, radius - wallThickness, endAngle, startAngle, true);
-    return s;
-  }, [radius, wallThickness, startAngle, endAngle]);
+  // Build shape inline (no hooks – this is a pure mesh component)
+  const shape = new THREE.Shape();
+  shape.moveTo(0, 0);
+  shape.absarc(0, 0, radius, startAngle, endAngle, false);
+  shape.lineTo(0, 0);
 
   return (
-    <mesh position={[posX, 0, posZ]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
+    <mesh position={[posX, posY, posZ]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
       <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
       <meshStandardMaterial {...mat} />
     </mesh>
   );
 }
+
 
 // ─── Main unit ────────────────────────────────────────────────────────────────
 export function ModularUnit3D({ config }: { config: ConfigState }) {
@@ -209,10 +209,10 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {/* ── Rounded corners ───────────────────────────────────── */}
       {cornerRadius > 0 && (
         <>
-          <CornerPiece posX={ width/2-cornerRadius} posZ={ depth/2-cornerRadius} startAngle={0}          endAngle={Math.PI*0.5} radius={cornerRadius} wallThickness={wallThick} height={height} mat={claddingProps} />
-          <CornerPiece posX={-width/2+cornerRadius} posZ={ depth/2-cornerRadius} startAngle={Math.PI*0.5} endAngle={Math.PI}     radius={cornerRadius} wallThickness={wallThick} height={height} mat={claddingProps} />
-          <CornerPiece posX={ width/2-cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI*1.5} endAngle={Math.PI*2}   radius={cornerRadius} wallThickness={wallThick} height={height} mat={claddingProps} />
-          <CornerPiece posX={-width/2+cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI}    endAngle={Math.PI*1.5} radius={cornerRadius} wallThickness={wallThick} height={height} mat={claddingProps} />
+          <CornerPiece posX={ width/2-cornerRadius} posZ={ depth/2-cornerRadius} startAngle={0}           endAngle={Math.PI*0.5} radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
+          <CornerPiece posX={-width/2+cornerRadius} posZ={ depth/2-cornerRadius} startAngle={Math.PI*0.5} endAngle={Math.PI}     radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
+          <CornerPiece posX={ width/2-cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI*1.5} endAngle={Math.PI*2}   radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
+          <CornerPiece posX={-width/2+cornerRadius} posZ={-depth/2+cornerRadius} startAngle={Math.PI}     endAngle={Math.PI*1.5} radius={cornerRadius} height={height} posY={floorThick} mat={claddingProps} />
         </>
       )}
 
