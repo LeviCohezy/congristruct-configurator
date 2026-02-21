@@ -591,7 +591,7 @@ function StartWalls({
               const screenH = 0.34;
               const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
               // Rotate ~45° so screen faces the office chair (diagonally toward -X, -Z)
-              const rot: [number, number, number] = [0, Math.PI * 0.25, 0];
+              const rot: [number, number, number] = [0, -Math.PI * 0.25, 0];
               return (
                 <group position={[monX, 0, monZ]} rotation={rot}>
                   {/* Stand foot */}
