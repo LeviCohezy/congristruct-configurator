@@ -539,6 +539,136 @@ function StartWalls({
         );
       })()}
 
+      {/* ── Office furniture: desk, chairs, monitor ── */}
+      {(() => {
+        // Room usable center (shelf on left wall takes ~0.45m)
+        const deskX = 0.15;
+        const deskZ = 0.0;
+        const deskW = 1.60;  // width along X
+        const deskDp = 0.80; // depth along Z
+        const deskH = 0.75;
+        const legT = 0.05;
+        const topT = 0.035;
+        const white = { color: "#f0f0ee", roughness: 0.35, metalness: 0.05 };
+        const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
+        const fabric = { color: "#1e1e1e", roughness: 0.85, metalness: 0.0 };
+        const chairGrey = { color: "#4a4a4a", roughness: 0.7, metalness: 0.1 };
+
+        // Office chair behind desk (toward back wall, -Z)
+        const chairZ = deskZ - deskDp / 2 - 0.45;
+        // 2 visitor chairs in front of desk (+Z)
+        const visitorZ = deskZ + deskDp / 2 + 0.50;
+
+        return (
+          <group>
+            {/* ── White Desk ── */}
+            {/* Tabletop */}
+            <mesh position={[deskX, deskH + floorThick, deskZ]} castShadow>
+              <boxGeometry args={[deskW, topT, deskDp]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            {/* 4 legs */}
+            {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
+              <mesh key={`dleg${i}`} position={[deskX + sx * (deskW / 2 - 0.06), deskH / 2 + floorThick, deskZ + sz * (deskDp / 2 - 0.06)]}>
+                <boxGeometry args={[legT, deskH, legT]} />
+                <meshStandardMaterial {...white} />
+              </mesh>
+            ))}
+            {/* Modesty panel (back side) */}
+            <mesh position={[deskX, deskH * 0.45 + floorThick, deskZ - deskDp / 2 + 0.02]}>
+              <boxGeometry args={[deskW - 0.15, deskH * 0.55, 0.02]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+
+            {/* ── Monitor on right corner ── */}
+            {(() => {
+              const monX = deskX + deskW / 2 - 0.30;
+              const monZ = deskZ - deskDp / 2 + 0.25;
+              const screenW = 0.58;
+              const screenH = 0.34;
+              return (
+                <group>
+                  {/* Stand base */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.01 + floorThick, monZ]}>
+                    <boxGeometry args={[0.22, 0.02, 0.18]} />
+                    <meshStandardMaterial {...darkMetal} />
+                  </mesh>
+                  {/* Stand neck */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.14 + floorThick, monZ - 0.04]}>
+                    <boxGeometry args={[0.04, 0.24, 0.04]} />
+                    <meshStandardMaterial {...darkMetal} />
+                  </mesh>
+                  {/* Screen */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.28 + screenH / 2 + floorThick, monZ - 0.06]}>
+                    <boxGeometry args={[screenW, screenH, 0.025]} />
+                    <meshStandardMaterial color="#111111" roughness={0.3} metalness={0.2} />
+                  </mesh>
+                  {/* Screen face (slightly lighter) */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.28 + screenH / 2 + floorThick, monZ - 0.06 + 0.014]}>
+                    <boxGeometry args={[screenW - 0.04, screenH - 0.03, 0.002]} />
+                    <meshStandardMaterial color="#1a2a3a" roughness={0.1} metalness={0.3} />
+                  </mesh>
+                </group>
+              );
+            })()}
+
+            {/* ── Office chair (behind desk) ── */}
+            <group position={[deskX, 0, chairZ]}>
+              {/* Base star (5 legs simplified as a disc) */}
+              <mesh position={[0, 0.06 + floorThick, 0]}>
+                <cylinderGeometry args={[0.28, 0.28, 0.03, 16]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              {/* Gas lift */}
+              <mesh position={[0, 0.25 + floorThick, 0]}>
+                <cylinderGeometry args={[0.025, 0.03, 0.38, 8]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              {/* Seat */}
+              <mesh position={[0, 0.46 + floorThick, 0]}>
+                <boxGeometry args={[0.48, 0.08, 0.46]} />
+                <meshStandardMaterial {...fabric} />
+              </mesh>
+              {/* Backrest */}
+              <mesh position={[0, 0.78 + floorThick, 0.20]}>
+                <boxGeometry args={[0.44, 0.56, 0.06]} />
+                <meshStandardMaterial {...fabric} />
+              </mesh>
+              {/* Armrests */}
+              {[-1, 1].map((s, i) => (
+                <mesh key={`arm${i}`} position={[s * 0.24, 0.58 + floorThick, 0.05]}>
+                  <boxGeometry args={[0.04, 0.04, 0.28]} />
+                  <meshStandardMaterial {...darkMetal} />
+                </mesh>
+              ))}
+            </group>
+
+            {/* ── 2 Visitor chairs (in front of desk) ── */}
+            {[-0.40, 0.40].map((offsetX, ci) => (
+              <group key={`vc${ci}`} position={[deskX + offsetX, 0, visitorZ]}>
+                {/* 4 legs */}
+                {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], li) => (
+                  <mesh key={`vl${li}`} position={[sx * 0.18, 0.22 + floorThick, sz * 0.18]}>
+                    <boxGeometry args={[0.03, 0.44, 0.03]} />
+                    <meshStandardMaterial {...darkMetal} />
+                  </mesh>
+                ))}
+                {/* Seat */}
+                <mesh position={[0, 0.44 + floorThick, 0]}>
+                  <boxGeometry args={[0.42, 0.045, 0.40]} />
+                  <meshStandardMaterial {...chairGrey} />
+                </mesh>
+                {/* Backrest */}
+                <mesh position={[0, 0.72 + floorThick, -0.18]}>
+                  <boxGeometry args={[0.40, 0.50, 0.04]} />
+                  <meshStandardMaterial {...chairGrey} />
+                </mesh>
+              </group>
+            ))}
+          </group>
+        );
+      })()}
+
       {/* ── Plan B: toilet partition in back-right corner ── */}
       {floorPlan === "b" && (() => {
         // Shift partition 15cm right of back window edge (265+15=280cm) for a gap
