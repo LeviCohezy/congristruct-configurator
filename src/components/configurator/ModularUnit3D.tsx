@@ -446,7 +446,7 @@ function StartWalls({
         const horizZ = -halfD + wallThick + partDepth;
 
         // Door in horizontal wall: 70cm wide
-        const doorW3D = cmToUnit(70);
+        const doorW3D = cmToUnit(90);
         const doorH3D = height * 0.82;
         const doorCenterLocal = horizW / 2;
         const leftSegW = doorCenterLocal - doorW3D / 2;
