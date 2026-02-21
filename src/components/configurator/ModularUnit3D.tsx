@@ -760,6 +760,73 @@ function StartWalls({
               <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
               <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
             </mesh>
+
+            {/* ── Toilet fixtures on the right (long) wall ── */}
+            {(() => {
+              const wallX = halfW - wallThick - 0.01; // inner face of right wall
+              const toiletZ = -halfD + wallThick + partDepth * 0.35; // toward back
+              const sinkZ = -halfD + wallThick + partDepth * 0.75;  // toward door
+              const white = { color: "#f0f0f0", roughness: 0.15, metalness: 0.05 };
+              const chrome = { color: "#c0c0c0", roughness: 0.1, metalness: 0.9 };
+
+              return (
+                <group>
+                  {/* ── Wall-hung toilet ── */}
+                  {/* Bowl */}
+                  <mesh position={[wallX - 0.18, 0.38 + floorThick, toiletZ]}>
+                    <boxGeometry args={[0.36, 0.14, 0.40]} />
+                    <meshStandardMaterial {...white} />
+                  </mesh>
+                  {/* Bowl front (rounded) */}
+                  <mesh position={[wallX - 0.36, 0.38 + floorThick, toiletZ]} rotation={[0, 0, Math.PI / 2]}>
+                    <cylinderGeometry args={[0.07, 0.07, 0.40, 12, 1, false, 0, Math.PI]} />
+                    <meshStandardMaterial {...white} />
+                  </mesh>
+                  {/* Seat */}
+                  <mesh position={[wallX - 0.20, 0.46 + floorThick, toiletZ]}>
+                    <boxGeometry args={[0.38, 0.025, 0.42]} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.02} />
+                  </mesh>
+                  {/* Lid */}
+                  <mesh position={[wallX - 0.10, 0.485 + floorThick, toiletZ]}>
+                    <boxGeometry args={[0.22, 0.02, 0.40]} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.1} metalness={0.02} />
+                  </mesh>
+                  {/* Cistern (concealed behind wall — visible block) */}
+                  <mesh position={[wallX - 0.02, 0.55 + floorThick, toiletZ]}>
+                    <boxGeometry args={[0.10, 0.35, 0.38]} />
+                    <meshStandardMaterial color="#ffffff" roughness={0.9} />
+                  </mesh>
+                  {/* Flush button */}
+                  <mesh position={[wallX - 0.08, 0.78 + floorThick, toiletZ]}>
+                    <boxGeometry args={[0.005, 0.08, 0.14]} />
+                    <meshStandardMaterial {...chrome} />
+                  </mesh>
+
+                  {/* ── Small wall-mounted sink ── */}
+                  {/* Basin */}
+                  <mesh position={[wallX - 0.14, 0.80 + floorThick, sinkZ]}>
+                    <boxGeometry args={[0.28, 0.06, 0.32]} />
+                    <meshStandardMaterial {...white} />
+                  </mesh>
+                  {/* Basin inner (dark recess) */}
+                  <mesh position={[wallX - 0.14, 0.81 + floorThick, sinkZ]}>
+                    <boxGeometry args={[0.22, 0.04, 0.26]} />
+                    <meshStandardMaterial color="#d8d8d8" roughness={0.1} />
+                  </mesh>
+                  {/* Faucet stem */}
+                  <mesh position={[wallX - 0.06, 0.88 + floorThick, sinkZ]}>
+                    <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
+                    <meshStandardMaterial {...chrome} />
+                  </mesh>
+                  {/* Faucet spout */}
+                  <mesh position={[wallX - 0.14, 0.94 + floorThick, sinkZ]} rotation={[0, 0, Math.PI / 2]}>
+                    <cylinderGeometry args={[0.01, 0.01, 0.12, 8]} />
+                    <meshStandardMaterial {...chrome} />
+                  </mesh>
+                </group>
+              );
+            })()}
           </group>
         );
       })()}
