@@ -541,11 +541,9 @@ function StartWalls({
 
       {/* ── Office furniture: slab desk, chairs, iMac monitor ── */}
       {(() => {
-        const deskX = 0.10;
-        const deskZ = 0.0;
-        // Slab desk: long axis along Z, narrow along X
-        const deskL = 1.80;  // length along Z
-        const deskW = 0.80;  // width along X
+        const isToilet = floorPlan === "b";
+        const deskL = 1.80;
+        const deskW = 0.80;
         const deskH = 0.75;
         const topT = 0.04;
         const panelT = 0.04;
@@ -553,58 +551,61 @@ function StartWalls({
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const chairFabric = { color: "#5a504a", roughness: 0.9, metalness: 0.0 };
 
-        // Office chair on -X side (between shelf/left wall and desk), facing +X
+        // Plan A: desk along Z, chairs along X. Office chair on -X (shelf side).
+        // Plan B: desk along X against left wall, chairs along Z. Office chair on -Z (shelf/back wall side).
+        // We wrap everything in a group with rotation for plan B.
+        const groupRot: [number, number, number] = isToilet ? [0, Math.PI / 2, 0] : [0, 0, 0];
+        // For plan B: after +90° Y rotation, original -X→-Z, +X→+Z, +Z→-X, -Z→+X
+        // Position the group so desk ends up against the left wall
+        const groupPos: [number, number, number] = isToilet
+          ? [-halfW + wallThick + deskW / 2 + 0.05, 0, -0.15]
+          : [0, 0, 0];
+
+        const deskX = 0.10;
+        const deskZ = 0.0;
         const officeChairX = deskX - deskW / 2 - 0.40;
-        // 2 visitor chairs on +X side (between desk and door/right wall), facing -X
         const visitorX = deskX + deskW / 2 + 0.45;
 
         return (
-          <group>
+          <group position={groupPos} rotation={groupRot}>
             {/* ── Slab Desk ── */}
-            {/* Tabletop */}
             <mesh position={[deskX, deskH + floorThick, deskZ]} castShadow>
               <boxGeometry args={[deskW, topT, deskL]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            {/* Front slab panel (at +Z end) */}
+            {/* Slab panel at +Z end */}
             <mesh position={[deskX, deskH / 2 + floorThick, deskZ + deskL / 2 - panelT / 2]}>
               <boxGeometry args={[deskW, deskH, panelT]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            {/* Back slab panel (at -Z end) */}
+            {/* Slab panel at -Z end */}
             <mesh position={[deskX, deskH / 2 + floorThick, deskZ - deskL / 2 + panelT / 2]}>
               <boxGeometry args={[deskW, deskH, panelT]} />
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ── iMac-style Monitor — right corner, diagonal ── */}
+            {/* ── iMac Monitor — corner, diagonal ── */}
             {(() => {
-              // Far right corner from office chair: +X side, -Z end of desk
               const monX = deskX + deskW / 2 - 0.15;
               const monZ = deskZ - deskL / 2 + 0.25;
               const screenW = 0.54;
               const screenH = 0.34;
               const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
-              // Rotate ~45° so screen faces the office chair (diagonally toward -X, -Z)
               const rot: [number, number, number] = [0, -Math.PI * 0.25, 0];
               return (
                 <group position={[monX, 0, monZ]} rotation={rot}>
-                  {/* Stand foot */}
                   <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                     <boxGeometry args={[0.20, 0.008, 0.18]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Stand neck */}
                   <mesh position={[0, deskH + topT / 2 + 0.10 + floorThick, 0]}>
                     <boxGeometry args={[0.06, 0.18, 0.02]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen body */}
                   <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01]}>
                     <boxGeometry args={[screenW, screenH, 0.02]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen display */}
                   <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01 + 0.012]}>
                     <boxGeometry args={[screenW - 0.03, screenH - 0.03, 0.002]} />
                     <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
@@ -613,52 +614,45 @@ function StartWalls({
               );
             })()}
 
-            {/* ── Keyboard on desk ── */}
+            {/* Keyboard */}
             <mesh position={[deskX - 0.10, deskH + topT / 2 + 0.01 + floorThick, deskZ + 0.10]}>
               <boxGeometry args={[0.12, 0.012, 0.35]} />
               <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
             </mesh>
 
-            {/* ── Office chair (-X side, facing +X toward desk) ── */}
+            {/* ── Office chair (-X side, facing +X) ── */}
             <group position={[officeChairX, 0, deskZ]}>
-              {/* Base */}
               <mesh position={[0, 0.05 + floorThick, 0]}>
                 <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
                 <meshStandardMaterial {...darkMetal} />
               </mesh>
-              {/* Gas lift */}
               <mesh position={[0, 0.24 + floorThick, 0]}>
                 <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
                 <meshStandardMaterial {...darkMetal} />
               </mesh>
-              {/* Seat */}
               <mesh position={[0, 0.44 + floorThick, 0]}>
                 <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
-              {/* Backrest (on -X side, facing +X) */}
               <mesh position={[-0.18, 0.72 + floorThick, 0]}>
                 <boxGeometry args={[0.05, 0.50, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
             </group>
 
-            {/* ── 2 Visitor chairs (+X side, facing -X toward desk) ── */}
+            {/* ── 2 Visitor chairs (+X side, facing -X) ── */}
             {[-0.35, 0.35].map((offsetZ, ci) => (
               <group key={`vc${ci}`} position={[visitorX, 0, deskZ + offsetZ]}>
-                {/* 4 thin metal legs */}
                 {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], li) => (
                   <mesh key={`vl${li}`} position={[sx * 0.16, 0.21 + floorThick, sz * 0.16]}>
                     <cylinderGeometry args={[0.012, 0.012, 0.42, 6]} />
                     <meshStandardMaterial {...darkMetal} />
                   </mesh>
                 ))}
-                {/* Seat */}
                 <mesh position={[0, 0.44 + floorThick, 0]}>
                   <cylinderGeometry args={[0.21, 0.22, 0.06, 16]} />
                   <meshStandardMaterial {...chairFabric} />
                 </mesh>
-                {/* Backrest (on +X side, facing -X toward desk) */}
                 <mesh position={[0.16, 0.68 + floorThick, 0]}>
                   <boxGeometry args={[0.04, 0.42, 0.38]} />
                   <meshStandardMaterial {...chairFabric} />
