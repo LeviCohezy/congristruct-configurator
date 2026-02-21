@@ -437,26 +437,70 @@ function StartWalls({
 
       {/* ── Plan B: toilet partition in back-right corner ── */}
       {floorPlan === "b" && (() => {
-        // Vertical wall: at 265cm from left (right edge of back window), runs 130cm from back wall inward
-        const partX = -halfW + cmToUnit(265);
+        // Shift partition 15cm right of back window edge (265+15=280cm) for a gap
+        const partX = -halfW + cmToUnit(280);
         const partDepth = cmToDepth(130);
         const partWallT = 0.08;
-        // Horizontal wall: at 130cm from back wall, runs from vertical partition to right wall
         const horizW = halfW - partX - partWallT / 2 - wallThick;
         const horizCX = partX + partWallT / 2 + horizW / 2;
         const horizZ = -halfD + wallThick + partDepth;
 
+        // Door in horizontal wall: 70cm wide
+        const doorW3D = cmToUnit(70);
+        const doorH3D = height * 0.82;
+        const doorCenterLocal = horizW / 2;
+        const leftSegW = doorCenterLocal - doorW3D / 2;
+        const rightSegW = horizW - doorCenterLocal - doorW3D / 2;
+        const leftSegCX = partX + partWallT / 2 + leftSegW / 2;
+        const rightSegCX = partX + partWallT / 2 + doorCenterLocal + doorW3D / 2 + rightSegW / 2;
+        const doorAbsX = partX + partWallT / 2 + doorCenterLocal;
+        const headerH = height - doorH3D;
+
         return (
           <group>
-            {/* Vertical partition wall (parallel to side walls) */}
+            {/* Vertical partition wall */}
             <mesh position={[partX, height / 2 + floorThick, -halfD + wallThick + partDepth / 2]}>
               <boxGeometry args={[partWallT, height, partDepth]} />
               <meshStandardMaterial color="#ffffff" roughness={0.92} />
             </mesh>
-            {/* Horizontal partition wall (parallel to front/back walls) */}
-            <mesh position={[horizCX, height / 2 + floorThick, horizZ]}>
-              <boxGeometry args={[horizW, height, partWallT]} />
+            {/* Horizontal wall — left of door */}
+            {leftSegW > 0.01 && (
+              <mesh position={[leftSegCX, height / 2 + floorThick, horizZ]}>
+                <boxGeometry args={[leftSegW, height, partWallT]} />
+                <meshStandardMaterial color="#ffffff" roughness={0.92} />
+              </mesh>
+            )}
+            {/* Horizontal wall — right of door */}
+            {rightSegW > 0.01 && (
+              <mesh position={[rightSegCX, height / 2 + floorThick, horizZ]}>
+                <boxGeometry args={[rightSegW, height, partWallT]} />
+                <meshStandardMaterial color="#ffffff" roughness={0.92} />
+              </mesh>
+            )}
+            {/* Door header */}
+            <mesh position={[doorAbsX, doorH3D + headerH / 2 + floorThick, horizZ]}>
+              <boxGeometry args={[doorW3D, headerH, partWallT]} />
               <meshStandardMaterial color="#ffffff" roughness={0.92} />
+            </mesh>
+            {/* Door frame — left jamb */}
+            <mesh position={[doorAbsX - doorW3D / 2 - 0.015, doorH3D / 2 + floorThick, horizZ]}>
+              <boxGeometry args={[0.03, doorH3D, partWallT + 0.01]} />
+              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+            </mesh>
+            {/* Door frame — right jamb */}
+            <mesh position={[doorAbsX + doorW3D / 2 + 0.015, doorH3D / 2 + floorThick, horizZ]}>
+              <boxGeometry args={[0.03, doorH3D, partWallT + 0.01]} />
+              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+            </mesh>
+            {/* Door frame — top */}
+            <mesh position={[doorAbsX, doorH3D + floorThick + 0.015, horizZ]}>
+              <boxGeometry args={[doorW3D + 0.06, 0.03, partWallT + 0.01]} />
+              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+            </mesh>
+            {/* Door handle */}
+            <mesh position={[doorAbsX + doorW3D / 2 - 0.06, doorH3D * 0.48 + floorThick, horizZ + partWallT / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+              <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+              <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
             </mesh>
           </group>
         );
