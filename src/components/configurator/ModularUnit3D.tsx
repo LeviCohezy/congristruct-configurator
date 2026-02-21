@@ -435,19 +435,32 @@ function StartWalls({
         <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
       </mesh>
 
-      {/* ── Plan B: toilet partition ── */}
-      {floorPlan === "b" && (
-        <group>
-          <mesh position={[-halfW + cmToUnit(135), height / 2 + floorThick, -halfD + cmToDepth(82.5) / 2 + wallThick / 2]}>
-            <boxGeometry args={[0.08, height, cmToDepth(82.5)]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.92} />
-          </mesh>
-          <mesh position={[-halfW + cmToUnit(135) / 2 + cmToUnit(135) / 2 + (halfW - cmToUnit(135)) / 2 + cmToUnit(135) / 2, height / 2 + floorThick, -halfD + cmToDepth(82.5) + wallThick / 2]}>
-            <boxGeometry args={[halfW * 2 - cmToUnit(135), height, 0.08]} />
-            <meshStandardMaterial color="#ffffff" roughness={0.92} />
-          </mesh>
-        </group>
-      )}
+      {/* ── Plan B: toilet partition in back-right corner ── */}
+      {floorPlan === "b" && (() => {
+        // Vertical wall: at 265cm from left (right edge of back window), runs 130cm from back wall inward
+        const partX = -halfW + cmToUnit(265);
+        const partDepth = cmToDepth(130);
+        const partWallT = 0.08;
+        // Horizontal wall: at 130cm from back wall, runs from vertical partition to right wall
+        const horizW = halfW - partX - partWallT / 2 - wallThick;
+        const horizCX = partX + partWallT / 2 + horizW / 2;
+        const horizZ = -halfD + wallThick + partDepth;
+
+        return (
+          <group>
+            {/* Vertical partition wall (parallel to side walls) */}
+            <mesh position={[partX, height / 2 + floorThick, -halfD + wallThick + partDepth / 2]}>
+              <boxGeometry args={[partWallT, height, partDepth]} />
+              <meshStandardMaterial color="#ffffff" roughness={0.92} />
+            </mesh>
+            {/* Horizontal partition wall (parallel to front/back walls) */}
+            <mesh position={[horizCX, height / 2 + floorThick, horizZ]}>
+              <boxGeometry args={[horizW, height, partWallT]} />
+              <meshStandardMaterial color="#ffffff" roughness={0.92} />
+            </mesh>
+          </group>
+        );
+      })()}
     </group>
   );
 }
