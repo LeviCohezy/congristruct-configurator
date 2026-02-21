@@ -584,9 +584,9 @@ function StartWalls({
 
             {/* ── iMac-style Monitor — right corner, diagonal ── */}
             {(() => {
-              // Right corner from office chair POV: +X, +Z corner of desk
-              const monX = deskX + deskW / 2 - 0.18;
-              const monZ = deskZ + deskL / 2 - 0.30;
+              // Far right corner from office chair: +X side, -Z end of desk
+              const monX = deskX + deskW / 2 - 0.15;
+              const monZ = deskZ - deskL / 2 + 0.25;
               const screenW = 0.54;
               const screenH = 0.34;
               const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
