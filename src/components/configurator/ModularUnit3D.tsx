@@ -9,7 +9,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
     case "thermowood-black":
       return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
     case "thermowood-natural":
-      return { color: "#c07a45", roughness: 0.78, metalness: 0.0, isWood: true };
+      return { color: "#cca37d", roughness: 0.78, metalness: 0.0, isWood: true };
     case "composite-white":
       return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
@@ -31,53 +31,53 @@ function getFacadeProps(facade: ConfigState["facade"]) {
 function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTexture | null {
   if (!isWood) return null;
   const canvas = document.createElement("canvas");
-  canvas.width = 1024; // Increased resolution for finer detail
+  canvas.width = 1024;
   canvas.height = 2048;
   const ctx = canvas.getContext("2d")!;
   const base = new THREE.Color(baseColor);
 
-  // 1. Dark Background (Visible in the deep gaps between slats)
+  // 1. Background (The "gap" color)
   ctx.fillStyle = "#110d0a";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Define Plank Dimensions (Narrower for that "Lignis" look)
+  // 2. Plank Dimensions (Narrow vertical slats)
   const numPlanks = 42;
   const pw = canvas.width / numPlanks;
-  const gapW = pw * 0.15; // Realistic spacing between slats
+  const gapW = pw * 0.15;
 
   for (let i = 0; i < numPlanks; i++) {
     const x = i * pw;
 
-    // 3. Natural Color Variation
-    // We mix the base color with subtle lighter/darker tones per slat
-    const variation = (Math.random() - 0.5) * 0.15;
-    const col = base.clone().multiplyScalar(1 + variation);
+    // 3. Color Variation (Scalar shift only, no hue change)
+    const col = base.clone();
+    const lightShift = (Math.random() - 0.5) * 0.1; // +/- 10% brightness
+    col.multiplyScalar(1 + lightShift);
 
-    // 4. Draw the Slat Base
+    // 4. Draw Slat
     ctx.fillStyle = `#${col.getHexString()}`;
     ctx.fillRect(x, 0, pw - gapW, canvas.height);
 
-    // 5. Vertical Grain Detail (Noise lines)
-    for (let g = 0; g < 15; g++) {
+    // 5. Vertical Grain (Subtle dark lines)
+    for (let g = 0; g < 12; g++) {
       const gx = x + Math.random() * (pw - gapW);
-      const gw = 0.5 + Math.random() * 2;
-      const opacity = 0.05 + Math.random() * 0.1;
-      ctx.fillStyle = `rgba(0,0,0,${opacity})`; // Dark grain
+      const gw = 0.5 + Math.random() * 1.5;
+      const opacity = 0.03 + Math.random() * 0.07;
+      ctx.fillStyle = `rgba(0,0,0,${opacity})`;
       ctx.fillRect(gx, 0, gw, canvas.height);
     }
 
-    // 6. 3D Bevel/Edge Simulation (Crucial for the image look)
-    // Left edge shadow (Ambient Occlusion)
-    const gradShadow = ctx.createLinearGradient(x, 0, x + pw * 0.1, 0);
-    gradShadow.addColorStop(0, "rgba(0,0,0,0.3)");
+    // 6. 3D Edge Shadows
+    // Left edge shadow
+    const gradShadow = ctx.createLinearGradient(x, 0, x + pw * 0.12, 0);
+    gradShadow.addColorStop(0, "rgba(0,0,0,0.25)");
     gradShadow.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = gradShadow;
-    ctx.fillRect(x, 0, pw * 0.1, canvas.height);
+    ctx.fillRect(x, 0, pw * 0.12, canvas.height);
 
-    // Right edge highlight (Caught light)
+    // Right edge highlight
     const gradLight = ctx.createLinearGradient(x + pw - gapW - pw * 0.1, 0, x + pw - gapW, 0);
     gradLight.addColorStop(0, "rgba(255,255,255,0)");
-    gradLight.addColorStop(1, "rgba(255,255,255,0.15)");
+    gradLight.addColorStop(1, "rgba(255,255,255,0.1)");
     ctx.fillStyle = gradLight;
     ctx.fillRect(x + pw - gapW - pw * 0.1, 0, pw * 0.1, canvas.height);
   }
@@ -85,8 +85,7 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  // This repeat ensures the planks don't look stretched on long walls
-  tex.repeat.set(4, 1);
+  tex.repeat.set(4, 1); // Controls the density of the vertical lines
   return tex;
 }
 
@@ -165,7 +164,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     metalness: fp.metalness,
     map: plankTex ?? undefined,
     bumpMap: plankTex ?? undefined,
-    bumpScale: fp.isWood ? 0.012 : 0,
+    bumpScale: fp.isWood ? 0.04 : 0, // Increased from 0.012 for more depth
   };
 
   const scaleX = config.mirrorPlan ? -1 : 1;
