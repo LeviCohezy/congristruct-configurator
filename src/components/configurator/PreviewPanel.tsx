@@ -1,7 +1,8 @@
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { ModularUnit3D } from "./ModularUnit3D";
+import { Home } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 
 interface PreviewPanelProps {
@@ -9,7 +10,7 @@ interface PreviewPanelProps {
   currentStep: number;
 }
 
-function SceneContent({ config }: { config: ConfigState }) {
+function SceneContent({ config, showRoof }: { config: ConfigState; showRoof: boolean }) {
   return (
     <>
       <ambientLight intensity={0.45} color="#f0ece8" />
@@ -27,7 +28,7 @@ function SceneContent({ config }: { config: ConfigState }) {
       <directionalLight position={[-5, 3, 4]} intensity={0.6} color="#e8f0f8" />
       <directionalLight position={[0, -3, 3]} intensity={0.25} color="#f5f0ea" />
       <Environment preset="city" />
-      <ModularUnit3D config={config} />
+      <ModularUnit3D config={config} showRoof={showRoof} />
       <ContactShadows position={[0, -1.41, 0]} opacity={0.35} scale={20} blur={2.5} far={4} color="#000000" />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.42, 0]} receiveShadow>
         <planeGeometry args={[40, 40]} />
@@ -56,6 +57,8 @@ const modelLabels: Record<ConfigState["model"], string> = {
 };
 
 export function PreviewPanel({ config }: PreviewPanelProps) {
+  const [showRoof, setShowRoof] = useState(true);
+
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
       {/* Model badge */}
@@ -73,6 +76,22 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
           </span>
         </div>
       )}
+
+      {/* Roof toggle button — bottom right */}
+      <button
+        onClick={() => setShowRoof(!showRoof)}
+        className="absolute bottom-20 right-4 z-10 w-10 h-10 rounded-full bg-card/80 backdrop-blur-sm border border-border flex items-center justify-center hover:bg-card transition-colors"
+        title={showRoof ? "Dak verbergen" : "Dak tonen"}
+      >
+        <div className="relative">
+          <Home size={18} className="text-foreground" />
+          {!showRoof && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-[26px] h-[2px] bg-foreground rotate-45 rounded-full" />
+            </div>
+          )}
+        </div>
+      </button>
 
       {/* Drag hint */}
       <div className="absolute bottom-16 left-0 right-0 z-10 flex justify-center pointer-events-none">
@@ -92,7 +111,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
           gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1.1 }}
           style={{ width: "100%", height: "100%" }}
         >
-          <SceneContent config={config} />
+          <SceneContent config={config} showRoof={showRoof} />
           <OrbitControls
             enablePan={false}
             minDistance={5}
