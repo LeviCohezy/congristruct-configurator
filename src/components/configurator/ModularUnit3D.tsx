@@ -107,10 +107,13 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
     const innerR = cornerRadius - wallThick;
     const make = (start: number, end: number) => {
       const s = new THREE.Shape();
-      // Outer arc
+      // Outer arc (rounded exterior)
       s.absarc(0, 0, cornerRadius, start, end, false);
-      // Inner arc (reverse direction to create hollow)
-      s.absarc(0, 0, innerR, end, start, true);
+      // Inner corners: straight lines (square interior)
+      const cos1 = Math.cos(end), sin1 = Math.sin(end);
+      const cos0 = Math.cos(start), sin0 = Math.sin(start);
+      s.lineTo(cos1 * innerR, sin1 * innerR);
+      s.lineTo(cos0 * innerR, sin0 * innerR);
       s.closePath();
       return s;
     };
