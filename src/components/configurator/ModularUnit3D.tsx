@@ -435,81 +435,103 @@ function StartWalls({
         <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
       </mesh>
 
-      {/* ── Built-in bookshelf/cabinet on back wall, left of window ── */}
+      {/* ── Built-in bookshelf/cabinet ── */}
+      {/* Open plan (A): against left wall, full wall length */}
+      {/* Plan B: against back wall, left of window */}
       {(() => {
-        const shelfW = cmToUnit(140);  // 140cm wide unit
-        const shelfD = 0.45;           // 45cm deep
-        const shelfX = -halfW + wallThick + shelfW / 2;
-        const shelfZ = -halfD + wallThick + shelfD / 2;
+        const isLeftWall = floorPlan === "a";
+        const shelfW = isLeftWall ? (depth - 2 * wallThick) : cmToUnit(140);
+        const shelfD = 0.45;
+
+        // Along-wall center, into-room center, back-panel position
+        const shelfCenterAlongWall = isLeftWall ? 0 : (-halfW + wallThick + shelfW / 2);
+        const shelfCenterIntoRoom = isLeftWall ? (-halfW + wallThick + shelfD / 2) : (-halfD + wallThick + shelfD / 2);
+        const backPanelPos = isLeftWall ? (-halfW + wallThick + 0.06) : (-halfD + wallThick + 0.06);
+
+        // Positions: [X, Y, Z] differ based on wall orientation
+        const pos = (along: number, y: number, into: number): [number, number, number] =>
+          isLeftWall ? [into, y, along] : [along, y, into];
+        // Box geometry: [alongWall, height, intoRoom] → need to swap for left wall
+        const geo = (along: number, h: number, into: number): [number, number, number] =>
+          isLeftWall ? [into, h, along] : [along, h, into];
+
         const cabinetColor = "#2a2118";
-        const counterTop = height * 0.30;   // counter/niche bottom
-        const nicheH = height * 0.30;       // niche is 3x taller now
+        const counterTop = height * 0.30;
+        const nicheH = height * 0.30;
         const nicheTop = counterTop + nicheH;
         const upperH = height - nicheTop;
         const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
         const panelW = shelfW / 6;
-        const openW = shelfW - panelW * 2; // open middle section width
-        const openCX = shelfX; // centered
+        const openW = shelfW - panelW * 2;
+
+        // Front face offset (for door lines)
+        const frontFace = isLeftWall
+          ? (-halfW + wallThick + shelfD + 0.002)
+          : (-halfD + wallThick + shelfD + 0.002);
+        const doorLinePos = (along: number, y: number): [number, number, number] =>
+          isLeftWall ? [frontFace, y, along] : [along, y, frontFace];
+        const doorLineGeo = (h: number): [number, number, number] =>
+          isLeftWall ? [0.004, h, 0.008] : [0.008, h, 0.004];
 
         return (
           <group>
-            {/* Full-height back panel — one solid piece behind everything */}
-            <mesh position={[shelfX, height / 2 + floorThick, -halfD + wallThick + 0.06]}>
-              <boxGeometry args={[shelfW, height, 0.02]} />
+            {/* Full-height back panel */}
+            <mesh position={pos(shelfCenterAlongWall, height / 2 + floorThick, backPanelPos)}>
+              <boxGeometry args={geo(shelfW, height, 0.02)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
 
-            {/* Lower cabinet body (full width) */}
-            <mesh position={[shelfX, counterTop / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[shelfW, counterTop, shelfD]} />
+            {/* Lower cabinet body */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(shelfW, counterTop, shelfD)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Counter surface (dark top) */}
-            <mesh position={[shelfX, counterTop + 0.015 + floorThick, shelfZ]}>
-              <boxGeometry args={[shelfW + 0.02, 0.03, shelfD + 0.02]} />
+            {/* Counter surface */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.015 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(shelfW + 0.02, 0.03, shelfD + 0.02)} />
               <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
             </mesh>
 
-            {/* Upper cabinets (full width) */}
-            <mesh position={[shelfX, nicheTop + upperH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[shelfW, upperH, shelfD]} />
+            {/* Upper cabinets */}
+            <mesh position={pos(shelfCenterAlongWall, nicheTop + upperH / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(shelfW, upperH, shelfD)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
 
             {/* Niche — left closed panel (1/6th) */}
-            <mesh position={[shelfX - shelfW / 2 + panelW / 2, counterTop + nicheH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[panelW, nicheH, shelfD]} />
+            <mesh position={pos(shelfCenterAlongWall - shelfW / 2 + panelW / 2, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(panelW, nicheH, shelfD)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Niche — right closed panel (1/6th) */}
-            <mesh position={[shelfX + shelfW / 2 - panelW / 2, counterTop + nicheH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[panelW, nicheH, shelfD]} />
+            <mesh position={pos(shelfCenterAlongWall + shelfW / 2 - panelW / 2, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(panelW, nicheH, shelfD)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
 
-            {/* Niche — dark back recess (visible open area) */}
-            <mesh position={[openCX, counterTop + 0.03 + nicheH / 2 + floorThick, -halfD + wallThick + 0.065]}>
-              <boxGeometry args={[openW - 0.02, nicheH - 0.06, 0.01]} />
+            {/* Niche — dark back recess */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.03 + nicheH / 2 + floorThick, backPanelPos + 0.005)}>
+              <boxGeometry args={geo(openW - 0.02, nicheH - 0.06, 0.01)} />
               <meshStandardMaterial color="#0e0a08" roughness={0.95} />
             </mesh>
 
             {/* Niche — middle shelf */}
-            <mesh position={[openCX, counterTop + nicheH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[openW - 0.02, 0.025, shelfD - 0.02]} />
+            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(openW - 0.02, 0.025, shelfD - 0.02)} />
               <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
             </mesh>
 
-            {/* Cabinet door lines (3 vertical seams on upper) */}
+            {/* Cabinet door lines (upper) */}
             {[0.33, 0.5, 0.67].map((frac, i) => (
-              <mesh key={`u${i}`} position={[shelfX - shelfW / 2 + shelfW * frac, nicheTop + upperH / 2 + floorThick, shelfZ + shelfD / 2 + 0.002]}>
-                <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
+              <mesh key={`u${i}`} position={doorLinePos(shelfCenterAlongWall - shelfW / 2 + shelfW * frac, nicheTop + upperH / 2 + floorThick)}>
+                <boxGeometry args={doorLineGeo(upperH - 0.02)} />
                 <meshStandardMaterial color="#151010" roughness={0.5} />
               </mesh>
             ))}
-            {/* Cabinet door lines (3 vertical seams on lower) */}
+            {/* Cabinet door lines (lower) */}
             {[0.33, 0.5, 0.67].map((frac, i) => (
-              <mesh key={`l${i}`} position={[shelfX - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick, shelfZ + shelfD / 2 + 0.002]}>
-                <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
+              <mesh key={`l${i}`} position={doorLinePos(shelfCenterAlongWall - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick)}>
+                <boxGeometry args={doorLineGeo(counterTop - 0.02)} />
                 <meshStandardMaterial color="#151010" roughness={0.5} />
               </mesh>
             ))}
