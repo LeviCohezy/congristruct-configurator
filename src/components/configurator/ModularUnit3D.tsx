@@ -190,7 +190,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   const cornerRadius = config.roundedCorners ? 0.45 : 0.0;
   const wallThick = 0.18;
-  const roofThick = 0.18;
+  const roofThick = 0.15;
   const floorThick = 0.18;
   const PILLAR_W = 0.38;
 
@@ -269,16 +269,16 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         <meshStandardMaterial color="#c9a97e" roughness={0.65} />
       </mesh>
 
-      {/* ── Roof slab ── */}
+      {/* ── Roof slab — black, covers full unit ── */}
       {slabShape ? (
         <mesh position={[0, height + 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
           <extrudeGeometry args={[slabShape, { depth: roofThick, bevelEnabled: false }]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
         </mesh>
       ) : (
         <mesh position={[0, height + roofThick / 2 + 0.003, 0]} castShadow>
-          <boxGeometry args={[width, roofThick, depth]} />
-          <meshStandardMaterial {...claddingProps} />
+          <boxGeometry args={[width + 0.04, roofThick, depth + 0.04]} />
+          <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
         </mesh>
       )}
 
