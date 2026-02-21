@@ -465,11 +465,27 @@ function StartWalls({
               <boxGeometry args={[shelfW, upperH, shelfD]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Open niche (back panel visible as dark strip) */}
-            <mesh position={[shelfX, counterTop + 0.03 + nicheH / 2 + floorThick, -halfD + wallThick + 0.01]}>
+            {/* Open niche — back panel pulled forward to avoid wall intersection */}
+            <mesh position={[shelfX, counterTop + 0.03 + nicheH / 2 + floorThick, -halfD + wallThick + 0.06]}>
               <boxGeometry args={[shelfW - 0.04, nicheH - 0.06, 0.01]} />
               <meshStandardMaterial color="#151010" roughness={0.9} />
             </mesh>
+            {/* Niche — closed left panel (1/6th width) */}
+            {(() => {
+              const panelW = shelfW / 6;
+              return (
+                <>
+                  <mesh position={[shelfX - shelfW / 2 + panelW / 2, counterTop + 0.03 + nicheH / 2 + floorThick, shelfZ]}>
+                    <boxGeometry args={[panelW, nicheH - 0.06, shelfD]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                  <mesh position={[shelfX + shelfW / 2 - panelW / 2, counterTop + 0.03 + nicheH / 2 + floorThick, shelfZ]}>
+                    <boxGeometry args={[panelW, nicheH - 0.06, shelfD]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                </>
+              );
+            })()}
             {/* Cabinet door lines (3 vertical seams on upper) */}
             {[0.33, 0.5, 0.67].map((frac, i) => (
               <mesh key={`u${i}`} position={[shelfX - shelfW / 2 + shelfW * frac, upperBottom + upperH / 2 + floorThick, shelfZ + shelfD / 2 + 0.002]}>
