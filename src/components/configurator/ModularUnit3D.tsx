@@ -542,7 +542,7 @@ function StartWalls({
       {/* ── Office furniture: slab desk, chairs, iMac monitor ── */}
       {(() => {
         const isToilet = floorPlan === "b";
-        const deskL = 1.80;
+        const deskL = 1.50;  // shorter to fit inside unit
         const deskW = 0.80;
         const deskH = 0.75;
         const topT = 0.04;
@@ -551,20 +551,16 @@ function StartWalls({
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const chairFabric = { color: "#5a504a", roughness: 0.9, metalness: 0.0 };
 
-        // Plan A: desk along Z, chairs along X. Office chair on -X (shelf side).
-        // Plan B: desk along X against left wall, chairs along Z. Office chair on -Z (shelf/back wall side).
-        // We wrap everything in a group with rotation for plan B.
         const groupRot: [number, number, number] = isToilet ? [0, Math.PI / 2, 0] : [0, 0, 0];
-        // For plan B: after +90° Y rotation, original -X→-Z, +X→+Z, +Z→-X, -Z→+X
-        // Position the group so desk ends up against the left wall
         const groupPos: [number, number, number] = isToilet
           ? [-halfW + wallThick + deskW / 2 + 0.05, 0, -0.15]
           : [0, 0, 0];
 
         const deskX = 0.10;
         const deskZ = 0.0;
-        const officeChairX = deskX - deskW / 2 - 0.40;
-        const visitorX = deskX + deskW / 2 + 0.45;
+        // Swapped: office chair on +X (door side), visitors on -X (shelf side)
+        const officeChairX = deskX + deskW / 2 + 0.40;
+        const visitorX = deskX - deskW / 2 - 0.40;
 
         return (
           <group position={groupPos} rotation={groupRot}>
@@ -634,7 +630,7 @@ function StartWalls({
                 <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
-              <mesh position={[-0.18, 0.72 + floorThick, 0]}>
+              <mesh position={[0.18, 0.72 + floorThick, 0]}>
                 <boxGeometry args={[0.05, 0.50, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
@@ -653,7 +649,7 @@ function StartWalls({
                   <cylinderGeometry args={[0.21, 0.22, 0.06, 16]} />
                   <meshStandardMaterial {...chairFabric} />
                 </mesh>
-                <mesh position={[0.16, 0.68 + floorThick, 0]}>
+                <mesh position={[-0.16, 0.68 + floorThick, 0]}>
                   <boxGeometry args={[0.04, 0.42, 0.38]} />
                   <meshStandardMaterial {...chairFabric} />
                 </mesh>
