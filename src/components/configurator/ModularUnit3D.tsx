@@ -303,11 +303,19 @@ function StartWalls({
         <meshStandardMaterial {...claddingProps} />
       </mesh>
       <GlassPane posX={backWinCenterX} posY={winCY + floorThick} width={backWinW} height={winH} frameColor={frameColor} z={-halfD + wallThick / 2} />
-      {/* Interior back wall */}
-      <mesh position={[0, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
-        <boxGeometry args={[flatW, height, 0.01]} />
-        <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
-      </mesh>
+      {/* Interior back wall — split around window */}
+      {backLeftW > 0.01 && (
+        <mesh position={[backLeftCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
+          <boxGeometry args={[backLeftW, height, 0.01]} />
+          <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+        </mesh>
+      )}
+      {backRightW > 0.01 && (
+        <mesh position={[backRightCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
+          <boxGeometry args={[backRightW, height, 0.01]} />
+          <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+        </mesh>
+      )}
 
       {/* ── FRONT WALL — 2 solid segments + big window ── */}
       {frontLeftW > 0.01 && (
