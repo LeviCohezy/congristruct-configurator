@@ -65,7 +65,7 @@ function roundedRect(w: number, d: number, r: number) {
 }
 
 // ─── Main unit ────────────────────────────────────────────────────────────────
-export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState; showRoof?: boolean }) {
+export function ModularUnit3D({ config }: { config: ConfigState }) {
   const fp = getFacadeProps(config.facade);
   const roofColor = getRoofColor(config.facade);
   const frameColor = fp.color === "#ededea" || fp.color === "#e8e6e2" ? "#1a1a1a" : "#080807";
@@ -167,7 +167,7 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
       </mesh>
 
       {/* ── Roof slab ── */}
-      {showRoof && (slabShape ? (
+      {slabShape ? (
         <mesh position={[0, height + 0.003, 0]} rotation={[-Math.PI / 2, 0, 0]} castShadow>
           <extrudeGeometry args={[slabShape, { depth: roofThick, bevelEnabled: false }]} />
           <meshStandardMaterial {...claddingProps} />
@@ -177,7 +177,7 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
           <boxGeometry args={[width, roofThick, depth]} />
           <meshStandardMaterial {...claddingProps} />
         </mesh>
-      ))}
+      )}
 
       {/* ── Rounded corners — exterior cladding ── */}
       {cornerShapes && cornerShapes.map(({ shape, posX, posZ }, i) => (
@@ -212,12 +212,10 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
       })()}
 
       {/* ── Interior ceiling — white box just under roof slab ── */}
-      {showRoof && (
-        <mesh position={[0, height - 0.03, 0]}>
-          <boxGeometry args={[width - wallThick * 2, 0.04, depth - wallThick * 2]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.95} />
-        </mesh>
-      )}
+      <mesh position={[0, height - 0.03, 0]}>
+        <boxGeometry args={[width - wallThick * 2, 0.04, depth - wallThick * 2]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.95} />
+      </mesh>
 
       {/* ── Interior lighting ── */}
       <pointLight position={[0, height * 0.85 + floorThick, -depth * 0.1]} intensity={1.4} color="#fff8f0" distance={9} decay={2} />
