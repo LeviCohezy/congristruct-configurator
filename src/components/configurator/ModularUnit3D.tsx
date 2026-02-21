@@ -237,40 +237,40 @@ function StartWalls({
   const backWinW = cmToUnit(80);
   const backWinCenterX = -halfW + cmToUnit(185) + backWinW / 2;
 
-  // Back wall segments — inset by wallThick so side walls wrap corners cleanly
-  const backLeftW = cmToUnit(185) - cornerRadius - wallThick;
-  const backRightW = cmToUnit(135) - cornerRadius - wallThick;
-  const backLeftCX = -halfW + cornerRadius + wallThick + backLeftW / 2;
-  const backRightCX = halfW - cornerRadius - wallThick - backRightW / 2;
+  // Back wall segments — full size to corners
+  const backLeftW = cmToUnit(185) - cornerRadius;
+  const backRightW = cmToUnit(135) - cornerRadius;
+  const backLeftCX = -halfW + cornerRadius + backLeftW / 2;
+  const backRightCX = halfW - cornerRadius - backRightW / 2;
 
   // ── Front wall (Z = +depth/2): window 200cm, starts at 96cm from left ──
   const frontWinW = cmToUnit(200);
   const frontWinCenterX = -halfW + cmToUnit(96) + frontWinW / 2;
-  const frontLeftW = cmToUnit(96) - cornerRadius - wallThick;
-  const frontRightW = cmToUnit(104) - cornerRadius - wallThick;
-  const frontLeftCX = -halfW + cornerRadius + wallThick + frontLeftW / 2;
-  const frontRightCX = halfW - cornerRadius - wallThick - frontRightW / 2;
+  const frontLeftW = cmToUnit(96) - cornerRadius;
+  const frontRightW = cmToUnit(104) - cornerRadius;
+  const frontLeftCX = -halfW + cornerRadius + frontLeftW / 2;
+  const frontRightCX = halfW - cornerRadius - frontRightW / 2;
 
   // ── Right wall (X = +width/2): door 100cm, starts 165cm from back (top) ──
-  const doorH = cmToDepth(100); // door height in Z-axis
+  const doorH = cmToDepth(100);
   const doorStartZ = -halfD + cmToDepth(165);
   const doorCenterZ = doorStartZ + doorH / 2;
-  const rightTopH = cmToDepth(165) - cornerRadius - wallThick; // shortened to avoid corner overlap
-  const rightBotH = cmToDepth(85) - cornerRadius - wallThick;  // shortened to avoid corner overlap
-  const rightTopCZ = -halfD + cornerRadius + wallThick + rightTopH / 2;
-  const rightBotCZ = halfD - cornerRadius - wallThick - rightBotH / 2;
+  const rightTopH = cmToDepth(165) - cornerRadius;
+  const rightBotH = cmToDepth(85) - cornerRadius;
+  const rightTopCZ = -halfD + cornerRadius + rightTopH / 2;
+  const rightBotCZ = halfD - cornerRadius - rightBotH / 2;
 
-  // ── Left wall: fully solid — shortened to avoid corner overlap ──
-  const leftFlatD = depth - cornerRadius * 2 - wallThick * 2;
+  // ── Left wall: fully solid ──
+  const leftFlatD = depth - cornerRadius * 2;
 
   const DOOR_W_3D = 1.0; // door width in 3D (100cm)
 
   return (
     <group>
-      {/* ── LEFT WALL — solid (inset by wallThick at front/back to avoid z-fighting) ── */}
+      {/* ── LEFT WALL — solid, polygonOffset to avoid z-fighting at corners ── */}
       <mesh position={[-halfW + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, leftFlatD]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       {/* Interior left wall */}
       <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
@@ -376,19 +376,19 @@ function StartWalls({
       {rightTopH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightTopCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightTopH]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
         </mesh>
       )}
       {rightBotH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightBotCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightBotH]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
         </mesh>
       )}
       {/* Door header above opening */}
       <mesh position={[halfW - wallThick / 2, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]} castShadow>
         <boxGeometry args={[wallThick, height - winTop, doorH]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       {/* Interior right wall segments */}
       {rightTopH > 0.01 && (
