@@ -553,7 +553,7 @@ function StartWalls({
 
         const groupRot: [number, number, number] = isToilet ? [0, Math.PI / 2, 0] : [0, 0, 0];
         const groupPos: [number, number, number] = isToilet
-          ? [-halfW + wallThick + deskW / 2 + 0.05, 0, -0.15]
+          ? [-halfW + wallThick + deskL / 2, 0, 0]
           : [0, 0, 0];
 
         const deskX = 0.10;
