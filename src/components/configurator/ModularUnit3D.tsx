@@ -7,7 +7,7 @@ import { getRoofColor } from "@/hooks/useConfigurator";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":     return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
-    case "thermowood-natural":   return { color: "#d9b48f", roughness: 0.82, metalness: 0.0, isWood: true };
+    case "thermowood-natural":   return { color: "#c07a45", roughness: 0.78, metalness: 0.0, isWood: true };
     case "composite-white":      return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":      return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium-anthracite": return { color: "#383a3b", roughness: 0.28, metalness: 0.80, isWood: false };
@@ -28,20 +28,20 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const base = new THREE.Color(baseColor);
 
   // Dark background visible in gaps
-  ctx.fillStyle = "#a08068";
+  ctx.fillStyle = "#2a1c10";
   ctx.fillRect(0, 0, 512, 1024);
 
   // Narrow vertical planks with visible dark gaps (65mm planks)
   const numPlanks = 28;
   const pw = 512 / numPlanks;
-  const gapW = 4; // dark gap between planks
+  const gapW = 5; // dark gap between planks
 
   for (let i = 0; i < numPlanks; i++) {
     const x = i * pw;
-    // Per-plank color variation — warmer/cooler shifts
-    const shift = (Math.sin(i * 4.7) * 0.5 + Math.cos(i * 2.3 + 1) * 0.3) * 0.12;
-    const warm = new THREE.Color("#e8a050");
-    const cool = new THREE.Color("#6a4020");
+    // Per-plank color variation — subtle warm shifts
+    const shift = (Math.sin(i * 4.7) * 0.5 + Math.cos(i * 2.3 + 1) * 0.3) * 0.08;
+    const warm = new THREE.Color("#d49058");
+    const cool = new THREE.Color("#a06030");
     const col = base.clone().lerp(shift > 0 ? warm : cool, Math.abs(shift));
     ctx.fillStyle = `#${col.getHexString()}`;
     ctx.fillRect(x, 0, pw - gapW, 1024);
