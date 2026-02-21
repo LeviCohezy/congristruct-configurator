@@ -40,14 +40,14 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   ctx.fillStyle = gapColor || "#1a1208";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Wide vertical slats — ensure all planks are equal width
+  // 2. Wide vertical slats — every plank same width, gaps included so it tiles seamlessly
   const numPlanks = 6;
-  const gapPx = 4; // fixed gap in pixels
-  const totalGaps = numPlanks - 1; // no gap after last plank
-  const slatW = (canvas.width - totalGaps * gapPx) / numPlanks;
+  const pw = canvas.width / numPlanks; // each plank "cell" is equal
+  const gapPx = 4;
+  const slatW = pw - gapPx; // plank width = cell minus gap
 
   for (let i = 0; i < numPlanks; i++) {
-    const x = i * (slatW + gapPx);
+    const x = i * pw; // uniform spacing
 
     // 3. Subtle per-plank brightness variation (+/- 4 %)
     const col = base.clone();
