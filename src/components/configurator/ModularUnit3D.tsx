@@ -558,9 +558,9 @@ function StartWalls({
 
         const deskX = 0.10;
         const deskZ = 0.0;
-        // Swapped: office chair on +X (door side), visitors on -X (shelf side)
-        const officeChairX = deskX + deskW / 2 + 0.40;
-        const visitorX = deskX - deskW / 2 - 0.40;
+        // After flipping group rotation, swap chairs back so they stay in original room positions
+        const officeChairX = deskX - deskW / 2 - 0.40;
+        const visitorX = deskX + deskW / 2 + 0.40;
 
         return (
           <group position={groupPos} rotation={groupRot}>
@@ -630,7 +630,7 @@ function StartWalls({
                 <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
-              <mesh position={[0.18, 0.72 + floorThick, 0]}>
+              <mesh position={[-0.18, 0.72 + floorThick, 0]}>
                 <boxGeometry args={[0.05, 0.50, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
@@ -649,7 +649,7 @@ function StartWalls({
                   <cylinderGeometry args={[0.21, 0.22, 0.06, 16]} />
                   <meshStandardMaterial {...chairFabric} />
                 </mesh>
-                <mesh position={[-0.16, 0.68 + floorThick, 0]}>
+                <mesh position={[0.16, 0.68 + floorThick, 0]}>
                   <boxGeometry args={[0.04, 0.42, 0.38]} />
                   <meshStandardMaterial {...chairFabric} />
                 </mesh>
