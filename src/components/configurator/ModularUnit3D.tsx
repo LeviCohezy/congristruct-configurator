@@ -104,11 +104,14 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
 
   const cornerShapes = useMemo(() => {
     if (cornerRadius <= 0) return null;
+    const innerR = cornerRadius - wallThick;
     const make = (start: number, end: number) => {
       const s = new THREE.Shape();
-      s.moveTo(0, 0);
+      // Outer arc
       s.absarc(0, 0, cornerRadius, start, end, false);
-      s.lineTo(0, 0);
+      // Inner arc (reverse direction to create hollow)
+      s.absarc(0, 0, innerR, end, start, true);
+      s.closePath();
       return s;
     };
     return [
