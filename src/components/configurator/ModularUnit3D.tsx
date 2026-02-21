@@ -30,7 +30,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
 // ─── Plank texture ────────────────────────────────────────────────────────────
 // The texture contains exactly ONE plank + gap. Repeat is set per real-world scale
 // so every plank everywhere is the same width regardless of wall size.
-const PLANK_WIDTH_M = 0.065; // 65mm real-world plank width
+const PLANK_WIDTH_M = 0.13; // 130mm real-world plank width
 const GAP_WIDTH_M = 0.005;   // 5mm gap
 const CELL_M = PLANK_WIDTH_M + GAP_WIDTH_M; // one repeating cell = 70mm
 
