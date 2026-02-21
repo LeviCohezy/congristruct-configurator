@@ -477,13 +477,13 @@ function StartWalls({
             </mesh>
 
             {/* Niche — left closed panel (1/6th) */}
-            <mesh position={[shelfX - shelfW / 2 + panelW / 2, counterTop + 0.03 + nicheH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[panelW, nicheH - 0.06, shelfD]} />
+            <mesh position={[shelfX - shelfW / 2 + panelW / 2, counterTop + nicheH / 2 + floorThick, shelfZ]}>
+              <boxGeometry args={[panelW, nicheH, shelfD]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Niche — right closed panel (1/6th) */}
-            <mesh position={[shelfX + shelfW / 2 - panelW / 2, counterTop + 0.03 + nicheH / 2 + floorThick, shelfZ]}>
-              <boxGeometry args={[panelW, nicheH - 0.06, shelfD]} />
+            <mesh position={[shelfX + shelfW / 2 - panelW / 2, counterTop + nicheH / 2 + floorThick, shelfZ]}>
+              <boxGeometry args={[panelW, nicheH, shelfD]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
 
