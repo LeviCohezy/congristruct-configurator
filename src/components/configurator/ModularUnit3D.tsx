@@ -331,17 +331,15 @@ function StartWalls({
         <boxGeometry args={[frontWinW, height - winTop, wallThick]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
-      <GlassPane posX={frontWinCenterX} posY={winCY + floorThick} width={frontWinW} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} hasDivider />
+      <GlassPane posX={frontWinCenterX} posY={winCY + floorThick} width={frontWinW} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} />
 
-      {/* ── RIGHT WALL — 2 solid segments + door opening ── */}
-      {/* Top segment (back side) */}
+      {/* ── RIGHT WALL — 2 solid segments + door opening (floor to lintel) ── */}
       {rightTopH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightTopCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightTopH]} />
           <meshStandardMaterial {...claddingProps} />
         </mesh>
       )}
-      {/* Bottom segment (front side) */}
       {rightBotH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightBotCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightBotH]} />
@@ -353,8 +351,12 @@ function StartWalls({
         <boxGeometry args={[wallThick, height - winTop, doorH]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
-      {/* Door glass */}
-      <GlassPane posX={halfW - wallThick / 2} posY={winCY + floorThick} width={doorH} height={winH} frameColor={frameColor} z={doorCenterZ} rotate />
+      {/* Door — full height from floor to lintel */}
+      <DoorPane
+        posX={halfW - wallThick / 2} posY={floorThick + winTop / 2}
+        width={doorH} height={winTop}
+        frameColor={frameColor} z={doorCenterZ}
+      />
       {/* Door step */}
       <mesh position={[halfW + 0.18, floorThick / 2, doorCenterZ]} castShadow>
         <boxGeometry args={[0.32, floorThick, doorH + 0.15]} />
@@ -420,6 +422,53 @@ function GlassPane({
           side={THREE.DoubleSide}
         />
       </mesh>
+    </group>
+  );
+}
+
+// ─── Door pane (full height, with handle) ─────────────────────────────────────
+function DoorPane({
+  posX, posY, width, height, frameColor, z,
+}: {
+  posX: number; posY: number; width: number; height: number; frameColor: string; z: number;
+}) {
+  const fw = 0.036;
+  return (
+    <group position={[posX, posY, z]} rotation={[0, Math.PI / 2, 0]}>
+      {/* Frame */}
+      {([
+        [0,  height / 2 - fw / 2, 0, width, fw, 0.06],
+        [0, -height / 2 + fw / 2, 0, width, fw, 0.06],
+        [-width / 2 + fw / 2, 0, 0, fw, height, 0.06],
+        [ width / 2 - fw / 2, 0, 0, fw, height, 0.06],
+      ] as [number, number, number, number, number, number][]).map(([x, y, zz, bw, bh, bd], i) => (
+        <mesh key={i} position={[x, y, zz]} castShadow>
+          <boxGeometry args={[bw, bh, bd]} />
+          <meshStandardMaterial color={frameColor} roughness={0.3} metalness={0.65} />
+        </mesh>
+      ))}
+      {/* Glass */}
+      <mesh position={[0, 0, 0.001]}>
+        <boxGeometry args={[width - fw * 2, height - fw * 2, 0.006]} />
+        <meshPhysicalMaterial
+          color="#c5d8e0" roughness={0.01} metalness={0.0}
+          transmission={0.94} thickness={0.12} ior={1.52}
+          transparent opacity={0.22} envMapIntensity={2} side={THREE.DoubleSide}
+        />
+      </mesh>
+      {/* Door handle — right side, at ~1m height from bottom */}
+      <group position={[width / 2 - fw - 0.06, -height / 2 + 1.0, 0.04]}>
+        {/* Handle bar */}
+        <mesh castShadow>
+          <boxGeometry args={[0.02, 0.14, 0.04]} />
+          <meshStandardMaterial color="#888" roughness={0.2} metalness={0.9} />
+        </mesh>
+        {/* Handle base plate */}
+        <mesh position={[0, 0, -0.015]}>
+          <boxGeometry args={[0.04, 0.2, 0.01]} />
+          <meshStandardMaterial color="#777" roughness={0.25} metalness={0.85} />
+        </mesh>
+      </group>
     </group>
   );
 }
