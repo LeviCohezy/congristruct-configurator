@@ -187,7 +187,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {/* ── Interior ceiling ── */}
       <mesh position={[0, height + floorThick - 0.01, 0]}>
         <boxGeometry args={[width - wallThick * 2, 0.02, depth - wallThick * 2]} />
-        <meshStandardMaterial color="#eceae6" roughness={0.95} />
+        <meshStandardMaterial color="#ffffff" roughness={0.95} />
       </mesh>
 
       {/* ── Interior lighting ── */}
@@ -275,7 +275,7 @@ function StartWalls({
       {/* Interior left wall */}
       <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
         <boxGeometry args={[0.01, height, leftFlatD]} />
-        <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
 
       {/* ── BACK WALL — 3 segments + window ── */}
@@ -307,13 +307,13 @@ function StartWalls({
       {backLeftW > 0.01 && (
         <mesh position={[backLeftCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
           <boxGeometry args={[backLeftW, height, 0.01]} />
-          <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
         </mesh>
       )}
       {backRightW > 0.01 && (
         <mesh position={[backRightCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
           <boxGeometry args={[backRightW, height, 0.01]} />
-          <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
         </mesh>
       )}
 
@@ -377,12 +377,12 @@ function StartWalls({
           {/* Vertical partition wall (X direction) at ~135cm from left → cmToUnit(135) */}
           <mesh position={[-halfW + cmToUnit(135), height / 2 + floorThick, -halfD + cmToDepth(82.5) / 2 + wallThick / 2]}>
             <boxGeometry args={[0.08, height, cmToDepth(82.5)]} />
-            <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
+            <meshStandardMaterial color="#ffffff" roughness={0.92} />
           </mesh>
           {/* Horizontal partition wall (Z direction) */}
           <mesh position={[-halfW + cmToUnit(135) / 2 + cmToUnit(135) / 2 + (halfW - cmToUnit(135)) / 2 + cmToUnit(135) / 2, height / 2 + floorThick, -halfD + cmToDepth(82.5) + wallThick / 2]}>
             <boxGeometry args={[halfW * 2 - cmToUnit(135), height, 0.08]} />
-            <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
+            <meshStandardMaterial color="#ffffff" roughness={0.92} />
           </mesh>
         </group>
       )}
@@ -519,7 +519,7 @@ function GenericWalls({
       {/* Interior back wall */}
       <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick + 0.01]}>
         <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
-        <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
 
       {/* Front facade */}
@@ -575,7 +575,7 @@ function GenericWalls({
       {hasDivider && (
         <mesh position={[room2StartX + PILLAR_W / 2, height / 2 + floorThick, 0]}>
           <boxGeometry args={[0.06, height, depth - wallThick * 2]} />
-          <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
+          <meshStandardMaterial color="#ffffff" roughness={0.92} />
         </mesh>
       )}
     </group>
