@@ -7,7 +7,7 @@ import { getRoofColor } from "@/hooks/useConfigurator";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":     return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
-    case "thermowood-natural":   return { color: "#b07840", roughness: 0.82, metalness: 0.0, isWood: true };
+    case "thermowood-natural":   return { color: "#cba17a", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":      return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":      return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium-anthracite": return { color: "#383a3b", roughness: 0.28, metalness: 0.80, isWood: false };
@@ -28,7 +28,7 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const base = new THREE.Color(baseColor);
 
   // Dark background visible in gaps
-  ctx.fillStyle = "#1a1208";
+  ctx.fillStyle = "#8b6d56";
   ctx.fillRect(0, 0, 512, 1024);
 
   // Narrow vertical planks with visible dark gaps (65mm planks)
