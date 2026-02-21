@@ -40,14 +40,14 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   ctx.fillStyle = gapColor || "#1a1208";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Narrow vertical slats with visible gaps (like thermowood cladding)
-  const numPlanks = 3;
-  const pw = canvas.width / numPlanks;
-  const gapW = pw * 0.12; // ~12 % of plank width = visible dark gap
+  // 2. Wide vertical slats — ensure all planks are equal width
+  const numPlanks = 6;
+  const gapPx = 4; // fixed gap in pixels
+  const totalGaps = numPlanks - 1; // no gap after last plank
+  const slatW = (canvas.width - totalGaps * gapPx) / numPlanks;
 
   for (let i = 0; i < numPlanks; i++) {
-    const x = i * pw;
-    const slatW = pw - gapW;
+    const x = i * (slatW + gapPx);
 
     // 3. Subtle per-plank brightness variation (+/- 4 %)
     const col = base.clone();
@@ -82,7 +82,7 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(3, 1);
+  tex.repeat.set(2, 1);
   return tex;
 }
 
