@@ -551,7 +551,7 @@ function StartWalls({
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const chairFabric = { color: "#5a504a", roughness: 0.9, metalness: 0.0 };
 
-        const groupRot: [number, number, number] = isToilet ? [0, Math.PI / 2, 0] : [0, 0, 0];
+        const groupRot: [number, number, number] = isToilet ? [0, -Math.PI / 2, 0] : [0, 0, 0];
         const groupPos: [number, number, number] = isToilet
           ? [-halfW + wallThick + deskL / 2, 0, 0]
           : [0, 0, 0];
