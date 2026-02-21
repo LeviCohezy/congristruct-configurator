@@ -251,17 +251,20 @@ function StartWalls({
   const frontLeftCX = -halfW + cornerRadius + frontLeftW / 2;
   const frontRightCX = halfW - cornerRadius - frontRightW / 2;
 
+  // Inset so side walls sit between front/back walls (avoids z-fighting overlap)
+  const sideInset = Math.max(cornerRadius, wallThick);
+
   // ── Right wall (X = +width/2): door 100cm, starts 165cm from back (top) ──
   const doorH = cmToDepth(100);
   const doorStartZ = -halfD + cmToDepth(165);
   const doorCenterZ = doorStartZ + doorH / 2;
-  const rightTopH = cmToDepth(165) - cornerRadius;
-  const rightBotH = cmToDepth(85) - cornerRadius;
-  const rightTopCZ = -halfD + cornerRadius + rightTopH / 2;
-  const rightBotCZ = halfD - cornerRadius - rightBotH / 2;
+  const rightTopH = cmToDepth(165) - sideInset;
+  const rightBotH = cmToDepth(85) - sideInset;
+  const rightTopCZ = -halfD + sideInset + rightTopH / 2;
+  const rightBotCZ = halfD - sideInset - rightBotH / 2;
 
   // ── Left wall: fully solid ──
-  const leftFlatD = depth - cornerRadius * 2;
+  const leftFlatD = depth - sideInset * 2;
 
   const DOOR_W_3D = 1.0; // door width in 3D (100cm)
 
@@ -533,6 +536,7 @@ function GenericWalls({
   winH, winBot, winTop, winCY, PILLAR_W,
   claddingProps, frameColor, floorPlan, model,
 }: any) {
+  const sideInset = Math.max(cornerRadius, wallThick);
   const hasDivider = floorPlan === "b";
   const roomSplit = hasDivider ? 55 : 100;
   const flatStartX = -width / 2 + cornerRadius;
@@ -544,6 +548,7 @@ function GenericWalls({
   const room1CX = flatStartX + PILLAR_W + room1Width / 2;
   const room2StartX = flatStartX + PILLAR_W + room1Width;
   const DOOR_W = 1.05;
+  const sideFlatD = depth - sideInset * 2;
 
   return (
     <group>
@@ -554,12 +559,12 @@ function GenericWalls({
       </mesh>
       {/* Right wall */}
       <mesh position={[width / 2 - wallThick / 2, height / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
+        <boxGeometry args={[wallThick, height, sideFlatD]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
       {/* Left wall */}
       <mesh position={[-width / 2 + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
+        <boxGeometry args={[wallThick, height, sideFlatD]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
       {/* Interior back wall */}
