@@ -485,17 +485,17 @@ function StartWalls({
             {/* Door frame — left jamb */}
             <mesh position={[doorAbsX - doorW3D / 2 - 0.015, doorH3D / 2 + floorThick, horizZ]}>
               <boxGeometry args={[0.03, doorH3D, partWallT + 0.01]} />
-              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
             {/* Door frame — right jamb */}
             <mesh position={[doorAbsX + doorW3D / 2 + 0.015, doorH3D / 2 + floorThick, horizZ]}>
               <boxGeometry args={[0.03, doorH3D, partWallT + 0.01]} />
-              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
             {/* Door frame — top */}
             <mesh position={[doorAbsX, doorH3D + floorThick + 0.015, horizZ]}>
               <boxGeometry args={[doorW3D + 0.06, 0.03, partWallT + 0.01]} />
-              <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
             {/* Door panel (solid white) */}
             <mesh position={[doorAbsX, doorH3D / 2 + floorThick, horizZ]}>
