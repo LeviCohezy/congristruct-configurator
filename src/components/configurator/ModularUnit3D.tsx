@@ -1,7 +1,9 @@
 import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
+import { useLoader } from "@react-three/fiber";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { getRoofColor } from "@/hooks/useConfigurator";
+import osbTextureUrl from "@/assets/osb-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"]) {
@@ -152,6 +154,26 @@ function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood,
   );
 }
 
+// ─── Interior material: OSB texture when shell, plain color otherwise ────────
+function InteriorMat({ osbTex, isShell, color, roughness, side, ...rest }: {
+  osbTex: THREE.Texture | null;
+  isShell: boolean;
+  color: string;
+  roughness: number;
+  side?: THREE.Side;
+  [k: string]: any;
+}) {
+  return (
+    <meshStandardMaterial
+      color={isShell && osbTex ? "#ffffff" : color}
+      roughness={roughness}
+      map={isShell ? osbTex : undefined}
+      side={side}
+      {...rest}
+    />
+  );
+}
+
 function roundedRect(w: number, d: number, r: number) {
   const s = new THREE.Shape();
   s.absarc(-w / 2 + r, -d / 2 + r, r, Math.PI, Math.PI * 1.5);
@@ -235,11 +257,22 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   // For wood walls, we need per-wall materials with correct repeat
   const woodBase = { baseTex: plankTex, color: effectiveColor, roughness: fp.roughness, metalness: fp.metalness, isWood: fp.isWood };
 
-  // Interior: OSB chipboard when shell (casco), white when finished
+  // Interior: OSB texture when shell (casco), white when finished
   const isShell = config.finishLevel === "shell";
   const interiorColor = isShell ? "#d4b88c" : "#ffffff";
   const interiorRoughness = isShell ? 0.85 : 0.9;
   const floorColor = isShell ? "#d4b88c" : "#c9a97e";
+
+  // Load OSB texture for shell finish
+  const osbTexRaw = useLoader(THREE.TextureLoader, osbTextureUrl);
+  const osbTex = useMemo(() => {
+    const t = osbTexRaw.clone();
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(3, 3);
+    t.needsUpdate = true;
+    return t;
+  }, [osbTexRaw]);
 
   const scaleX = config.mirrorPlan ? -1 : 1;
 
@@ -272,7 +305,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {/* Walkable floor */}
       <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[width - wallThick * 2, depth - wallThick * 2]} />
-        <meshStandardMaterial color={floorColor} roughness={isShell ? 0.85 : 0.65} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={isShell ? 0.85 : 0.65} />
       </mesh>
 
       {/* ── Roof slab — black, covers full unit ── */}
@@ -316,7 +349,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
             return (
               <mesh key={`ci${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]}>
                 <extrudeGeometry args={[shell, { depth: height, bevelEnabled: false }]} />
-                <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
               </mesh>
             );
           });
@@ -325,7 +358,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {/* ── Interior ceiling — white box just under roof slab ── */}
       <mesh position={[0, height - 0.03, 0]}>
         <boxGeometry args={[width - wallThick * 2, 0.04, depth - wallThick * 2]} />
-        <meshStandardMaterial color={interiorColor} roughness={isShell ? 0.85 : 0.95} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={isShell ? 0.85 : 0.95} />
       </mesh>
 
       {/* ── Interior lighting ── */}
@@ -365,6 +398,8 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           finishLevel={config.finishLevel}
           interiorColor={interiorColor}
           interiorRoughness={interiorRoughness}
+          osbTex={osbTex}
+          isShell={isShell}
         />
       ) : (
         <GenericWalls
@@ -386,6 +421,8 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           model={config.model}
           interiorColor={interiorColor}
           interiorRoughness={interiorRoughness}
+          osbTex={osbTex}
+          isShell={isShell}
         />
       )}
     </group>
@@ -415,6 +452,8 @@ function StartWalls({
   finishLevel,
   interiorColor,
   interiorRoughness,
+  osbTex,
+  isShell,
 }: any) {
   const halfW = width / 2;
   const halfD = depth / 2;
@@ -478,7 +517,7 @@ function StartWalls({
       {/* Interior left wall */}
       <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
         <boxGeometry args={[0.01, height, intLeftD]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
       {/* ── BACK WALL — 3 segments + window (front-priority: negative offset) ── */}
@@ -515,23 +554,23 @@ function StartWalls({
       {intBackLeftW > 0.01 && (
         <mesh position={[intBackLeftCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
           <boxGeometry args={[intBackLeftW, height, 0.01]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {intBackRightW > 0.01 && (
         <mesh position={[intBackRightCX, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
           <boxGeometry args={[intBackRightW, height, 0.01]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {/* Interior back wall — above & below window */}
       <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick + 0.005]}>
         <boxGeometry args={[backWinW, winBot, 0.01]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
       <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick + 0.005]}>
         <boxGeometry args={[backWinW, height - winTop, 0.01]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
       {/* ── FRONT WALL — 2 solid segments + big window (front-priority: negative offset) ── */}
@@ -568,23 +607,23 @@ function StartWalls({
       {intFrontLeftW > 0.01 && (
         <mesh position={[intFrontLeftCX, height / 2 + floorThick, halfD - wallThick - 0.005]}>
           <boxGeometry args={[intFrontLeftW, height, 0.01]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {intFrontRightW > 0.01 && (
         <mesh position={[intFrontRightCX, height / 2 + floorThick, halfD - wallThick - 0.005]}>
           <boxGeometry args={[intFrontRightW, height, 0.01]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {/* Interior front — above & below window */}
       <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick - 0.005]}>
         <boxGeometry args={[frontWinW, winBot, 0.01]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
       <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick - 0.005]}>
         <boxGeometry args={[frontWinW, height - winTop, 0.01]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
       {/* ── RIGHT WALL — 2 solid segments + door opening (floor to lintel) ── */}
@@ -609,19 +648,19 @@ function StartWalls({
       {intRightTopH > 0.01 && (
         <mesh position={[halfW - wallThick - 0.005, height / 2 + floorThick, intRightTopCZ]}>
           <boxGeometry args={[0.01, height, intRightTopH]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {intRightBotH > 0.01 && (
         <mesh position={[halfW - wallThick - 0.005, height / 2 + floorThick, intRightBotCZ]}>
           <boxGeometry args={[0.01, height, intRightBotH]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
       {/* Interior right — door header */}
       <mesh position={[halfW - wallThick - 0.005, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]}>
         <boxGeometry args={[0.01, height - winTop, doorH]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
       {/* Door — full height from floor to lintel */}
@@ -917,26 +956,26 @@ function StartWalls({
               {/* Vertical partition wall — extended to cover corner joint */}
               <mesh position={[partX, height / 2 + floorThick, -halfD + wallThick + (partDepth + partWallT / 2) / 2]}>
                 <boxGeometry args={[partWallT, height, partDepth + partWallT / 2]} />
-                <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
               </mesh>
               {/* Horizontal wall — left of door */}
               {leftSegW > 0.01 && (
                 <mesh position={[leftSegCX, height / 2 + floorThick, horizZ]}>
                   <boxGeometry args={[leftSegW, height, partWallT]} />
-                  <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+                  <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
                 </mesh>
               )}
               {/* Horizontal wall — right of door */}
               {rightSegW > 0.01 && (
                 <mesh position={[rightSegCX, height / 2 + floorThick, horizZ]}>
                   <boxGeometry args={[rightSegW, height, partWallT]} />
-                  <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+                  <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
                 </mesh>
               )}
               {/* Door header */}
               <mesh position={[doorAbsX, doorH3D + headerH / 2 + floorThick, horizZ]}>
                 <boxGeometry args={[doorW3D, headerH, partWallT]} />
-                <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
               </mesh>
               {/* Door frame — left jamb */}
               <mesh position={[doorAbsX - doorW3D / 2 - 0.015, doorH3D / 2 + floorThick, horizZ]}>
@@ -1183,6 +1222,8 @@ function GenericWalls({
   model,
   interiorColor,
   interiorRoughness,
+  osbTex,
+  isShell,
 }: any) {
   const sideInset = Math.max(cornerRadius, wallThick);
   const hasDivider = floorPlan === "b";
@@ -1218,7 +1259,7 @@ function GenericWalls({
       {/* Interior back wall */}
       <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick + 0.01]}>
         <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
-        <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
       {/* Front facade */}
@@ -1298,7 +1339,7 @@ function GenericWalls({
       {hasDivider && (
         <mesh position={[room2StartX + PILLAR_W / 2, height / 2 + floorThick, 0]}>
           <boxGeometry args={[0.06, height, depth - wallThick * 2]} />
-          <meshStandardMaterial color={interiorColor} roughness={interiorRoughness} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       )}
     </group>
