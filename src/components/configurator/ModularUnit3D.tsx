@@ -91,27 +91,11 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const floorThick    = 0.18;
   const PILLAR_W      = 0.38;
 
-  // Room split based on floorPlan
-  const hasDivider = config.floorPlan === "b" && config.model !== "start";
-  const roomSplit = hasDivider ? 55 : 100;
-
-  // Front facade geometry
-  const flatStartX   = -width / 2 + cornerRadius;
-  const flatEndX     =  width / 2 - cornerRadius;
-  const flatWidth    = flatEndX - flatStartX;
-  const usableWidth  = flatWidth - PILLAR_W;
-  const room1Width   = usableWidth * (roomSplit / 100);
-  const room2Width   = usableWidth * (1 - roomSplit / 100);
-  const room1CX      = flatStartX + PILLAR_W + room1Width / 2;
-  const room2StartX  = flatStartX + PILLAR_W + room1Width;
-
   // Window heights
   const winH    = height * 0.72;
   const winBot  = height * 0.09;
   const winTop  = winBot + winH;
   const winCY   = winBot + winH / 2;
-
-  const DOOR_W  = 1.05;
 
   const slabShape = useMemo(
     () => (cornerRadius > 0 ? roundedRect(width, depth, cornerRadius) : null),
@@ -145,6 +129,17 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   };
 
   const scaleX = config.mirrorPlan ? -1 : 1;
+
+  /* ── START-specific wall/window/door layout from architectural plan ── */
+  /* Back wall:  185 + 80(window) + 135 = 400cm
+     Front wall: 96 + 200(window) + 104 = 400cm
+     Right wall: 165 + 100(door) + 85 = 350cm
+     Left wall:  solid (storage unit against it) */
+  const isStart = config.model === "start";
+
+  // Convert cm to 3D units for the START model
+  const cmToUnit = (cm: number) => (cm / 400) * width; // width maps to 400cm
+  const cmToDepth = (cm: number) => (cm / 350) * depth; // depth maps to 350cm
 
   return (
     <group scale={[scaleX, 1, 1]}>
@@ -181,24 +176,6 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         </mesh>
       )}
 
-      {/* ── Back wall ── */}
-      <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick / 2]} castShadow>
-        <boxGeometry args={[width - cornerRadius * 2, height, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
-      </mesh>
-
-      {/* ── Right wall ── */}
-      <mesh position={[width / 2 - wallThick / 2, height / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
-        <meshStandardMaterial {...claddingProps} />
-      </mesh>
-
-      {/* ── Left wall ── */}
-      <mesh position={[-width / 2 + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
-        <meshStandardMaterial {...claddingProps} />
-      </mesh>
-
       {/* ── Rounded corners ── */}
       {cornerShapes && cornerShapes.map(({ shape, posX, posZ }, i) => (
         <mesh key={i} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
@@ -213,20 +190,283 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         <meshStandardMaterial color="#eceae6" roughness={0.95} />
       </mesh>
 
-      {/* ── Interior back wall ── */}
+      {/* ── Interior lighting ── */}
+      <pointLight position={[0, height * 0.85 + floorThick, -depth * 0.1]} intensity={1.4} color="#fff8f0" distance={9} decay={2} />
+      <pointLight position={[0, height * 0.85 + floorThick,  depth * 0.2]} intensity={0.7} color="#fffaf5" distance={6} decay={2} />
+
+      {isStart ? (
+        <StartWalls
+          width={width} height={height} depth={depth}
+          wallThick={wallThick} floorThick={floorThick}
+          cornerRadius={cornerRadius}
+          winH={winH} winBot={winBot} winTop={winTop} winCY={winCY}
+          claddingProps={claddingProps} frameColor={frameColor}
+          cmToUnit={cmToUnit} cmToDepth={cmToDepth}
+          floorPlan={config.floorPlan}
+        />
+      ) : (
+        <GenericWalls
+          width={width} height={height} depth={depth}
+          wallThick={wallThick} floorThick={floorThick}
+          cornerRadius={cornerRadius}
+          winH={winH} winBot={winBot} winTop={winTop} winCY={winCY}
+          PILLAR_W={PILLAR_W}
+          claddingProps={claddingProps} frameColor={frameColor}
+          floorPlan={config.floorPlan}
+          model={config.model}
+        />
+      )}
+    </group>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   START model walls — windows & door placed per architectural plan
+   ═══════════════════════════════════════════════════════════════════════ */
+function StartWalls({
+  width, height, depth, wallThick, floorThick, cornerRadius,
+  winH, winBot, winTop, winCY,
+  claddingProps, frameColor,
+  cmToUnit, cmToDepth, floorPlan,
+}: any) {
+  const halfW = width / 2;
+  const halfD = depth / 2;
+  const flatW = width - cornerRadius * 2;
+
+  // ── Back wall (Z = -depth/2): window 80cm wide, starts at 185cm from left ──
+  const backWinW = cmToUnit(80);
+  const backWinCenterX = -halfW + cmToUnit(185) + backWinW / 2;
+
+  // Segments: left solid (185cm), window (80cm), right solid (135cm)
+  const backLeftW = cmToUnit(185) - cornerRadius;
+  const backRightW = cmToUnit(135) - cornerRadius;
+  const backLeftCX = -halfW + cornerRadius + backLeftW / 2;
+  const backRightCX = halfW - cornerRadius - backRightW / 2;
+
+  // ── Front wall (Z = +depth/2): window 200cm, starts at 96cm from left ──
+  const frontWinW = cmToUnit(200);
+  const frontWinCenterX = -halfW + cmToUnit(96) + frontWinW / 2;
+  const frontLeftW = cmToUnit(96) - cornerRadius;
+  const frontRightW = cmToUnit(104) - cornerRadius;
+  const frontLeftCX = -halfW + cornerRadius + frontLeftW / 2;
+  const frontRightCX = halfW - cornerRadius - frontRightW / 2;
+
+  // ── Right wall (X = +width/2): door 100cm, starts 165cm from back (top) ──
+  const doorH = cmToDepth(100); // door height in Z-axis
+  const doorStartZ = -halfD + cmToDepth(165);
+  const doorCenterZ = doorStartZ + doorH / 2;
+  const rightTopH = cmToDepth(165) - cornerRadius; // solid above door
+  const rightBotH = cmToDepth(85) - cornerRadius;  // solid below door
+  const rightTopCZ = -halfD + cornerRadius + rightTopH / 2;
+  const rightBotCZ = halfD - cornerRadius - rightBotH / 2;
+
+  // ── Left wall: fully solid ──
+  const leftFlatD = depth - cornerRadius * 2;
+
+  const DOOR_W_3D = 1.0; // door width in 3D (100cm)
+
+  return (
+    <group>
+      {/* ── LEFT WALL — solid ── */}
+      <mesh position={[-halfW + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
+        <boxGeometry args={[wallThick, height, leftFlatD]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      {/* Interior left wall */}
+      <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
+        <boxGeometry args={[0.01, height, leftFlatD]} />
+        <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+      </mesh>
+
+      {/* ── BACK WALL — 3 segments + window ── */}
+      {/* Left segment */}
+      {backLeftW > 0.01 && (
+        <mesh position={[backLeftCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
+          <boxGeometry args={[backLeftW, height, wallThick]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {/* Right segment */}
+      {backRightW > 0.01 && (
+        <mesh position={[backRightCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
+          <boxGeometry args={[backRightW, height, wallThick]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {/* Window area — spandrel below + header above + glass */}
+      <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
+        <boxGeometry args={[backWinW, winBot, wallThick]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
+        <boxGeometry args={[backWinW, height - winTop, wallThick]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      <GlassPane posX={backWinCenterX} posY={winCY + floorThick} width={backWinW} height={winH} frameColor={frameColor} z={-halfD + wallThick / 2} />
+      {/* Interior back wall */}
+      <mesh position={[0, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
+        <boxGeometry args={[flatW, height, 0.01]} />
+        <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
+      </mesh>
+
+      {/* ── FRONT WALL — 2 solid segments + big window ── */}
+      {frontLeftW > 0.01 && (
+        <mesh position={[frontLeftCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
+          <boxGeometry args={[frontLeftW, height, wallThick]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {frontRightW > 0.01 && (
+        <mesh position={[frontRightCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
+          <boxGeometry args={[frontRightW, height, wallThick]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {/* Window spandrel + header */}
+      <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
+        <boxGeometry args={[frontWinW, winBot, wallThick]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
+        <boxGeometry args={[frontWinW, height - winTop, wallThick]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      <GlassPane posX={frontWinCenterX} posY={winCY + floorThick} width={frontWinW} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} hasDivider />
+
+      {/* ── RIGHT WALL — 2 solid segments + door opening ── */}
+      {/* Top segment (back side) */}
+      {rightTopH > 0.01 && (
+        <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightTopCZ]} castShadow>
+          <boxGeometry args={[wallThick, height, rightTopH]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {/* Bottom segment (front side) */}
+      {rightBotH > 0.01 && (
+        <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightBotCZ]} castShadow>
+          <boxGeometry args={[wallThick, height, rightBotH]} />
+          <meshStandardMaterial {...claddingProps} />
+        </mesh>
+      )}
+      {/* Door header above opening */}
+      <mesh position={[halfW - wallThick / 2, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]} castShadow>
+        <boxGeometry args={[wallThick, height - winTop, doorH]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      {/* Door glass */}
+      <GlassPane posX={halfW - wallThick / 2} posY={winCY + floorThick} width={doorH} height={winH} frameColor={frameColor} z={doorCenterZ} rotate />
+      {/* Door step */}
+      <mesh position={[halfW + 0.18, floorThick / 2, doorCenterZ]} castShadow>
+        <boxGeometry args={[0.32, floorThick, doorH + 0.15]} />
+        <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
+      </mesh>
+
+      {/* ── Plan B: toilet partition ── */}
+      {floorPlan === "b" && (
+        <group>
+          {/* Vertical partition wall (X direction) at ~135cm from left → cmToUnit(135) */}
+          <mesh position={[-halfW + cmToUnit(135), height / 2 + floorThick, -halfD + cmToDepth(82.5) / 2 + wallThick / 2]}>
+            <boxGeometry args={[0.08, height, cmToDepth(82.5)]} />
+            <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
+          </mesh>
+          {/* Horizontal partition wall (Z direction) */}
+          <mesh position={[-halfW + cmToUnit(135) / 2 + cmToUnit(135) / 2 + (halfW - cmToUnit(135)) / 2 + cmToUnit(135) / 2, height / 2 + floorThick, -halfD + cmToDepth(82.5) + wallThick / 2]}>
+            <boxGeometry args={[halfW * 2 - cmToUnit(135), height, 0.08]} />
+            <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
+          </mesh>
+        </group>
+      )}
+    </group>
+  );
+}
+
+// ─── Glass pane ───────────────────────────────────────────────────────────────
+function GlassPane({
+  posX, posY, width, height, frameColor, hasDivider, z = 0, rotate,
+}: {
+  posX: number; posY: number; width: number; height: number; frameColor: string;
+  hasDivider?: boolean; z?: number; rotate?: boolean;
+}) {
+  const fw = 0.036;
+  const rotation: [number, number, number] = rotate ? [0, Math.PI / 2, 0] : [0, 0, 0];
+  return (
+    <group position={[posX, posY, z]} rotation={rotation}>
+      {(
+        [
+          [0,  height / 2 - fw / 2, 0, width, fw, 0.06],
+          [0, -height / 2 + fw / 2, 0, width, fw, 0.06],
+          [-width / 2 + fw / 2, 0, 0, fw, height, 0.06],
+          [ width / 2 - fw / 2, 0, 0, fw, height, 0.06],
+          ...(hasDivider ? [[0, 0, 0.004, fw, height - fw * 2, 0.05]] : []),
+        ] as [number, number, number, number, number, number][]
+      ).map(([x, y, zz, bw, bh, bd], i) => (
+        <mesh key={i} position={[x, y, zz]} castShadow>
+          <boxGeometry args={[bw, bh, bd]} />
+          <meshStandardMaterial color={frameColor} roughness={0.3} metalness={0.65} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0, 0.001]}>
+        <boxGeometry args={[width - fw * 2, height - fw * 2, 0.006]} />
+        <meshPhysicalMaterial
+          color="#c5d8e0"
+          roughness={0.01}
+          metalness={0.0}
+          transmission={0.94}
+          thickness={0.12}
+          ior={1.52}
+          transparent
+          opacity={0.22}
+          envMapIntensity={2}
+          side={THREE.DoubleSide}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+// ─── Generic walls for FLOW / HUB / BASE ─────────────────────────────────────
+function GenericWalls({
+  width, height, depth, wallThick, floorThick, cornerRadius,
+  winH, winBot, winTop, winCY, PILLAR_W,
+  claddingProps, frameColor, floorPlan, model,
+}: any) {
+  const hasDivider = floorPlan === "b";
+  const roomSplit = hasDivider ? 55 : 100;
+  const flatStartX = -width / 2 + cornerRadius;
+  const flatEndX = width / 2 - cornerRadius;
+  const flatWidth = flatEndX - flatStartX;
+  const usableWidth = flatWidth - PILLAR_W;
+  const room1Width = usableWidth * (roomSplit / 100);
+  const room2Width = usableWidth * (1 - roomSplit / 100);
+  const room1CX = flatStartX + PILLAR_W + room1Width / 2;
+  const room2StartX = flatStartX + PILLAR_W + room1Width;
+  const DOOR_W = 1.05;
+
+  return (
+    <group>
+      {/* Back wall */}
+      <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick / 2]} castShadow>
+        <boxGeometry args={[width - cornerRadius * 2, height, wallThick]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      {/* Right wall */}
+      <mesh position={[width / 2 - wallThick / 2, height / 2 + floorThick, 0]} castShadow>
+        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      {/* Left wall */}
+      <mesh position={[-width / 2 + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
+        <boxGeometry args={[wallThick, height, depth - cornerRadius * 2]} />
+        <meshStandardMaterial {...claddingProps} />
+      </mesh>
+      {/* Interior back wall */}
       <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick + 0.01]}>
         <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
         <meshStandardMaterial color="#e8e5e0" roughness={0.9} />
       </mesh>
 
-      {/* ── Interior lighting ── */}
-      <pointLight position={[0, height * 0.85 + floorThick, -depth * 0.1]} intensity={1.4} color="#fff8f0" distance={9} decay={2} />
-      <pointLight position={[0, height * 0.85 + floorThick,  depth * 0.2]} intensity={0.7} color="#fffaf5" distance={6} decay={2} />
-
-      {/* ── FRONT FACADE ── */}
+      {/* Front facade */}
       <group position={[0, floorThick, depth / 2 - wallThick / 2]}>
-
-        {/* Starting pillar (left) */}
         <mesh position={[flatStartX + PILLAR_W / 2, height / 2, 0]} castShadow>
           <boxGeometry args={[PILLAR_W, height, wallThick]} />
           <meshStandardMaterial {...claddingProps} />
@@ -234,7 +474,6 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
         {roomSplit < 100 ? (
           <>
-            {/* Room 1 window */}
             <mesh position={[room1CX, winBot / 2, 0]} castShadow>
               <boxGeometry args={[room1Width, winBot, wallThick]} />
               <meshStandardMaterial {...claddingProps} />
@@ -244,29 +483,16 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
               <meshStandardMaterial {...claddingProps} />
             </mesh>
             <GlassPane posX={room1CX} posY={winCY} width={room1Width} height={winH} frameColor={frameColor} hasDivider />
-
-            {/* Room 2 partition pillar */}
             <mesh position={[room2StartX + PILLAR_W / 2, height / 2, 0]} castShadow>
               <boxGeometry args={[PILLAR_W, height, wallThick]} />
               <meshStandardMaterial {...claddingProps} />
             </mesh>
-
-            {/* Room 2 — door + window */}
             <Room2Facade
-              room2StartX={room2StartX}
-              room2Width={room2Width}
-              height={height}
-              wallThick={wallThick}
-              winBot={winBot}
-              winTop={winTop}
-              winCY={winCY}
-              winH={winH}
-              flatEndX={flatEndX}
-              PILLAR_W={PILLAR_W}
-              DOOR_W={DOOR_W}
-              frameColor={frameColor}
-              claddingProps={claddingProps}
-              floorThick={floorThick}
+              room2StartX={room2StartX} room2Width={room2Width}
+              height={height} wallThick={wallThick}
+              winBot={winBot} winTop={winTop} winCY={winCY} winH={winH}
+              flatEndX={flatEndX} PILLAR_W={PILLAR_W} DOOR_W={DOOR_W}
+              frameColor={frameColor} claddingProps={claddingProps} floorThick={floorThick}
             />
           </>
         ) : (
@@ -288,56 +514,13 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         )}
       </group>
 
-      {/* ── Room divider ── */}
+      {/* Room divider */}
       {hasDivider && (
         <mesh position={[room2StartX + PILLAR_W / 2, height / 2 + floorThick, 0]}>
           <boxGeometry args={[0.06, height, depth - wallThick * 2]} />
           <meshStandardMaterial color="#e0ddd8" roughness={0.92} />
         </mesh>
       )}
-
-    </group>
-  );
-}
-
-// ─── Glass pane ───────────────────────────────────────────────────────────────
-function GlassPane({
-  posX, posY, width, height, frameColor, hasDivider,
-}: {
-  posX: number; posY: number; width: number; height: number; frameColor: string; hasDivider?: boolean;
-}) {
-  const fw = 0.036;
-  return (
-    <group position={[posX, posY, 0]}>
-      {(
-        [
-          [0,  height / 2 - fw / 2, 0, width, fw, 0.06],
-          [0, -height / 2 + fw / 2, 0, width, fw, 0.06],
-          [-width / 2 + fw / 2, 0, 0, fw, height, 0.06],
-          [ width / 2 - fw / 2, 0, 0, fw, height, 0.06],
-          ...(hasDivider ? [[0, 0, 0.004, fw, height - fw * 2, 0.05]] : []),
-        ] as [number, number, number, number, number, number][]
-      ).map(([x, y, z, bw, bh, bd], i) => (
-        <mesh key={i} position={[x, y, z]} castShadow>
-          <boxGeometry args={[bw, bh, bd]} />
-          <meshStandardMaterial color={frameColor} roughness={0.3} metalness={0.65} />
-        </mesh>
-      ))}
-      <mesh position={[0, 0, 0.001]}>
-        <boxGeometry args={[width - fw * 2, height - fw * 2, 0.006]} />
-        <meshPhysicalMaterial
-          color="#c5d8e0"
-          roughness={0.01}
-          metalness={0.0}
-          transmission={0.94}
-          thickness={0.12}
-          ior={1.52}
-          transparent
-          opacity={0.22}
-          envMapIntensity={2}
-          side={THREE.DoubleSide}
-        />
-      </mesh>
     </group>
   );
 }
