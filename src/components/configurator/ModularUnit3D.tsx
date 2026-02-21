@@ -287,7 +287,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         cornerShapes.map(({ shape, posX, posZ }, i) => (
           <mesh key={`ce${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
             <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
-            <meshStandardMaterial {...claddingProps} />
+            <CladMaterial {...woodBase} wallWidth={Math.PI * 0.5 * cornerRadius} />
           </mesh>
         ))}
       {/* ── Rounded corners — white interior face ── */}
