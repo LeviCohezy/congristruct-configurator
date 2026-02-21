@@ -7,7 +7,7 @@ import { getRoofColor } from "@/hooks/useConfigurator";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":     return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
-    case "thermowood-natural":   return { color: "#7a5728", roughness: 0.88, metalness: 0.0, isWood: true };
+    case "thermowood-natural":   return { color: "#b07840", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":      return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":      return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium-anthracite": return { color: "#383a3b", roughness: 0.28, metalness: 0.80, isWood: false };
@@ -27,24 +27,38 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const ctx = canvas.getContext("2d")!;
   const base = new THREE.Color(baseColor);
 
-  ctx.fillStyle = `#${base.getHexString()}`;
+  // Dark background visible in gaps
+  ctx.fillStyle = "#1a1208";
   ctx.fillRect(0, 0, 512, 1024);
 
-  const numPlanks = 20;
+  // Narrow vertical planks with visible dark gaps (65mm planks)
+  const numPlanks = 28;
   const pw = 512 / numPlanks;
+  const gapW = 4; // dark gap between planks
+
   for (let i = 0; i < numPlanks; i++) {
     const x = i * pw;
-    const tone = (Math.sin(i * 6.3) * 0.5 + Math.cos(i * 2.1) * 0.5) * 0.08;
-    const col = base.clone().lerp(tone > 0 ? new THREE.Color("#fff") : new THREE.Color("#000"), Math.abs(tone));
+    // Per-plank color variation — warmer/cooler shifts
+    const shift = (Math.sin(i * 4.7) * 0.5 + Math.cos(i * 2.3 + 1) * 0.3) * 0.12;
+    const warm = new THREE.Color("#e8a050");
+    const cool = new THREE.Color("#6a4020");
+    const col = base.clone().lerp(shift > 0 ? warm : cool, Math.abs(shift));
     ctx.fillStyle = `#${col.getHexString()}`;
-    ctx.fillRect(x, 0, pw, 1024);
-    for (let g = 0; g < 12; g++) {
-      const gx = x + Math.random() * pw;
-      ctx.fillStyle = `rgba(0,0,0,${0.04 + Math.random() * 0.06})`;
-      ctx.fillRect(gx, 0, 1 + Math.random() * 1.5, 1024);
+    ctx.fillRect(x, 0, pw - gapW, 1024);
+
+    // Subtle wood grain lines
+    for (let g = 0; g < 18; g++) {
+      const gx = x + Math.random() * (pw - gapW);
+      const alpha = 0.03 + Math.random() * 0.07;
+      ctx.fillStyle = `rgba(0,0,0,${alpha})`;
+      ctx.fillRect(gx, 0, 0.8 + Math.random() * 1.2, 1024);
     }
-    ctx.fillStyle = "rgba(0,0,0,0.55)";
-    ctx.fillRect(x + pw - 3, 0, 3, 1024);
+    // Lighter grain highlights
+    for (let g = 0; g < 6; g++) {
+      const gx = x + Math.random() * (pw - gapW);
+      ctx.fillStyle = `rgba(255,220,180,${0.03 + Math.random() * 0.04})`;
+      ctx.fillRect(gx, 0, 0.8 + Math.random() * 1, 1024);
+    }
   }
 
   const tex = new THREE.CanvasTexture(canvas);
