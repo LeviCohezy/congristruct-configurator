@@ -9,7 +9,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
     case "thermowood-black":
       return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
     case "thermowood-natural":
-      return { color: "#cea67c", roughness: 0.82, metalness: 0.0, isWood: true };
+      return { color: "#ccb999", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":
       return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
@@ -41,7 +41,7 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // 2. Narrow vertical slats with visible gaps (like thermowood cladding)
-  const numPlanks = 28;
+  const numPlanks = 20;
   const pw = canvas.width / numPlanks;
   const gapW = pw * 0.12; // ~12 % of plank width = visible dark gap
 
