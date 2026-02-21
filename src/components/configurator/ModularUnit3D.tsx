@@ -316,6 +316,15 @@ function StartWalls({
           <meshStandardMaterial color="#ffffff" roughness={0.9} />
         </mesh>
       )}
+      {/* Interior back wall — above & below window */}
+      <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick + 0.005]}>
+        <boxGeometry args={[backWinW, winBot, 0.01]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick + 0.005]}>
+        <boxGeometry args={[backWinW, height - winTop, 0.01]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
 
       {/* ── FRONT WALL — 2 solid segments + big window ── */}
       {frontLeftW > 0.01 && (
@@ -340,6 +349,28 @@ function StartWalls({
         <meshStandardMaterial {...claddingProps} />
       </mesh>
       <GlassPane posX={frontWinCenterX} posY={winCY + floorThick} width={frontWinW} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} />
+      {/* Interior front wall segments */}
+      {frontLeftW > 0.01 && (
+        <mesh position={[frontLeftCX, height / 2 + floorThick, halfD - wallThick - 0.005]}>
+          <boxGeometry args={[frontLeftW, height, 0.01]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
+        </mesh>
+      )}
+      {frontRightW > 0.01 && (
+        <mesh position={[frontRightCX, height / 2 + floorThick, halfD - wallThick - 0.005]}>
+          <boxGeometry args={[frontRightW, height, 0.01]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
+        </mesh>
+      )}
+      {/* Interior front — above & below window */}
+      <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick - 0.005]}>
+        <boxGeometry args={[frontWinW, winBot, 0.01]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+      <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick - 0.005]}>
+        <boxGeometry args={[frontWinW, height - winTop, 0.01]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
 
       {/* ── RIGHT WALL — 2 solid segments + door opening (floor to lintel) ── */}
       {rightTopH > 0.01 && (
@@ -359,6 +390,25 @@ function StartWalls({
         <boxGeometry args={[wallThick, height - winTop, doorH]} />
         <meshStandardMaterial {...claddingProps} />
       </mesh>
+      {/* Interior right wall segments */}
+      {rightTopH > 0.01 && (
+        <mesh position={[halfW - wallThick - 0.005, height / 2 + floorThick, rightTopCZ]}>
+          <boxGeometry args={[0.01, height, rightTopH]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
+        </mesh>
+      )}
+      {rightBotH > 0.01 && (
+        <mesh position={[halfW - wallThick - 0.005, height / 2 + floorThick, rightBotCZ]}>
+          <boxGeometry args={[0.01, height, rightBotH]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
+        </mesh>
+      )}
+      {/* Interior right — door header */}
+      <mesh position={[halfW - wallThick - 0.005, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]}>
+        <boxGeometry args={[0.01, height - winTop, doorH]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.9} />
+      </mesh>
+
       {/* Door — full height from floor to lintel */}
       <DoorPane
         posX={halfW - wallThick / 2} posY={floorThick + winTop / 2}
@@ -374,12 +424,10 @@ function StartWalls({
       {/* ── Plan B: toilet partition ── */}
       {floorPlan === "b" && (
         <group>
-          {/* Vertical partition wall (X direction) at ~135cm from left → cmToUnit(135) */}
           <mesh position={[-halfW + cmToUnit(135), height / 2 + floorThick, -halfD + cmToDepth(82.5) / 2 + wallThick / 2]}>
             <boxGeometry args={[0.08, height, cmToDepth(82.5)]} />
             <meshStandardMaterial color="#ffffff" roughness={0.92} />
           </mesh>
-          {/* Horizontal partition wall (Z direction) */}
           <mesh position={[-halfW + cmToUnit(135) / 2 + cmToUnit(135) / 2 + (halfW - cmToUnit(135)) / 2 + cmToUnit(135) / 2, height / 2 + floorThick, -halfD + cmToDepth(82.5) + wallThick / 2]}>
             <boxGeometry args={[halfW * 2 - cmToUnit(135), height, 0.08]} />
             <meshStandardMaterial color="#ffffff" roughness={0.92} />
