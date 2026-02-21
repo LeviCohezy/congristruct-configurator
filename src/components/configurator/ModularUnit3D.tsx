@@ -237,19 +237,19 @@ function StartWalls({
   const backWinW = cmToUnit(80);
   const backWinCenterX = -halfW + cmToUnit(185) + backWinW / 2;
 
-  // Segments: left solid (185cm), window (80cm), right solid (135cm)
-  const backLeftW = cmToUnit(185) - cornerRadius;
-  const backRightW = cmToUnit(135) - cornerRadius;
-  const backLeftCX = -halfW + cornerRadius + backLeftW / 2;
-  const backRightCX = halfW - cornerRadius - backRightW / 2;
+  // Back wall segments — inset by wallThick so side walls wrap corners cleanly
+  const backLeftW = cmToUnit(185) - cornerRadius - wallThick;
+  const backRightW = cmToUnit(135) - cornerRadius - wallThick;
+  const backLeftCX = -halfW + cornerRadius + wallThick + backLeftW / 2;
+  const backRightCX = halfW - cornerRadius - wallThick - backRightW / 2;
 
   // ── Front wall (Z = +depth/2): window 200cm, starts at 96cm from left ──
   const frontWinW = cmToUnit(200);
   const frontWinCenterX = -halfW + cmToUnit(96) + frontWinW / 2;
-  const frontLeftW = cmToUnit(96) - cornerRadius;
-  const frontRightW = cmToUnit(104) - cornerRadius;
-  const frontLeftCX = -halfW + cornerRadius + frontLeftW / 2;
-  const frontRightCX = halfW - cornerRadius - frontRightW / 2;
+  const frontLeftW = cmToUnit(96) - cornerRadius - wallThick;
+  const frontRightW = cmToUnit(104) - cornerRadius - wallThick;
+  const frontLeftCX = -halfW + cornerRadius + wallThick + frontLeftW / 2;
+  const frontRightCX = halfW - cornerRadius - wallThick - frontRightW / 2;
 
   // ── Right wall (X = +width/2): door 100cm, starts 165cm from back (top) ──
   const doorH = cmToDepth(100); // door height in Z-axis
