@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect } from "react";
 import * as THREE from "three";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { getRoofColor } from "@/hooks/useConfigurator";
@@ -28,65 +28,130 @@ function getFacadeProps(facade: ConfigState["facade"]) {
 }
 
 // ─── Plank texture ────────────────────────────────────────────────────────────
+// The texture contains exactly ONE plank + gap. Repeat is set per real-world scale
+// so every plank everywhere is the same width regardless of wall size.
+const PLANK_WIDTH_M = 0.065; // 65mm real-world plank width
+const GAP_WIDTH_M = 0.005;   // 5mm gap
+const CELL_M = PLANK_WIDTH_M + GAP_WIDTH_M; // one repeating cell = 70mm
+
 function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: string): THREE.CanvasTexture | null {
   if (!isWood) return null;
   const canvas = document.createElement("canvas");
-  canvas.width = 1024;
-  canvas.height = 2048;
+  // Single plank cell — high res for one plank
+  canvas.width = 128;
+  canvas.height = 512;
   const ctx = canvas.getContext("2d")!;
   const base = new THREE.Color(baseColor);
 
-  // 1. Background — dark shadow gap between slats
+  // Gap on the right edge
+  const gapFrac = GAP_WIDTH_M / CELL_M;
+  const gapPx = Math.round(canvas.width * gapFrac);
+  const slatW = canvas.width - gapPx;
+
+  // 1. Fill entire cell with gap color
   ctx.fillStyle = gapColor || "#1a1208";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Wide vertical slats — every plank same width, gaps included so it tiles seamlessly
-  const numPlanks = 6;
-  const pw = canvas.width / numPlanks; // each plank "cell" is equal
-  const gapPx = 4;
-  const slatW = pw - gapPx; // plank width = cell minus gap
+  // 2. Draw the single plank
+  const col = base.clone();
+  ctx.fillStyle = `#${col.getHexString()}`;
+  ctx.fillRect(0, 0, slatW, canvas.height);
 
-  for (let i = 0; i < numPlanks; i++) {
-    const x = i * pw; // uniform spacing
-
-    // 3. Subtle per-plank brightness variation (+/- 4 %)
-    const col = base.clone();
-    col.multiplyScalar(1 + (Math.random() - 0.5) * 0.08);
-
-    // 4. Draw slat
-    ctx.fillStyle = `#${col.getHexString()}`;
-    ctx.fillRect(x, 0, slatW, canvas.height);
-
-    // 5. Very faint vertical grain lines (2-3 per slat)
-    for (let g = 0; g < 3; g++) {
-      const gx = x + 2 + Math.random() * (slatW - 4);
-      ctx.fillStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
-      ctx.fillRect(gx, 0, 0.8, canvas.height);
-    }
-
-    // 6. Soft left-edge shadow for depth
-    const grad = ctx.createLinearGradient(x, 0, x + slatW * 0.08, 0);
-    grad.addColorStop(0, "rgba(0,0,0,0.18)");
-    grad.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = grad;
-    ctx.fillRect(x, 0, slatW * 0.08, canvas.height);
-
-    // 7. Soft right-edge highlight
-    const hl = ctx.createLinearGradient(x + slatW * 0.92, 0, x + slatW, 0);
-    hl.addColorStop(0, "rgba(255,255,255,0)");
-    hl.addColorStop(1, "rgba(255,255,255,0.06)");
-    ctx.fillStyle = hl;
-    ctx.fillRect(x + slatW * 0.92, 0, slatW * 0.08, canvas.height);
+  // 3. Faint grain lines
+  for (let g = 0; g < 3; g++) {
+    const gx = 2 + Math.random() * (slatW - 4);
+    ctx.fillStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
+    ctx.fillRect(gx, 0, 0.8, canvas.height);
   }
+
+  // 4. Left-edge shadow
+  const grad = ctx.createLinearGradient(0, 0, slatW * 0.08, 0);
+  grad.addColorStop(0, "rgba(0,0,0,0.15)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, slatW * 0.08, canvas.height);
+
+  // 5. Right-edge highlight
+  const hl = ctx.createLinearGradient(slatW * 0.92, 0, slatW, 0);
+  hl.addColorStop(0, "rgba(255,255,255,0)");
+  hl.addColorStop(1, "rgba(255,255,255,0.06)");
+  ctx.fillStyle = hl;
+  ctx.fillRect(slatW * 0.92, 0, slatW * 0.08, canvas.height);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(2, 1);
+  // Don't set repeat here — it will be set per-geometry based on real-world size
   return tex;
 }
 
-// ─── Rounded shape ───────────────────────────────────────────────────────────
+// ─── Cladding material with real-world plank repeat ─────────────────────────
+// wallWidthM = how wide the wall face is in meters. The texture repeats so
+// every plank is exactly CELL_M wide, and if it doesn't divide evenly it just
+// gets cut off at the edge — which is exactly what real cladding looks like.
+function makeCladdingMat(
+  baseTex: THREE.CanvasTexture | null,
+  wallWidthM: number,
+  wallHeightM: number,
+  color: string,
+  roughness: number,
+  metalness: number,
+  isWood: boolean,
+): THREE.MeshStandardMaterial {
+  if (!baseTex || !isWood) {
+    return new THREE.MeshStandardMaterial({ color, roughness, metalness });
+  }
+  const tex = baseTex.clone();
+  tex.needsUpdate = true;
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(wallWidthM / CELL_M, 1);
+  const bump = baseTex.clone();
+  bump.needsUpdate = true;
+  bump.wrapS = THREE.RepeatWrapping;
+  bump.wrapT = THREE.RepeatWrapping;
+  bump.repeat.set(wallWidthM / CELL_M, 1);
+  return new THREE.MeshStandardMaterial({ color, roughness, metalness, map: tex, bumpMap: bump, bumpScale: 0.04 });
+}
+
+// ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
+function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood, ...rest }: {
+  baseTex: THREE.CanvasTexture | null;
+  wallWidth: number;
+  color: string;
+  roughness: number;
+  metalness: number;
+  isWood: boolean;
+  [k: string]: any;
+}) {
+  const [map, bumpMap] = useMemo(() => {
+    if (!baseTex || !isWood) return [undefined, undefined];
+    const t = baseTex.clone();
+    t.needsUpdate = true;
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(wallWidth / CELL_M, 1);
+    const b = baseTex.clone();
+    b.needsUpdate = true;
+    b.wrapS = THREE.RepeatWrapping;
+    b.wrapT = THREE.RepeatWrapping;
+    b.repeat.set(wallWidth / CELL_M, 1);
+    return [t, b];
+  }, [baseTex, wallWidth, isWood]);
+
+  return (
+    <meshStandardMaterial
+      color={color}
+      roughness={roughness}
+      metalness={metalness}
+      map={map}
+      bumpMap={bumpMap}
+      bumpScale={isWood ? 0.04 : 0}
+      {...rest}
+    />
+  );
+}
+
 function roundedRect(w: number, d: number, r: number) {
   const s = new THREE.Shape();
   s.absarc(-w / 2 + r, -d / 2 + r, r, Math.PI, Math.PI * 1.5);
@@ -160,14 +225,15 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     ];
   }, [cornerRadius, width, depth]);
 
+  // Base cladding props (for non-wood or roof where repeat doesn't matter)
   const claddingProps = {
     color: effectiveColor,
     roughness: fp.roughness,
     metalness: fp.metalness,
-    map: plankTex ?? undefined,
-    bumpMap: plankTex ?? undefined,
-    bumpScale: fp.isWood ? 0.04 : 0, // Increased from 0.012 for more depth
   };
+
+  // For wood walls, we need per-wall materials with correct repeat
+  const woodBase = { baseTex: plankTex, color: effectiveColor, roughness: fp.roughness, metalness: fp.metalness, isWood: fp.isWood };
 
   const scaleX = config.mirrorPlan ? -1 : 1;
 
@@ -285,6 +351,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           winTop={winTop}
           winCY={winCY}
           claddingProps={claddingProps}
+          woodBase={woodBase}
           frameColor={frameColor}
           cmToUnit={cmToUnit}
           cmToDepth={cmToDepth}
@@ -304,6 +371,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           winCY={winCY}
           PILLAR_W={PILLAR_W}
           claddingProps={claddingProps}
+          woodBase={woodBase}
           frameColor={frameColor}
           floorPlan={config.floorPlan}
           model={config.model}
@@ -328,6 +396,7 @@ function StartWalls({
   winTop,
   winCY,
   claddingProps,
+  woodBase,
   frameColor,
   cmToUnit,
   cmToDepth,
@@ -390,7 +459,7 @@ function StartWalls({
       {/* ── LEFT WALL — solid ── */}
       <mesh position={[-halfW + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, leftFlatD]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+        <CladMaterial {...woodBase} wallWidth={leftFlatD} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       {/* Interior left wall */}
       <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
@@ -402,23 +471,23 @@ function StartWalls({
       {backLeftW > 0.01 && (
         <mesh position={[backLeftCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
           <boxGeometry args={[backLeftW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+          <CladMaterial {...woodBase} wallWidth={backLeftW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {backRightW > 0.01 && (
         <mesh position={[backRightCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
           <boxGeometry args={[backRightW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+          <CladMaterial {...woodBase} wallWidth={backRightW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {/* Window area — spandrel below + header above + glass */}
       <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
         <boxGeometry args={[backWinW, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+        <CladMaterial {...woodBase} wallWidth={backWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
         <boxGeometry args={[backWinW, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+        <CladMaterial {...woodBase} wallWidth={backWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <GlassPane
         posX={backWinCenterX}
@@ -455,23 +524,23 @@ function StartWalls({
       {frontLeftW > 0.01 && (
         <mesh position={[frontLeftCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
           <boxGeometry args={[frontLeftW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+          <CladMaterial {...woodBase} wallWidth={frontLeftW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {frontRightW > 0.01 && (
         <mesh position={[frontRightCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
           <boxGeometry args={[frontRightW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+          <CladMaterial {...woodBase} wallWidth={frontRightW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {/* Window spandrel + header */}
       <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
         <boxGeometry args={[frontWinW, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+        <CladMaterial {...woodBase} wallWidth={frontWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
         <boxGeometry args={[frontWinW, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+        <CladMaterial {...woodBase} wallWidth={frontWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <GlassPane
         posX={frontWinCenterX}
@@ -508,19 +577,19 @@ function StartWalls({
       {rightTopH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightTopCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightTopH]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+          <CladMaterial {...woodBase} wallWidth={rightTopH} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
         </mesh>
       )}
       {rightBotH > 0.01 && (
         <mesh position={[halfW - wallThick / 2, height / 2 + floorThick, rightBotCZ]} castShadow>
           <boxGeometry args={[wallThick, height, rightBotH]} />
-          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+          <CladMaterial {...woodBase} wallWidth={rightBotH} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
         </mesh>
       )}
       {/* Door header above opening */}
       <mesh position={[halfW - wallThick / 2, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]} castShadow>
         <boxGeometry args={[wallThick, height - winTop, doorH]} />
-        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+        <CladMaterial {...woodBase} wallWidth={doorH} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       {/* Interior right wall segments */}
       {intRightTopH > 0.01 && (
@@ -1091,6 +1160,7 @@ function GenericWalls({
   winCY,
   PILLAR_W,
   claddingProps,
+  woodBase,
   frameColor,
   floorPlan,
   model,
@@ -1114,17 +1184,17 @@ function GenericWalls({
       {/* Back wall */}
       <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick / 2]} castShadow>
         <boxGeometry args={[width - cornerRadius * 2, height, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={width - cornerRadius * 2} />
       </mesh>
       {/* Right wall */}
       <mesh position={[width / 2 - wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, sideFlatD]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={sideFlatD} />
       </mesh>
       {/* Left wall */}
       <mesh position={[-width / 2 + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, sideFlatD]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={sideFlatD} />
       </mesh>
       {/* Interior back wall */}
       <mesh position={[0, height / 2 + floorThick, -depth / 2 + wallThick + 0.01]}>
@@ -1136,18 +1206,18 @@ function GenericWalls({
       <group position={[0, floorThick, depth / 2 - wallThick / 2]}>
         <mesh position={[flatStartX + PILLAR_W / 2, height / 2, 0]} castShadow>
           <boxGeometry args={[PILLAR_W, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} />
+          <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
         </mesh>
 
         {roomSplit < 100 ? (
           <>
             <mesh position={[room1CX, winBot / 2, 0]} castShadow>
               <boxGeometry args={[room1Width, winBot, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={room1Width} />
             </mesh>
             <mesh position={[room1CX, winTop + (height - winTop) / 2, 0]} castShadow>
               <boxGeometry args={[room1Width, height - winTop, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={room1Width} />
             </mesh>
             <GlassPane
               posX={room1CX}
@@ -1159,7 +1229,7 @@ function GenericWalls({
             />
             <mesh position={[room2StartX + PILLAR_W / 2, height / 2, 0]} castShadow>
               <boxGeometry args={[PILLAR_W, height, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
             </mesh>
             <Room2Facade
               room2StartX={room2StartX}
@@ -1175,6 +1245,7 @@ function GenericWalls({
               DOOR_W={DOOR_W}
               frameColor={frameColor}
               claddingProps={claddingProps}
+              woodBase={woodBase}
               floorThick={floorThick}
             />
           </>
@@ -1182,11 +1253,11 @@ function GenericWalls({
           <>
             <mesh position={[room1CX, winBot / 2, 0]} castShadow>
               <boxGeometry args={[flatWidth - PILLAR_W, winBot, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={flatWidth - PILLAR_W} />
             </mesh>
             <mesh position={[room1CX, winTop + (height - winTop) / 2, 0]} castShadow>
               <boxGeometry args={[flatWidth - PILLAR_W, height - winTop, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={flatWidth - PILLAR_W} />
             </mesh>
             <GlassPane
               posX={room1CX}
@@ -1198,7 +1269,7 @@ function GenericWalls({
             />
             <mesh position={[flatEndX - PILLAR_W / 2, height / 2, 0]} castShadow>
               <boxGeometry args={[PILLAR_W, height, wallThick]} />
-              <meshStandardMaterial {...claddingProps} />
+              <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
             </mesh>
           </>
         )}
@@ -1230,6 +1301,7 @@ function Room2Facade({
   DOOR_W,
   frameColor,
   claddingProps,
+  woodBase,
   floorThick,
 }: any) {
   const r2Content = room2Width - PILLAR_W * 2;
@@ -1241,11 +1313,11 @@ function Room2Facade({
     <>
       <mesh position={[doorCX, winBot / 2, 0]} castShadow>
         <boxGeometry args={[DOOR_W, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={DOOR_W} />
       </mesh>
       <mesh position={[doorCX, winTop + (height - winTop) / 2, 0]} castShadow>
         <boxGeometry args={[DOOR_W, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={DOOR_W} />
       </mesh>
       <GlassPane posX={doorCX} posY={winCY} width={DOOR_W} height={winH} frameColor={frameColor} />
       <mesh position={[doorCX, -floorThick * 0.5, wallThick + 0.18]} castShadow>
@@ -1255,22 +1327,22 @@ function Room2Facade({
 
       <mesh position={[room2StartX + PILLAR_W + DOOR_W + PILLAR_W / 2, height / 2, 0]} castShadow>
         <boxGeometry args={[PILLAR_W, height, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
       </mesh>
 
       <mesh position={[win2CX, winBot / 2, 0]} castShadow>
         <boxGeometry args={[win2W, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={win2W} />
       </mesh>
       <mesh position={[win2CX, winTop + (height - winTop) / 2, 0]} castShadow>
         <boxGeometry args={[win2W, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={win2W} />
       </mesh>
       <GlassPane posX={win2CX} posY={winCY} width={win2W} height={winH} frameColor={frameColor} hasDivider />
 
       <mesh position={[flatEndX - PILLAR_W / 2, height / 2, 0]} castShadow>
         <boxGeometry args={[PILLAR_W, height, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
       </mesh>
     </>
   );
