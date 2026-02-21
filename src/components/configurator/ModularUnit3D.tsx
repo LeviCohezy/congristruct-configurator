@@ -576,11 +576,6 @@ function StartWalls({
               <boxGeometry args={[deskW, deskH, panelT]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            {/* Modesty panel (on +X side, facing visitors) */}
-            <mesh position={[deskX + deskW / 2 - panelT / 2, deskH * 0.45 + floorThick, deskZ]}>
-              <boxGeometry args={[panelT, deskH * 0.6, deskL - panelT * 2]} />
-              <meshStandardMaterial {...white} />
-            </mesh>
 
             {/* ── iMac-style Monitor — right corner, diagonal ── */}
             {(() => {
