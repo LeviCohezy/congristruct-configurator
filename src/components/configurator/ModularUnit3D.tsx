@@ -497,8 +497,13 @@ function StartWalls({
               <boxGeometry args={[doorW3D + 0.06, 0.03, partWallT + 0.01]} />
               <meshStandardMaterial color="#888" roughness={0.4} metalness={0.3} />
             </mesh>
+            {/* Door panel (solid white) */}
+            <mesh position={[doorAbsX, doorH3D / 2 + floorThick, horizZ]}>
+              <boxGeometry args={[doorW3D - 0.02, doorH3D - 0.02, 0.035]} />
+              <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
+            </mesh>
             {/* Door handle */}
-            <mesh position={[doorAbsX + doorW3D / 2 - 0.06, doorH3D * 0.48 + floorThick, horizZ + partWallT / 2 + 0.02]} rotation={[Math.PI / 2, 0, 0]}>
+            <mesh position={[doorAbsX + doorW3D / 2 - 0.06, doorH3D * 0.48 + floorThick, horizZ + 0.04]} rotation={[Math.PI / 2, 0, 0]}>
               <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
               <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
             </mesh>
