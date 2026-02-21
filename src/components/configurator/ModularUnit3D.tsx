@@ -356,6 +356,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           cmToUnit={cmToUnit}
           cmToDepth={cmToDepth}
           floorPlan={config.floorPlan}
+          finishLevel={config.finishLevel}
         />
       ) : (
         <GenericWalls
@@ -401,6 +402,7 @@ function StartWalls({
   cmToUnit,
   cmToDepth,
   floorPlan,
+  finishLevel,
 }: any) {
   const halfW = width / 2;
   const halfD = depth / 2;
@@ -625,6 +627,8 @@ function StartWalls({
         <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
       </mesh>
 
+      {/* ── Furniture (only when fully finished) ── */}
+      {finishLevel === "fully-finished" && <>
       {/* ── Built-in bookshelf/cabinet ── */}
       {/* Open plan (A): against left wall, full wall length */}
       {/* Plan B: against back wall, left of window */}
@@ -872,6 +876,7 @@ function StartWalls({
           </group>
         );
       })()}
+      </>}
 
       {/* ── Plan B: toilet partition in back-right corner ── */}
       {floorPlan === "b" &&
