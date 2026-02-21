@@ -57,27 +57,34 @@ const modelLabels: Record<ConfigState["model"], string> = {
 };
 
 export function PreviewPanel({ config }: PreviewPanelProps) {
-  const [woodColor, setWoodColor] = useState("#cea67c");
+  const [woodColor, setWoodColor] = useState("#18130e");
   const [gapColor, setGapColor] = useState("#1a1208");
 
-  // Pass override colors via a patched config
-  const patchedConfig = { ...config, __woodColor: woodColor, __gapColor: gapColor } as any;
+  const isThermowoodNatural = config.facade === "thermowood-natural";
+  const showPicker = !isThermowoodNatural;
+
+  // Only override colors for non-thermowood-natural facades
+  const patchedConfig = showPicker
+    ? { ...config, __woodColor: woodColor, __gapColor: gapColor } as any
+    : config;
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
-      {/* TEMP: Color picker swatch */}
-      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
-        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Wood Color</label>
-        <div className="flex items-center gap-2">
-          <input type="color" value={woodColor} onChange={(e) => setWoodColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
-          <span className="text-xs font-mono text-foreground">{woodColor}</span>
+      {/* TEMP: Color picker swatch (hidden for thermowood-natural, already locked in) */}
+      {showPicker && (
+        <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
+          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Wood Color</label>
+          <div className="flex items-center gap-2">
+            <input type="color" value={woodColor} onChange={(e) => setWoodColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
+            <span className="text-xs font-mono text-foreground">{woodColor}</span>
+          </div>
+          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Gap Color</label>
+          <div className="flex items-center gap-2">
+            <input type="color" value={gapColor} onChange={(e) => setGapColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
+            <span className="text-xs font-mono text-foreground">{gapColor}</span>
+          </div>
         </div>
-        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Gap Color</label>
-        <div className="flex items-center gap-2">
-          <input type="color" value={gapColor} onChange={(e) => setGapColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
-          <span className="text-xs font-mono text-foreground">{gapColor}</span>
-        </div>
-      </div>
+      )}
 
       {/* Model badge */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 pointer-events-none">
