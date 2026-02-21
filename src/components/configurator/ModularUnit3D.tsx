@@ -539,129 +539,136 @@ function StartWalls({
         );
       })()}
 
-      {/* ── Office furniture: desk, chairs, monitor ── */}
+      {/* ── Office furniture: slab desk, chairs, iMac monitor ── */}
       {(() => {
-        // Room usable center (shelf on left wall takes ~0.45m)
-        const deskX = 0.15;
+        const deskX = 0.10;
         const deskZ = 0.0;
-        const deskW = 1.60;  // width along X
-        const deskDp = 0.80; // depth along Z
+        // Slab desk: long axis along Z (depth), narrow along X
+        const deskL = 1.80;  // length along Z
+        const deskW = 0.80;  // width along X
         const deskH = 0.75;
-        const legT = 0.05;
-        const topT = 0.035;
-        const white = { color: "#f0f0ee", roughness: 0.35, metalness: 0.05 };
+        const topT = 0.04;
+        const panelT = 0.04; // side panel thickness
+        const white = { color: "#f5f5f0", roughness: 0.25, metalness: 0.05 };
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
-        const fabric = { color: "#1e1e1e", roughness: 0.85, metalness: 0.0 };
-        const chairGrey = { color: "#4a4a4a", roughness: 0.7, metalness: 0.1 };
+        const chairFabric = { color: "#5a504a", roughness: 0.9, metalness: 0.0 };
 
-        // Office chair behind desk (toward back wall, -Z)
-        const chairZ = deskZ - deskDp / 2 - 0.45;
-        // 2 visitor chairs in front of desk (+Z)
-        const visitorZ = deskZ + deskDp / 2 + 0.50;
+        // Office chair behind desk (toward back wall, -Z side)
+        const chairZ = deskZ - deskL / 2 - 0.40;
+        // 2 visitor chairs in front of desk (+Z side)
+        const visitorZ = deskZ + deskL / 2 + 0.45;
 
         return (
           <group>
-            {/* ── White Desk ── */}
+            {/* ── Slab Desk ── */}
             {/* Tabletop */}
             <mesh position={[deskX, deskH + floorThick, deskZ]} castShadow>
-              <boxGeometry args={[deskW, topT, deskDp]} />
+              <boxGeometry args={[deskW, topT, deskL]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            {/* 4 legs */}
-            {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], i) => (
-              <mesh key={`dleg${i}`} position={[deskX + sx * (deskW / 2 - 0.06), deskH / 2 + floorThick, deskZ + sz * (deskDp / 2 - 0.06)]}>
-                <boxGeometry args={[legT, deskH, legT]} />
-                <meshStandardMaterial {...white} />
-              </mesh>
-            ))}
-            {/* Modesty panel (back side) */}
-            <mesh position={[deskX, deskH * 0.45 + floorThick, deskZ - deskDp / 2 + 0.02]}>
-              <boxGeometry args={[deskW - 0.15, deskH * 0.55, 0.02]} />
+            {/* Left side panel (solid slab) */}
+            <mesh position={[deskX - deskW / 2 + panelT / 2, deskH / 2 + floorThick, deskZ]}>
+              <boxGeometry args={[panelT, deskH, deskL]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            {/* Right side panel (solid slab) */}
+            <mesh position={[deskX + deskW / 2 - panelT / 2, deskH / 2 + floorThick, deskZ]}>
+              <boxGeometry args={[panelT, deskH, deskL]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            {/* Back panel (modesty, facing office chair side) */}
+            <mesh position={[deskX, deskH * 0.45 + floorThick, deskZ - deskL / 2 + panelT / 2]}>
+              <boxGeometry args={[deskW - panelT * 2, deskH * 0.6, panelT]} />
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ── Monitor on right corner ── */}
+            {/* ── iMac-style Monitor on right corner ── */}
             {(() => {
-              const monX = deskX + deskW / 2 - 0.30;
-              const monZ = deskZ - deskDp / 2 + 0.25;
-              const screenW = 0.58;
+              const monX = deskX + deskW / 2 - 0.22;
+              const monZ = deskZ - deskL / 2 + 0.35;
+              const screenW = 0.54;
               const screenH = 0.34;
+              const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
               return (
                 <group>
-                  {/* Stand base */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.01 + floorThick, monZ]}>
-                    <boxGeometry args={[0.22, 0.02, 0.18]} />
-                    <meshStandardMaterial {...darkMetal} />
+                  {/* Stand foot (aluminum wedge) */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.008 + floorThick, monZ]}>
+                    <boxGeometry args={[0.20, 0.008, 0.18]} />
+                    <meshStandardMaterial {...silver} />
                   </mesh>
                   {/* Stand neck */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.14 + floorThick, monZ - 0.04]}>
-                    <boxGeometry args={[0.04, 0.24, 0.04]} />
-                    <meshStandardMaterial {...darkMetal} />
+                  <mesh position={[monX, deskH + topT / 2 + 0.10 + floorThick, monZ - 0.05]}>
+                    <boxGeometry args={[0.06, 0.18, 0.02]} />
+                    <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.28 + screenH / 2 + floorThick, monZ - 0.06]}>
-                    <boxGeometry args={[screenW, screenH, 0.025]} />
-                    <meshStandardMaterial color="#111111" roughness={0.3} metalness={0.2} />
+                  {/* Screen body (silver back) */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, monZ - 0.06]}>
+                    <boxGeometry args={[screenW, screenH, 0.02]} />
+                    <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen face (slightly lighter) */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.28 + screenH / 2 + floorThick, monZ - 0.06 + 0.014]}>
-                    <boxGeometry args={[screenW - 0.04, screenH - 0.03, 0.002]} />
-                    <meshStandardMaterial color="#1a2a3a" roughness={0.1} metalness={0.3} />
+                  {/* Screen display (dark face, toward chair) */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, monZ - 0.06 + 0.012]}>
+                    <boxGeometry args={[screenW - 0.03, screenH - 0.03, 0.002]} />
+                    <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
+                  </mesh>
+                  {/* Chin (bottom bezel with logo area) */}
+                  <mesh position={[monX, deskH + topT / 2 + 0.22 + floorThick, monZ - 0.06 + 0.011]}>
+                    <boxGeometry args={[screenW, 0.04, 0.002]} />
+                    <meshStandardMaterial {...silver} />
                   </mesh>
                 </group>
               );
             })()}
 
-            {/* ── Office chair (behind desk) ── */}
+            {/* ── Keyboard on desk ── */}
+            <mesh position={[deskX + 0.05, deskH + topT / 2 + 0.01 + floorThick, deskZ - 0.15]}>
+              <boxGeometry args={[0.35, 0.012, 0.12]} />
+              <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
+            </mesh>
+
+            {/* ── Office chair (behind desk, -Z) ── */}
             <group position={[deskX, 0, chairZ]}>
-              {/* Base star (5 legs simplified as a disc) */}
-              <mesh position={[0, 0.06 + floorThick, 0]}>
-                <cylinderGeometry args={[0.28, 0.28, 0.03, 16]} />
+              {/* Base (5-star simplified as cylinder) */}
+              <mesh position={[0, 0.05 + floorThick, 0]}>
+                <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
                 <meshStandardMaterial {...darkMetal} />
               </mesh>
               {/* Gas lift */}
-              <mesh position={[0, 0.25 + floorThick, 0]}>
-                <cylinderGeometry args={[0.025, 0.03, 0.38, 8]} />
+              <mesh position={[0, 0.24 + floorThick, 0]}>
+                <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
                 <meshStandardMaterial {...darkMetal} />
               </mesh>
-              {/* Seat */}
-              <mesh position={[0, 0.46 + floorThick, 0]}>
-                <boxGeometry args={[0.48, 0.08, 0.46]} />
-                <meshStandardMaterial {...fabric} />
+              {/* Seat (rounded) */}
+              <mesh position={[0, 0.44 + floorThick, 0]}>
+                <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
               {/* Backrest */}
-              <mesh position={[0, 0.78 + floorThick, 0.20]}>
-                <boxGeometry args={[0.44, 0.56, 0.06]} />
-                <meshStandardMaterial {...fabric} />
+              <mesh position={[0, 0.72 + floorThick, 0.18]}>
+                <boxGeometry args={[0.42, 0.50, 0.05]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
-              {/* Armrests */}
-              {[-1, 1].map((s, i) => (
-                <mesh key={`arm${i}`} position={[s * 0.24, 0.58 + floorThick, 0.05]}>
-                  <boxGeometry args={[0.04, 0.04, 0.28]} />
-                  <meshStandardMaterial {...darkMetal} />
-                </mesh>
-              ))}
             </group>
 
-            {/* ── 2 Visitor chairs (in front of desk) ── */}
-            {[-0.40, 0.40].map((offsetX, ci) => (
+            {/* ── 2 Visitor chairs (in front of desk, +Z) ── */}
+            {[-0.35, 0.35].map((offsetX, ci) => (
               <group key={`vc${ci}`} position={[deskX + offsetX, 0, visitorZ]}>
-                {/* 4 legs */}
+                {/* 4 thin metal legs */}
                 {[[-1, -1], [1, -1], [-1, 1], [1, 1]].map(([sx, sz], li) => (
-                  <mesh key={`vl${li}`} position={[sx * 0.18, 0.22 + floorThick, sz * 0.18]}>
-                    <boxGeometry args={[0.03, 0.44, 0.03]} />
+                  <mesh key={`vl${li}`} position={[sx * 0.16, 0.21 + floorThick, sz * 0.16]}>
+                    <cylinderGeometry args={[0.012, 0.012, 0.42, 6]} />
                     <meshStandardMaterial {...darkMetal} />
                   </mesh>
                 ))}
-                {/* Seat */}
+                {/* Seat (rounded cushion) */}
                 <mesh position={[0, 0.44 + floorThick, 0]}>
-                  <boxGeometry args={[0.42, 0.045, 0.40]} />
-                  <meshStandardMaterial {...chairGrey} />
+                  <cylinderGeometry args={[0.21, 0.22, 0.06, 16]} />
+                  <meshStandardMaterial {...chairFabric} />
                 </mesh>
-                {/* Backrest */}
-                <mesh position={[0, 0.72 + floorThick, -0.18]}>
-                  <boxGeometry args={[0.40, 0.50, 0.04]} />
-                  <meshStandardMaterial {...chairGrey} />
+                {/* Backrest (curved, slightly reclined toward desk) */}
+                <mesh position={[0, 0.68 + floorThick, -0.16]}>
+                  <boxGeometry args={[0.38, 0.42, 0.04]} />
+                  <meshStandardMaterial {...chairFabric} />
                 </mesh>
               </group>
             ))}
