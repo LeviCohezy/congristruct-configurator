@@ -582,33 +582,36 @@ function StartWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ── iMac-style Monitor on desk corner ── */}
+            {/* ── iMac-style Monitor — right corner, diagonal ── */}
             {(() => {
-              const monX = deskX + deskW / 2 - 0.22;
-              const monZ = deskZ + deskL / 2 - 0.40;
+              // Right corner from office chair POV: +X, +Z corner of desk
+              const monX = deskX + deskW / 2 - 0.18;
+              const monZ = deskZ + deskL / 2 - 0.30;
               const screenW = 0.54;
               const screenH = 0.34;
               const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
+              // Rotate ~45° so screen faces the office chair (diagonally toward -X, -Z)
+              const rot: [number, number, number] = [0, Math.PI * 0.25, 0];
               return (
-                <group>
+                <group position={[monX, 0, monZ]} rotation={rot}>
                   {/* Stand foot */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.008 + floorThick, monZ]}>
+                  <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                     <boxGeometry args={[0.20, 0.008, 0.18]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
                   {/* Stand neck */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.10 + floorThick, monZ]}>
+                  <mesh position={[0, deskH + topT / 2 + 0.10 + floorThick, 0]}>
                     <boxGeometry args={[0.06, 0.18, 0.02]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen body (facing -X toward office chair) */}
-                  <mesh position={[monX, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, monZ]}>
-                    <boxGeometry args={[0.02, screenH, screenW]} />
+                  {/* Screen body */}
+                  <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01]}>
+                    <boxGeometry args={[screenW, screenH, 0.02]} />
                     <meshStandardMaterial {...silver} />
                   </mesh>
-                  {/* Screen display (facing -X) */}
-                  <mesh position={[monX - 0.012, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, monZ]}>
-                    <boxGeometry args={[0.002, screenH - 0.03, screenW - 0.03]} />
+                  {/* Screen display */}
+                  <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01 + 0.012]}>
+                    <boxGeometry args={[screenW - 0.03, screenH - 0.03, 0.002]} />
                     <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
                   </mesh>
                 </group>
