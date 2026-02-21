@@ -107,13 +107,10 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
     const innerR = cornerRadius - wallThick;
     const make = (start: number, end: number) => {
       const s = new THREE.Shape();
-      // Outer arc (rounded exterior)
+      // Outer arc
       s.absarc(0, 0, cornerRadius, start, end, false);
-      // Inner corners: straight lines (square interior)
-      const cos1 = Math.cos(end), sin1 = Math.sin(end);
-      const cos0 = Math.cos(start), sin0 = Math.sin(start);
-      s.lineTo(cos1 * innerR, sin1 * innerR);
-      s.lineTo(cos0 * innerR, sin0 * innerR);
+      // Inner arc (reverse direction to create hollow)
+      s.absarc(0, 0, innerR, end, start, true);
       s.closePath();
       return s;
     };
@@ -182,13 +179,37 @@ export function ModularUnit3D({ config, showRoof = true }: { config: ConfigState
         </mesh>
       ))}
 
-      {/* ── Rounded corners ── */}
+      {/* ── Rounded corners — exterior cladding ── */}
       {cornerShapes && cornerShapes.map(({ shape, posX, posZ }, i) => (
-        <mesh key={i} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+        <mesh key={`ce${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
           <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
           <meshStandardMaterial {...claddingProps} />
         </mesh>
       ))}
+      {/* ── Rounded corners — white interior face ── */}
+      {cornerShapes && (() => {
+        const innerR = cornerRadius - wallThick;
+        const arcs: { start: number; end: number; posX: number; posZ: number }[] = [
+          { start: 0, end: Math.PI * 0.5, posX: width/2 - cornerRadius, posZ: depth/2 - cornerRadius },
+          { start: Math.PI * 0.5, end: Math.PI, posX: -width/2 + cornerRadius, posZ: depth/2 - cornerRadius },
+          { start: Math.PI, end: Math.PI * 1.5, posX: -width/2 + cornerRadius, posZ: -depth/2 + cornerRadius },
+          { start: Math.PI * 1.5, end: Math.PI * 2, posX: width/2 - cornerRadius, posZ: -depth/2 + cornerRadius },
+        ];
+        return arcs.map(({ start, end, posX, posZ }, i) => {
+          // Thin curved shell on the inner radius
+          const shell = new THREE.Shape();
+          const shellThick = 0.01;
+          shell.absarc(0, 0, innerR, start, end, false);
+          shell.absarc(0, 0, innerR - shellThick, end, start, true);
+          shell.closePath();
+          return (
+            <mesh key={`ci${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]}>
+              <extrudeGeometry args={[shell, { depth: height, bevelEnabled: false }]} />
+              <meshStandardMaterial color="#ffffff" roughness={0.92} side={THREE.DoubleSide} />
+            </mesh>
+          );
+        });
+      })()}
 
       {/* ── Interior ceiling — white box just under roof slab ── */}
       {showRoof && (
