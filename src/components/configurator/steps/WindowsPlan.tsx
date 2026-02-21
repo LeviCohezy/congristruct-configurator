@@ -68,68 +68,59 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
 
 /* ── START model: accurate architectural floorplan ────────────────── */
 /* Dimensions from plan: 400×350 cm, walls 23cm thick.
-   Front (bottom): 104 + 200(window) + 96 = 400
-   Top: 135 + 80(window) + 185 = 400
-   Left wall: door arc at bottom portion
-   Plan B: toilet partition top-left corner */
+   Back (top):   185 + 80(window) + 135 = 400
+   Front (bottom): 96 + 200(big window) + 104 = 400
+   Right wall:   165 + 100(door) + 85 = 350
+   Door is on the RIGHT wall, swings inward */
 function StartPlanSVG({ plan, mirrored, wallColor, winColor }: {
   plan: "a" | "b"; mirrored: boolean; wallColor: string; winColor: string;
 }) {
-  const vw = 200; // viewBox width (400/2 scale)
-  const vh = 175; // viewBox height (350/2 scale)
-  const wt = 11.5; // wall thickness (23/2)
+  // All measurements /2 for viewBox scale
+  const vw = 200; // 400/2
+  const vh = 175; // 350/2
+  const wt = 11.5; // 23/2
   const transform = mirrored ? `scale(-1,1) translate(${-vw},0)` : undefined;
 
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 110 }}>
       <g transform={transform}>
-        {/* Outer walls — thick black rectangles */}
-        {/* Top wall */}
+        {/* Outer walls */}
         <rect x={0} y={0} width={vw} height={wt} fill={wallColor} opacity={0.85} />
-        {/* Bottom wall */}
         <rect x={0} y={vh - wt} width={vw} height={wt} fill={wallColor} opacity={0.85} />
-        {/* Left wall */}
         <rect x={0} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
-        {/* Right wall */}
         <rect x={vw - wt} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
 
-        {/* Top window: 135-215 cm → 67.5-107.5 scaled */}
-        <rect x={67.5} y={0} width={40} height={wt} fill="hsl(var(--background))" />
-        <line x1={67.5} y1={wt / 2} x2={107.5} y2={wt / 2} stroke={winColor} strokeWidth={2.5} />
+        {/* Back (top) window: 185cm from left, 80cm wide → 92.5 to 132.5 */}
+        <rect x={92.5} y={0} width={40} height={wt} fill="hsl(var(--background))" />
+        <line x1={92.5} y1={wt / 2} x2={132.5} y2={wt / 2} stroke={winColor} strokeWidth={2.5} />
 
-        {/* Front (bottom) windows: two sections */}
-        {/* Window 1: 0-104cm → 0-52 scaled */}
-        <rect x={wt} y={vh - wt} width={52 - wt} height={wt} fill="hsl(var(--background))" />
-        <line x1={wt} y1={vh - wt / 2} x2={52} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
-        {/* Window 2: 104-304cm → 52-152 scaled (200cm wide front window) */}
-        <rect x={52} y={vh - wt} width={100} height={wt} fill="hsl(var(--background))" />
-        <line x1={52} y1={vh - wt / 2} x2={152} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
+        {/* Front (bottom) big window: 96cm from left, 200cm wide → 48 to 148 */}
+        <rect x={48} y={vh - wt} width={100} height={wt} fill="hsl(var(--background))" />
+        <line x1={48} y1={vh - wt / 2} x2={148} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
 
-        {/* Door on left wall — quarter circle arc */}
-        {/* Door opening: bottom portion of left wall, around y=132.5 to y=175 (85cm = 42.5 scaled) */}
-        <rect x={0} y={vh - wt - 42.5} width={wt} height={42.5} fill="hsl(var(--background))" />
-        {/* Door arc (quarter circle swinging inward) */}
+        {/* Door on RIGHT wall: 165cm from top, 100cm opening → y=82.5 to 132.5 */}
+        <rect x={vw - wt} y={82.5} width={wt} height={50} fill="hsl(var(--background))" />
+        {/* Door arc swinging inward (quarter circle, radius=50) */}
         <path
-          d={`M ${wt} ${vh - wt - 42.5} A 42.5 42.5 0 0 1 ${wt + 42.5} ${vh - wt}`}
+          d={`M ${vw - wt} ${82.5} A 50 50 0 0 0 ${vw - wt - 50} ${132.5}`}
           fill="none"
           stroke={wallColor}
           strokeWidth={0.8}
           opacity={0.4}
         />
-        {/* Door line */}
-        <line x1={wt} y1={vh - wt - 42.5} x2={wt} y2={vh - wt} stroke={wallColor} strokeWidth={1.2} opacity={0.5} />
 
         {plan === "b" && (
           <>
-            {/* Toilet partition — horizontal wall from left, at y≈82.5 (165/2), length ≈ 60 scaled */}
-            <rect x={wt} y={77} width={55} height={wt / 1.5} fill={wallColor} opacity={0.7} />
-            {/* Vertical wall segment closing the toilet room */}
-            <rect x={55 + wt} y={0} width={wt / 1.5} height={77 + wt / 1.5} fill={wallColor} opacity={0.7} />
+            {/* Toilet partition in top-right corner */}
+            {/* Vertical wall from top: ~135cm from left (67.5 scaled), going down ~82.5 */}
+            <rect x={132.5} y={wt} width={wt / 1.5} height={65} fill={wallColor} opacity={0.7} />
+            {/* Horizontal wall closing toilet */}
+            <rect x={132.5} y={65 + wt} width={vw - wt - 132.5} height={wt / 1.5} fill={wallColor} opacity={0.7} />
             {/* Toilet symbol */}
-            <ellipse cx={35} cy={30} rx={8} ry={10} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
-            <rect x={29} y={18} width={12} height={8} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+            <ellipse cx={165} cy={35} rx={8} ry={10} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+            <rect x={159} y={22} width={12} height={8} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
             {/* Sink */}
-            <rect x={16} cy={60} y={55} width={10} height={8} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
+            <rect x={175} y={55} width={8} height={10} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
           </>
         )}
       </g>
