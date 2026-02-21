@@ -267,7 +267,7 @@ function StartWalls({
 
   return (
     <group>
-      {/* ── LEFT WALL — solid, polygonOffset to avoid z-fighting at corners ── */}
+      {/* ── LEFT WALL — solid ── */}
       <mesh position={[-halfW + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, leftFlatD]} />
         <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
@@ -278,29 +278,27 @@ function StartWalls({
         <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
 
-      {/* ── BACK WALL — 3 segments + window ── */}
-      {/* Left segment */}
+      {/* ── BACK WALL — 3 segments + window (front-priority: negative offset) ── */}
       {backLeftW > 0.01 && (
         <mesh position={[backLeftCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
           <boxGeometry args={[backLeftW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
-      {/* Right segment */}
       {backRightW > 0.01 && (
         <mesh position={[backRightCX, height / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
           <boxGeometry args={[backRightW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {/* Window area — spandrel below + header above + glass */}
       <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
         <boxGeometry args={[backWinW, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
         <boxGeometry args={[backWinW, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <GlassPane posX={backWinCenterX} posY={winCY + floorThick} width={backWinW} height={winH} frameColor={frameColor} z={-halfD + wallThick / 2} />
       {/* Interior back wall — split around window */}
@@ -326,27 +324,27 @@ function StartWalls({
         <meshStandardMaterial color="#ffffff" roughness={0.9} />
       </mesh>
 
-      {/* ── FRONT WALL — 2 solid segments + big window ── */}
+      {/* ── FRONT WALL — 2 solid segments + big window (front-priority: negative offset) ── */}
       {frontLeftW > 0.01 && (
         <mesh position={[frontLeftCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
           <boxGeometry args={[frontLeftW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {frontRightW > 0.01 && (
         <mesh position={[frontRightCX, height / 2 + floorThick, halfD - wallThick / 2]} castShadow>
           <boxGeometry args={[frontRightW, height, wallThick]} />
-          <meshStandardMaterial {...claddingProps} />
+          <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
         </mesh>
       )}
       {/* Window spandrel + header */}
       <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
         <boxGeometry args={[frontWinW, winBot, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
         <boxGeometry args={[frontWinW, height - winTop, wallThick]} />
-        <meshStandardMaterial {...claddingProps} />
+        <meshStandardMaterial {...claddingProps} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <GlassPane posX={frontWinCenterX} posY={winCY + floorThick} width={frontWinW} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} />
       {/* Interior front wall segments */}
