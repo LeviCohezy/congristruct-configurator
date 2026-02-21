@@ -255,19 +255,19 @@ function StartWalls({
   const doorH = cmToDepth(100); // door height in Z-axis
   const doorStartZ = -halfD + cmToDepth(165);
   const doorCenterZ = doorStartZ + doorH / 2;
-  const rightTopH = cmToDepth(165) - cornerRadius; // solid above door
-  const rightBotH = cmToDepth(85) - cornerRadius;  // solid below door
-  const rightTopCZ = -halfD + cornerRadius + rightTopH / 2;
-  const rightBotCZ = halfD - cornerRadius - rightBotH / 2;
+  const rightTopH = cmToDepth(165) - cornerRadius - wallThick; // shortened to avoid corner overlap
+  const rightBotH = cmToDepth(85) - cornerRadius - wallThick;  // shortened to avoid corner overlap
+  const rightTopCZ = -halfD + cornerRadius + wallThick + rightTopH / 2;
+  const rightBotCZ = halfD - cornerRadius - wallThick - rightBotH / 2;
 
-  // ── Left wall: fully solid ──
-  const leftFlatD = depth - cornerRadius * 2;
+  // ── Left wall: fully solid — shortened to avoid corner overlap ──
+  const leftFlatD = depth - cornerRadius * 2 - wallThick * 2;
 
   const DOOR_W_3D = 1.0; // door width in 3D (100cm)
 
   return (
     <group>
-      {/* ── LEFT WALL — solid ── */}
+      {/* ── LEFT WALL — solid (inset by wallThick at front/back to avoid z-fighting) ── */}
       <mesh position={[-halfW + wallThick / 2, height / 2 + floorThick, 0]} castShadow>
         <boxGeometry args={[wallThick, height, leftFlatD]} />
         <meshStandardMaterial {...claddingProps} />
