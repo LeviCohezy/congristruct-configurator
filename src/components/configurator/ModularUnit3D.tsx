@@ -184,8 +184,8 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         </mesh>
       ))}
 
-      {/* ── Interior ceiling ── */}
-      <mesh position={[0, height + floorThick - 0.06, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      {/* ── Interior ceiling — just below roof slab bottom ── */}
+      <mesh position={[0, height - 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[width - wallThick * 2, depth - wallThick * 2]} />
         <meshStandardMaterial color="#ffffff" roughness={0.95} />
       </mesh>
