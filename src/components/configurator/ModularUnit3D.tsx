@@ -28,7 +28,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
 }
 
 // ─── Plank texture ────────────────────────────────────────────────────────────
-function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTexture | null {
+function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: string): THREE.CanvasTexture | null {
   if (!isWood) return null;
   const canvas = document.createElement("canvas");
   canvas.width = 1024;
@@ -37,7 +37,7 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const base = new THREE.Color(baseColor);
 
   // 1. Background — dark shadow gap between slats
-  ctx.fillStyle = "#1a1208";
+  ctx.fillStyle = gapColor || "#1a1208";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // 2. Narrow vertical slats with visible gaps (like thermowood cladding)
@@ -98,11 +98,16 @@ function roundedRect(w: number, d: number, r: number) {
 
 // ─── Main unit ────────────────────────────────────────────────────────────────
 export function ModularUnit3D({ config }: { config: ConfigState }) {
+  const anyConfig = config as any;
+  const woodColorOverride = anyConfig.__woodColor as string | undefined;
+  const gapColorOverride = anyConfig.__gapColor as string | undefined;
   const fp = getFacadeProps(config.facade);
+  // Use override color for wood facades
+  const effectiveColor = fp.isWood && woodColorOverride ? woodColorOverride : fp.color;
   const roofColor = getRoofColor(config.facade);
   const frameColor = fp.color === "#ededea" || fp.color === "#e8e6e2" ? "#1a1a1a" : "#080807";
 
-  const plankTex = useMemo(() => createPlankTexture(fp.color, fp.isWood), [fp.color, fp.isWood]);
+  const plankTex = useMemo(() => createPlankTexture(effectiveColor, fp.isWood, gapColorOverride), [effectiveColor, fp.isWood, gapColorOverride]);
 
   // Dimensions — all 4m depth, variable width
   const { width, height, depth } = useMemo(() => {
@@ -156,7 +161,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   }, [cornerRadius, width, depth]);
 
   const claddingProps = {
-    color: fp.color,
+    color: effectiveColor,
     roughness: fp.roughness,
     metalness: fp.metalness,
     map: plankTex ?? undefined,
