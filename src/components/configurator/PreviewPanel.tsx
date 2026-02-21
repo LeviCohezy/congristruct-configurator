@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { ModularUnit3D } from "./ModularUnit3D";
@@ -7,6 +7,7 @@ import type { ConfigState } from "@/hooks/useConfigurator";
 interface PreviewPanelProps {
   config: ConfigState;
   currentStep: number;
+  onOverrideWoodColor?: (color: string | null) => void;
 }
 
 function SceneContent({ config }: { config: ConfigState }) {
@@ -56,9 +57,28 @@ const modelLabels: Record<ConfigState["model"], string> = {
 };
 
 export function PreviewPanel({ config }: PreviewPanelProps) {
+  const [woodColor, setWoodColor] = useState("#cea67c");
+  const [gapColor, setGapColor] = useState("#1a1208");
+
+  // Pass override colors via a patched config
+  const patchedConfig = { ...config, __woodColor: woodColor, __gapColor: gapColor } as any;
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
+      {/* TEMP: Color picker swatch */}
+      <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
+        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Wood Color</label>
+        <div className="flex items-center gap-2">
+          <input type="color" value={woodColor} onChange={(e) => setWoodColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
+          <span className="text-xs font-mono text-foreground">{woodColor}</span>
+        </div>
+        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Gap Color</label>
+        <div className="flex items-center gap-2">
+          <input type="color" value={gapColor} onChange={(e) => setGapColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
+          <span className="text-xs font-mono text-foreground">{gapColor}</span>
+        </div>
+      </div>
+
       {/* Model badge */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 pointer-events-none">
         <span className="px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm border border-border text-xs font-medium text-foreground">
@@ -66,17 +86,14 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         </span>
       </div>
 
-      {/* Mirror indicator */}
       {config.mirrorPlan && (
-        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 pointer-events-none">
+        <div className="absolute top-14 right-4 sm:top-16 sm:right-6 z-10 pointer-events-none">
           <span className="px-3 py-1.5 rounded-full bg-accent/10 text-accent text-xs font-medium">
             Gespiegeld
           </span>
         </div>
       )}
 
-
-      {/* Drag hint */}
       <div className="absolute bottom-16 left-0 right-0 z-10 flex justify-center pointer-events-none">
         <span className="px-3 py-1.5 rounded-full bg-card/70 backdrop-blur-sm border border-border text-[11px] font-medium text-muted-foreground flex items-center gap-1.5">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -86,7 +103,6 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         </span>
       </div>
 
-      {/* 3D Canvas */}
       <Suspense fallback={<LoadingFallback />}>
         <Canvas
           shadows
@@ -94,7 +110,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
           gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1.1 }}
           style={{ width: "100%", height: "100%" }}
         >
-          <SceneContent config={config} />
+          <SceneContent config={patchedConfig} />
           <OrbitControls
             enablePan={false}
             minDistance={5}
@@ -107,7 +123,6 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         </Canvas>
       </Suspense>
 
-      {/* Config chips */}
       <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2 justify-center pointer-events-none">
         <Chip label={config.facade.replace(/-/g, " ")} />
         <Chip label={config.floorPlan === "a" ? "Plan A" : "Plan B"} />
