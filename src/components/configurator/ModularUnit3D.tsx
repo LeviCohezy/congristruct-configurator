@@ -9,7 +9,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
     case "thermowood-black":
       return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
     case "thermowood-natural":
-      return { color: "#cca37d", roughness: 0.78, metalness: 0.0, isWood: true };
+      return { color: "#cea67c", roughness: 0.78, metalness: 0.0, isWood: false };
     case "composite-white":
       return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
