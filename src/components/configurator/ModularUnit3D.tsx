@@ -711,9 +711,9 @@ function StartWalls({
 
         return (
           <group>
-            {/* Vertical partition wall */}
-            <mesh position={[partX, height / 2 + floorThick, -halfD + wallThick + partDepth / 2]}>
-              <boxGeometry args={[partWallT, height, partDepth]} />
+            {/* Vertical partition wall — extended to cover corner joint */}
+            <mesh position={[partX, height / 2 + floorThick, -halfD + wallThick + (partDepth + partWallT / 2) / 2]}>
+              <boxGeometry args={[partWallT, height, partDepth + partWallT / 2]} />
               <meshStandardMaterial color="#ffffff" roughness={0.92} />
             </mesh>
             {/* Horizontal wall — left of door */}
