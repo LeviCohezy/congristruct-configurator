@@ -41,7 +41,7 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   // 2. Narrow vertical slats with visible gaps (like thermowood cladding)
-  const numPlanks = 20;
+  const numPlanks = 3;
   const pw = canvas.width / numPlanks;
   const gapW = pw * 0.12; // ~12 % of plank width = visible dark gap
 
