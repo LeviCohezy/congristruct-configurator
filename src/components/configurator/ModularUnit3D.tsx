@@ -435,6 +435,59 @@ function StartWalls({
         <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
       </mesh>
 
+      {/* ── Built-in bookshelf/cabinet on back wall, left of window ── */}
+      {(() => {
+        const shelfW = cmToUnit(140);  // 140cm wide unit
+        const shelfD = 0.45;           // 45cm deep
+        const shelfX = -halfW + wallThick + shelfW / 2;
+        const shelfZ = -halfD + wallThick + shelfD / 2;
+        const cabinetColor = "#2a2118";
+        const counterTop = height * 0.35;   // counter at ~35% height
+        const upperBottom = height * 0.45;  // upper cabinets start
+        const nicheH = upperBottom - counterTop;
+        const upperH = height - upperBottom;
+        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
+
+        return (
+          <group>
+            {/* Lower cabinet body */}
+            <mesh position={[shelfX, counterTop / 2 + floorThick, shelfZ]}>
+              <boxGeometry args={[shelfW, counterTop, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Counter surface (dark top) */}
+            <mesh position={[shelfX, counterTop + 0.015 + floorThick, shelfZ]}>
+              <boxGeometry args={[shelfW + 0.02, 0.03, shelfD + 0.02]} />
+              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+            </mesh>
+            {/* Upper cabinets */}
+            <mesh position={[shelfX, upperBottom + upperH / 2 + floorThick, shelfZ]}>
+              <boxGeometry args={[shelfW, upperH, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Open niche (back panel visible as dark strip) */}
+            <mesh position={[shelfX, counterTop + 0.03 + nicheH / 2 + floorThick, -halfD + wallThick + 0.01]}>
+              <boxGeometry args={[shelfW - 0.04, nicheH - 0.06, 0.01]} />
+              <meshStandardMaterial color="#151010" roughness={0.9} />
+            </mesh>
+            {/* Cabinet door lines (3 vertical seams on upper) */}
+            {[0.33, 0.5, 0.67].map((frac, i) => (
+              <mesh key={`u${i}`} position={[shelfX - shelfW / 2 + shelfW * frac, upperBottom + upperH / 2 + floorThick, shelfZ + shelfD / 2 + 0.002]}>
+                <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
+                <meshStandardMaterial color="#151010" roughness={0.5} />
+              </mesh>
+            ))}
+            {/* Cabinet door lines (3 vertical seams on lower) */}
+            {[0.33, 0.5, 0.67].map((frac, i) => (
+              <mesh key={`l${i}`} position={[shelfX - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick, shelfZ + shelfD / 2 + 0.002]}>
+                <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
+                <meshStandardMaterial color="#151010" roughness={0.5} />
+              </mesh>
+            ))}
+          </group>
+        );
+      })()}
+
       {/* ── Plan B: toilet partition in back-right corner ── */}
       {floorPlan === "b" && (() => {
         // Shift partition 15cm right of back window edge (265+15=280cm) for a gap
@@ -447,7 +500,7 @@ function StartWalls({
 
         // Door in horizontal wall: 70cm wide
         const doorW3D = cmToUnit(90);
-        const doorH3D = height * 0.82;
+        const doorH3D = winTop;
         const doorCenterLocal = horizW / 2;
         const leftSegW = doorCenterLocal - doorW3D / 2;
         const rightSegW = horizW - doorCenterLocal - doorW3D / 2;
