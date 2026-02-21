@@ -9,7 +9,7 @@ function getFacadeProps(facade: ConfigState["facade"]) {
     case "thermowood-black":
       return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
     case "thermowood-natural":
-      return { color: "#cea67c", roughness: 0.78, metalness: 0.0, isWood: false };
+      return { color: "#cea67c", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":
       return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
@@ -36,56 +36,53 @@ function createPlankTexture(baseColor: string, isWood: boolean): THREE.CanvasTex
   const ctx = canvas.getContext("2d")!;
   const base = new THREE.Color(baseColor);
 
-  // 1. Background (The "gap" color)
-  ctx.fillStyle = "#110d0a";
+  // 1. Background — dark shadow gap between slats
+  ctx.fillStyle = "#1a1208";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // 2. Plank Dimensions (Narrow vertical slats)
-  const numPlanks = 42;
+  // 2. Narrow vertical slats with visible gaps (like thermowood cladding)
+  const numPlanks = 28;
   const pw = canvas.width / numPlanks;
-  const gapW = pw * 0.15;
+  const gapW = pw * 0.12; // ~12 % of plank width = visible dark gap
 
   for (let i = 0; i < numPlanks; i++) {
     const x = i * pw;
+    const slatW = pw - gapW;
 
-    // 3. Color Variation (Scalar shift only, no hue change)
+    // 3. Subtle per-plank brightness variation (+/- 4 %)
     const col = base.clone();
-    const lightShift = (Math.random() - 0.5) * 0.1; // +/- 10% brightness
-    col.multiplyScalar(1 + lightShift);
+    col.multiplyScalar(1 + (Math.random() - 0.5) * 0.08);
 
-    // 4. Draw Slat
+    // 4. Draw slat
     ctx.fillStyle = `#${col.getHexString()}`;
-    ctx.fillRect(x, 0, pw - gapW, canvas.height);
+    ctx.fillRect(x, 0, slatW, canvas.height);
 
-    // 5. Vertical Grain (Subtle dark lines)
-    for (let g = 0; g < 12; g++) {
-      const gx = x + Math.random() * (pw - gapW);
-      const gw = 0.5 + Math.random() * 1.5;
-      const opacity = 0.03 + Math.random() * 0.07;
-      ctx.fillStyle = `rgba(0,0,0,${opacity})`;
-      ctx.fillRect(gx, 0, gw, canvas.height);
+    // 5. Very faint vertical grain lines (2-3 per slat)
+    for (let g = 0; g < 3; g++) {
+      const gx = x + 2 + Math.random() * (slatW - 4);
+      ctx.fillStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
+      ctx.fillRect(gx, 0, 0.8, canvas.height);
     }
 
-    // 6. 3D Edge Shadows
-    // Left edge shadow
-    const gradShadow = ctx.createLinearGradient(x, 0, x + pw * 0.12, 0);
-    gradShadow.addColorStop(0, "rgba(0,0,0,0.25)");
-    gradShadow.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = gradShadow;
-    ctx.fillRect(x, 0, pw * 0.12, canvas.height);
+    // 6. Soft left-edge shadow for depth
+    const grad = ctx.createLinearGradient(x, 0, x + slatW * 0.08, 0);
+    grad.addColorStop(0, "rgba(0,0,0,0.18)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(x, 0, slatW * 0.08, canvas.height);
 
-    // Right edge highlight
-    const gradLight = ctx.createLinearGradient(x + pw - gapW - pw * 0.1, 0, x + pw - gapW, 0);
-    gradLight.addColorStop(0, "rgba(255,255,255,0)");
-    gradLight.addColorStop(1, "rgba(255,255,255,0.1)");
-    ctx.fillStyle = gradLight;
-    ctx.fillRect(x + pw - gapW - pw * 0.1, 0, pw * 0.1, canvas.height);
+    // 7. Soft right-edge highlight
+    const hl = ctx.createLinearGradient(x + slatW * 0.92, 0, x + slatW, 0);
+    hl.addColorStop(0, "rgba(255,255,255,0)");
+    hl.addColorStop(1, "rgba(255,255,255,0.06)");
+    ctx.fillStyle = hl;
+    ctx.fillRect(x + slatW * 0.92, 0, slatW * 0.08, canvas.height);
   }
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(4, 1); // Controls the density of the vertical lines
+  tex.repeat.set(3, 1);
   return tex;
 }
 
