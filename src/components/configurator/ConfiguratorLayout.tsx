@@ -35,7 +35,7 @@ export function ConfiguratorLayout() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Preview panel - left side on desktop, top on mobile */}
-      <div className="lg:w-[55%] lg:sticky lg:top-0 lg:h-screen h-[40vh] lg:h-auto">
+      <div className="lg:w-[55%] lg:sticky lg:top-0 lg:h-screen h-[40vh] sticky top-0 z-20">
         <PreviewPanel config={config} currentStep={currentStep} />
       </div>
 

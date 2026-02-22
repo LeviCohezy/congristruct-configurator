@@ -70,9 +70,9 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
-      {/* TEMP: Color picker swatch (hidden for thermowood-natural, already locked in) */}
+      {/* TEMP: Color picker swatch (hidden on mobile and for thermowood-natural) */}
       {showPicker && (
-        <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
+        <div className="hidden lg:flex absolute top-4 right-4 z-20 flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
           <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Wood Color</label>
           <div className="flex items-center gap-2">
             <input type="color" value={woodColor} onChange={(e) => setWoodColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
@@ -101,7 +101,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         </div>
       )}
 
-      <div className="absolute bottom-16 left-0 right-0 z-10 flex justify-center pointer-events-none">
+      <div className="absolute bottom-16 left-0 right-0 z-10 hidden lg:flex justify-center pointer-events-none">
         <span className="px-3 py-1.5 rounded-full bg-card/70 backdrop-blur-sm border border-border text-[11px] font-medium text-muted-foreground flex items-center gap-1.5">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/>
