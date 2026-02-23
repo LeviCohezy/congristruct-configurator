@@ -1263,6 +1263,7 @@ function DoorPane({
   height,
   frameColor,
   z,
+  rotate = true,
 }: {
   posX: number;
   posY: number;
@@ -1270,10 +1271,11 @@ function DoorPane({
   height: number;
   frameColor: string;
   z: number;
+  rotate?: boolean;
 }) {
   const fw = 0.036;
   return (
-    <group position={[posX, posY, z]} rotation={[0, Math.PI / 2, 0]}>
+    <group position={[posX, posY, z]} rotation={rotate ? [0, Math.PI / 2, 0] : [0, 0, 0]}>
       {/* Frame */}
       {(
         [
@@ -1465,7 +1467,7 @@ function FlowBWalls({
               <boxGeometry args={[seg.w, height - winTop, wallThick]} />
               <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
-            <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} />
+            <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
             {/* Door step */}
             <mesh position={[seg.cx, floorThick / 2, halfD + 0.18]} castShadow>
               <boxGeometry args={[seg.w + 0.15, floorThick, 0.32]} />
