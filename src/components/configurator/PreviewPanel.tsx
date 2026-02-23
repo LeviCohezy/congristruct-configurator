@@ -60,10 +60,10 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
   const [woodColor, setWoodColor] = useState("#18130e");
   const [gapColor, setGapColor] = useState("#1a1208");
 
-  const isThermowoodNatural = config.facade === "thermowood-natural";
-  const showPicker = !isThermowoodNatural;
+  const isWoodLocked = config.facade === "thermowood-natural" || config.facade === "thermowood-black";
+  const showPicker = !isWoodLocked;
 
-  // Only override colors for non-thermowood-natural facades
+  // Only override colors for non-locked wood facades
   const patchedConfig = showPicker
     ? { ...config, __woodColor: woodColor, __gapColor: gapColor } as any
     : config;

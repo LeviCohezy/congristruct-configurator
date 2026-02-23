@@ -9,7 +9,7 @@ import osbTextureUrl from "@/assets/osb-texture.png";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":
-      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
+      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true, gapColor: "#c7c7c7" };
     case "thermowood-natural":
       return { color: "#ccb999", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":
@@ -194,7 +194,8 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const roofColor = getRoofColor(config.facade);
   const frameColor = fp.color === "#ededea" || fp.color === "#e8e6e2" ? "#1a1a1a" : "#080807";
 
-  const plankTex = useMemo(() => createPlankTexture(effectiveColor, fp.isWood, gapColorOverride), [effectiveColor, fp.isWood, gapColorOverride]);
+  const effectiveGapColor = gapColorOverride || (fp as any).gapColor || undefined;
+  const plankTex = useMemo(() => createPlankTexture(effectiveColor, fp.isWood, effectiveGapColor), [effectiveColor, fp.isWood, effectiveGapColor]);
 
   // Dimensions — all 4m depth, variable width
   const { width, height, depth } = useMemo(() => {
