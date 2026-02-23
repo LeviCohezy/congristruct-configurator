@@ -113,7 +113,7 @@ function makeCladdingMat(
   bump.wrapS = THREE.RepeatWrapping;
   bump.wrapT = THREE.RepeatWrapping;
   bump.repeat.set(wallWidthM / CELL_M, 1);
-  return new THREE.MeshStandardMaterial({ color, roughness, metalness, map: tex, bumpMap: bump, bumpScale: 0.04 });
+  return new THREE.MeshStandardMaterial({ color: "#ffffff", roughness, metalness, map: tex, bumpMap: bump, bumpScale: 0.04 });
 }
 
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
@@ -143,7 +143,7 @@ function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood,
 
   return (
     <meshStandardMaterial
-      color={color}
+      color={map ? "#ffffff" : color}
       roughness={roughness}
       metalness={metalness}
       map={map}
