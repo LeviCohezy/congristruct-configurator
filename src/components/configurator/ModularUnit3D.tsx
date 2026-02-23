@@ -59,11 +59,48 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   ctx.fillStyle = `#${col.getHexString()}`;
   ctx.fillRect(0, 0, slatW, canvas.height);
 
-  // 3. Faint grain lines
-  for (let g = 0; g < 3; g++) {
-    const gx = 2 + Math.random() * (slatW - 4);
-    ctx.fillStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.04})`;
-    ctx.fillRect(gx, 0, 0.8, canvas.height);
+  // 3. Rich wood grain pattern
+  // — broad tonal variation bands (heartwood / sapwood streaks)
+  for (let b = 0; b < 6; b++) {
+    const bx = Math.random() * slatW;
+    const bw = 4 + Math.random() * 18;
+    const dark = Math.random() > 0.5;
+    ctx.fillStyle = dark
+      ? `rgba(0,0,0,${0.04 + Math.random() * 0.06})`
+      : `rgba(255,255,255,${0.03 + Math.random() * 0.04})`;
+    ctx.fillRect(bx, 0, bw, canvas.height);
+  }
+
+  // — fine grain lines running full height
+  for (let g = 0; g < 12; g++) {
+    const gx = 1 + Math.random() * (slatW - 2);
+    const lineW = 0.4 + Math.random() * 1.2;
+    ctx.fillStyle = `rgba(0,0,0,${0.03 + Math.random() * 0.06})`;
+    ctx.fillRect(gx, 0, lineW, canvas.height);
+  }
+
+  // — subtle knot-like oval marks (1-2 per plank)
+  const knots = 1 + Math.floor(Math.random() * 2);
+  for (let k = 0; k < knots; k++) {
+    const kx = 8 + Math.random() * (slatW - 16);
+    const ky = 40 + Math.random() * (canvas.height - 80);
+    const kr = 3 + Math.random() * 6;
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, kr, kr * (1.5 + Math.random()), 0, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,0,0,${0.06 + Math.random() * 0.06})`;
+    ctx.fill();
+    // lighter ring around knot
+    ctx.beginPath();
+    ctx.ellipse(kx, ky, kr + 2, (kr + 2) * (1.5 + Math.random()), 0, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,255,255,${0.03 + Math.random() * 0.03})`;
+    ctx.lineWidth = 0.8;
+    ctx.stroke();
+  }
+
+  // — horizontal year-ring waviness
+  for (let y = 0; y < canvas.height; y += 18 + Math.random() * 30) {
+    ctx.fillStyle = `rgba(0,0,0,${0.015 + Math.random() * 0.025})`;
+    ctx.fillRect(0, y, slatW, 1 + Math.random() * 1.5);
   }
 
   // 4. Left-edge shadow
