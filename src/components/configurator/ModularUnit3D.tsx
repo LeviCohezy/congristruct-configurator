@@ -158,10 +158,11 @@ function makeCladdingMat(
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
 // photoTex: optional real photo texture (overrides baseTex procedural)
 // photoTexWidthM: real-world width the photo covers (for repeat calc)
-function CladMaterial({ baseTex, photoTex, photoTexWidthM, wallWidth, color, roughness, metalness, isWood, ...rest }: {
+function CladMaterial({ baseTex, photoTex, photoTexWidthM, photoTint, wallWidth, color, roughness, metalness, isWood, ...rest }: {
   baseTex: THREE.CanvasTexture | null;
   photoTex?: THREE.Texture | null;
   photoTexWidthM?: number;
+  photoTint?: string;
   wallWidth: number;
   color: string;
   roughness: number;
@@ -201,7 +202,7 @@ function CladMaterial({ baseTex, photoTex, photoTexWidthM, wallWidth, color, rou
 
   return (
     <meshStandardMaterial
-      color={photoTex ? "#8a8a8a" : color}
+      color={photoTex ? (photoTint || "#ffffff") : color}
       roughness={roughness}
       metalness={metalness}
       map={map}
@@ -347,6 +348,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const woodBase = {
     baseTex: plankTex,
     photoTex: activePhotoTex,
+    photoTint: isThermowoodBlack ? "#8a8a8a" : undefined, // darken black, no tint on Ayous
     photoTexWidthM: 1,
     color: effectiveColor,
     roughness: fp.roughness,
