@@ -9,7 +9,7 @@ import osbTextureUrl from "@/assets/osb-texture.png";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":
-      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true, gapColor: "#4a4a4a" };
+      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true, gapColor: "#c7c7c7" };
     case "thermowood-natural":
       return { color: "#ccb999", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":
@@ -113,7 +113,7 @@ function makeCladdingMat(
   bump.wrapS = THREE.RepeatWrapping;
   bump.wrapT = THREE.RepeatWrapping;
   bump.repeat.set(wallWidthM / CELL_M, 1);
-  return new THREE.MeshStandardMaterial({ color: "#ffffff", roughness, metalness, map: tex, bumpMap: bump, bumpScale: 0.04 });
+  return new THREE.MeshStandardMaterial({ color, roughness, metalness, map: tex, bumpMap: bump, bumpScale: 0.04 });
 }
 
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
@@ -143,7 +143,7 @@ function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood,
 
   return (
     <meshStandardMaterial
-      color={map ? "#ffffff" : color}
+      color={color}
       roughness={roughness}
       metalness={metalness}
       map={map}
