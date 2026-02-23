@@ -9,7 +9,7 @@ import osbTextureUrl from "@/assets/osb-texture.png";
 function getFacadeProps(facade: ConfigState["facade"]) {
   switch (facade) {
     case "thermowood-black":
-      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true, gapColor: "#c7c7c7" };
+      return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true, gapColor: "#4a4a4a" };
     case "thermowood-natural":
       return { color: "#ccb999", roughness: 0.82, metalness: 0.0, isWood: true };
     case "composite-white":
