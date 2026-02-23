@@ -5,6 +5,7 @@ import type { ConfigState } from "@/hooks/useConfigurator";
 import { getRoofColor } from "@/hooks/useConfigurator";
 import osbTextureUrl from "@/assets/osb-texture.png";
 import thermowoodBlackTextureUrl from "@/assets/thermowood-black-texture.png";
+import thermowoodNaturalTextureUrl from "@/assets/thermowood-natural-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"]) {
@@ -251,12 +252,15 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const roofColor = getRoofColor(config.facade);
   const frameColor = fp.color === "#ededea" || fp.color === "#e8e6e2" ? "#1a1a1a" : "#080807";
 
-  // Load real photo texture for thermowood-black
+  // Load real photo textures for thermowood
   const twBlackTexRaw = useLoader(THREE.TextureLoader, thermowoodBlackTextureUrl);
+  const twNaturalTexRaw = useLoader(THREE.TextureLoader, thermowoodNaturalTextureUrl);
   const isThermowoodBlack = config.facade === "thermowood-black";
+  const isThermowoodNatural = config.facade === "thermowood-natural";
+  const isPhotoTex = isThermowoodBlack || isThermowoodNatural;
 
   const plankTex = useMemo(() => {
-    if (isThermowoodBlack) return null; // use photo texture instead
+    if (isPhotoTex) return null; // use photo texture instead
     return createPlankTexture(effectiveColor, fp.isWood, gapColorOverride);
   }, [effectiveColor, fp.isWood, gapColorOverride, isThermowoodBlack]);
 
@@ -329,10 +333,21 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     return t;
   }, [twBlackTexRaw, isThermowoodBlack]);
 
+  const twNaturalTex = useMemo(() => {
+    if (!isThermowoodNatural) return null;
+    const t = twNaturalTexRaw.clone();
+    t.needsUpdate = true;
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }, [twNaturalTexRaw, isThermowoodNatural]);
+
+  const activePhotoTex = isThermowoodBlack ? twBlackTex : isThermowoodNatural ? twNaturalTex : null;
+
   const woodBase = {
     baseTex: plankTex,
-    photoTex: isThermowoodBlack ? twBlackTex : null,
-    photoTexWidthM: 1, // the photo covers ~1m of real wall
+    photoTex: activePhotoTex,
+    photoTexWidthM: 1,
     color: effectiveColor,
     roughness: fp.roughness,
     metalness: fp.metalness,
