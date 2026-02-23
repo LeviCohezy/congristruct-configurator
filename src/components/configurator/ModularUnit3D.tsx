@@ -4,6 +4,7 @@ import { useLoader } from "@react-three/fiber";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { getRoofColor } from "@/hooks/useConfigurator";
 import osbTextureUrl from "@/assets/osb-texture.png";
+import thermowoodBlackTextureUrl from "@/assets/thermowood-black-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"]) {
@@ -154,8 +155,12 @@ function makeCladdingMat(
 }
 
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
-function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood, ...rest }: {
+// photoTex: optional real photo texture (overrides baseTex procedural)
+// photoTexWidthM: real-world width the photo covers (for repeat calc)
+function CladMaterial({ baseTex, photoTex, photoTexWidthM, wallWidth, color, roughness, metalness, isWood, ...rest }: {
   baseTex: THREE.CanvasTexture | null;
+  photoTex?: THREE.Texture | null;
+  photoTexWidthM?: number;
   wallWidth: number;
   color: string;
   roughness: number;
@@ -164,6 +169,21 @@ function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood,
   [k: string]: any;
 }) {
   const [map, bumpMap] = useMemo(() => {
+    // Photo texture takes priority
+    if (photoTex) {
+      const pw = photoTexWidthM || 1;
+      const t = photoTex.clone();
+      t.needsUpdate = true;
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(wallWidth / pw, 1);
+      const b = photoTex.clone();
+      b.needsUpdate = true;
+      b.wrapS = THREE.RepeatWrapping;
+      b.wrapT = THREE.RepeatWrapping;
+      b.repeat.set(wallWidth / pw, 1);
+      return [t, b];
+    }
     if (!baseTex || !isWood) return [undefined, undefined];
     const t = baseTex.clone();
     t.needsUpdate = true;
@@ -176,11 +196,11 @@ function CladMaterial({ baseTex, wallWidth, color, roughness, metalness, isWood,
     b.wrapT = THREE.RepeatWrapping;
     b.repeat.set(wallWidth / CELL_M, 1);
     return [t, b];
-  }, [baseTex, wallWidth, isWood]);
+  }, [baseTex, photoTex, photoTexWidthM, wallWidth, isWood]);
 
   return (
     <meshStandardMaterial
-      color={color}
+      color={photoTex ? "#ffffff" : color}
       roughness={roughness}
       metalness={metalness}
       map={map}
@@ -231,7 +251,14 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const roofColor = getRoofColor(config.facade);
   const frameColor = fp.color === "#ededea" || fp.color === "#e8e6e2" ? "#1a1a1a" : "#080807";
 
-  const plankTex = useMemo(() => createPlankTexture(effectiveColor, fp.isWood, gapColorOverride), [effectiveColor, fp.isWood, gapColorOverride]);
+  // Load real photo texture for thermowood-black
+  const twBlackTexRaw = useLoader(THREE.TextureLoader, thermowoodBlackTextureUrl);
+  const isThermowoodBlack = config.facade === "thermowood-black";
+
+  const plankTex = useMemo(() => {
+    if (isThermowoodBlack) return null; // use photo texture instead
+    return createPlankTexture(effectiveColor, fp.isWood, gapColorOverride);
+  }, [effectiveColor, fp.isWood, gapColorOverride, isThermowoodBlack]);
 
   // Dimensions — all 4m depth, variable width
   const { width, height, depth } = useMemo(() => {
@@ -292,7 +319,25 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   };
 
   // For wood walls, we need per-wall materials with correct repeat
-  const woodBase = { baseTex: plankTex, color: effectiveColor, roughness: fp.roughness, metalness: fp.metalness, isWood: fp.isWood };
+  // Photo texture for thermowood-black: image covers ~1m of real cladding width
+  const twBlackTex = useMemo(() => {
+    if (!isThermowoodBlack) return null;
+    const t = twBlackTexRaw.clone();
+    t.needsUpdate = true;
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }, [twBlackTexRaw, isThermowoodBlack]);
+
+  const woodBase = {
+    baseTex: plankTex,
+    photoTex: isThermowoodBlack ? twBlackTex : null,
+    photoTexWidthM: 1, // the photo covers ~1m of real wall
+    color: effectiveColor,
+    roughness: fp.roughness,
+    metalness: fp.metalness,
+    isWood: fp.isWood,
+  };
 
   // Interior: OSB texture when shell (casco), white when finished
   const isShell = config.finishLevel === "shell";
