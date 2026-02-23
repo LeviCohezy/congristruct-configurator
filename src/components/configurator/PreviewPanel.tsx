@@ -3,6 +3,8 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
 import { ModularUnit3D } from "./ModularUnit3D";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { Button } from "@/components/ui/button";
+import { Check } from "lucide-react";
 
 interface PreviewPanelProps {
   config: ConfigState;
@@ -59,32 +61,34 @@ const modelLabels: Record<ConfigState["model"], string> = {
 export function PreviewPanel({ config }: PreviewPanelProps) {
   const [woodColor, setWoodColor] = useState("#18130e");
   const [gapColor, setGapColor] = useState("#1a1208");
+  const [confirmed, setConfirmed] = useState(false);
 
-  const isWoodLocked = config.facade === "thermowood-natural" || config.facade === "thermowood-black";
-  const showPicker = !isWoodLocked;
-
-  // Only override colors for non-locked wood facades
-  const patchedConfig = showPicker
-    ? { ...config, __woodColor: woodColor, __gapColor: gapColor } as any
-    : config;
+  // Always allow color picking; apply overrides to config
+  const patchedConfig = { ...config, __woodColor: woodColor, __gapColor: gapColor } as any;
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
-      {/* TEMP: Color picker swatch (hidden on mobile and for thermowood-natural) */}
-      {showPicker && (
-        <div className="hidden lg:flex absolute top-4 right-4 z-20 flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
-          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Wood Color</label>
-          <div className="flex items-center gap-2">
-            <input type="color" value={woodColor} onChange={(e) => setWoodColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
-            <span className="text-xs font-mono text-foreground">{woodColor}</span>
-          </div>
-          <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Gap Color</label>
-          <div className="flex items-center gap-2">
-            <input type="color" value={gapColor} onChange={(e) => setGapColor(e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0" />
-            <span className="text-xs font-mono text-foreground">{gapColor}</span>
-          </div>
+      {/* Color picker */}
+      <div className="hidden lg:flex absolute top-4 right-4 z-20 flex-col gap-2 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-3">
+        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Plank kleur</label>
+        <div className="flex items-center gap-2">
+          <input type="color" value={woodColor} onChange={(e) => { setWoodColor(e.target.value); setConfirmed(false); }} className="w-8 h-8 rounded cursor-pointer border-0" />
+          <span className="text-xs font-mono text-foreground">{woodColor}</span>
         </div>
-      )}
+        <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">Voeg kleur</label>
+        <div className="flex items-center gap-2">
+          <input type="color" value={gapColor} onChange={(e) => { setGapColor(e.target.value); setConfirmed(false); }} className="w-8 h-8 rounded cursor-pointer border-0" />
+          <span className="text-xs font-mono text-foreground">{gapColor}</span>
+        </div>
+        <Button
+          size="sm"
+          variant={confirmed ? "outline" : "default"}
+          className="mt-1 w-full text-xs gap-1.5"
+          onClick={() => setConfirmed(true)}
+        >
+          {confirmed ? <><Check className="w-3.5 h-3.5" /> Bevestigd</> : "Bevestigen"}
+        </Button>
+      </div>
 
       {/* Model badge */}
       <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10 pointer-events-none">
