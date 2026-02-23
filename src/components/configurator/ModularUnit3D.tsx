@@ -200,7 +200,7 @@ function CladMaterial({ baseTex, photoTex, photoTexWidthM, wallWidth, color, rou
 
   return (
     <meshStandardMaterial
-      color={photoTex ? "#ffffff" : color}
+      color={photoTex ? "#8a8a8a" : color}
       roughness={roughness}
       metalness={metalness}
       map={map}
