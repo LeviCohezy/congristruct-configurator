@@ -123,7 +123,7 @@ const cameraDistances: Record<ConfigState["model"], number> = {
   start: 12,
   flow: 17,
   hub: 20,
-  base: 23,
+  base: 26,
 };
 
 export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
