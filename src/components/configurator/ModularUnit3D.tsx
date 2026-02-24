@@ -41,9 +41,9 @@ const COMPOSITE_PANEL_M = 1.22; // 1.22m panel width
 const COMPOSITE_GAP_M = 0.005;  // 5mm joint
 const COMPOSITE_CELL_M = COMPOSITE_PANEL_M + COMPOSITE_GAP_M;
 
-const ALU_PLANK_M = 0.20;   // 200mm aluminium plank
-const ALU_GAP_M = 0.003;    // 3mm joint
-const ALU_CELL_M = ALU_PLANK_M + ALU_GAP_M;
+const ALU_PANEL_M = 1.5;     // 1.5m aluminium panel
+const ALU_GAP_M = 0.005;    // 5mm joint
+const ALU_CELL_M = ALU_PANEL_M + ALU_GAP_M;
 
 function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: string): THREE.CanvasTexture | null {
   if (!isWood) return null;
@@ -177,57 +177,50 @@ function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
   return tex;
 }
 
-// ─── Aluminium plank texture: small planks with brushed metallic look ────────
-function createAluminiumPlankTexture(baseColor: string): THREE.CanvasTexture {
+// ─── Aluminium panel texture: flat plates every 1.5m with brushed metallic look ─
+function createAluminiumPanelTexture(baseColor: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
-  canvas.width = 128;
-  canvas.height = 512;
+  canvas.width = 256;
+  canvas.height = 64;
   const ctx = canvas.getContext("2d")!;
   const base = new THREE.Color(baseColor);
+  const isDark = base.r + base.g + base.b < 1.0;
+  const gapCol = isDark ? "#5a5a5a" : "#0a0a0a";
 
   const gapFrac = ALU_GAP_M / ALU_CELL_M;
   const gapPx = Math.max(1, Math.round(canvas.width * gapFrac));
-  const plankW = canvas.width - gapPx;
+  const panelW = canvas.width - gapPx;
 
-  // Gap (dark line between planks)
-  ctx.fillStyle = "#0a0a0a";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  // Plank fill
+  // Panel fill
   ctx.fillStyle = `#${base.getHexString()}`;
-  ctx.fillRect(0, 0, plankW, canvas.height);
+  ctx.fillRect(0, 0, panelW, canvas.height);
 
-  // Brushed metal horizontal streaks
-  for (let y = 0; y < canvas.height; y += 1) {
-    const alpha = 0.01 + Math.random() * 0.04;
-    const bright = Math.random() > 0.5;
-    ctx.fillStyle = bright
+  // Brushed metal horizontal micro-streaks across panel
+  for (let y = 0; y < canvas.height; y++) {
+    const alpha = 0.01 + Math.random() * 0.03;
+    ctx.fillStyle = Math.random() > 0.5
       ? `rgba(255,255,255,${alpha})`
       : `rgba(0,0,0,${alpha})`;
-    ctx.fillRect(0, y, plankW, 1);
+    ctx.fillRect(0, y, panelW, 1);
   }
 
-  // Subtle vertical reflection bands
-  for (let b = 0; b < 3; b++) {
-    const bx = Math.random() * plankW;
-    const bw = 8 + Math.random() * 20;
-    ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.random() * 0.03})`;
-    ctx.fillRect(bx, 0, bw, canvas.height);
-  }
+  // Joint line
+  ctx.fillStyle = gapCol;
+  ctx.fillRect(panelW, 0, gapPx, canvas.height);
 
-  // Left edge shadow
-  const grad = ctx.createLinearGradient(0, 0, plankW * 0.06, 0);
-  grad.addColorStop(0, "rgba(0,0,0,0.12)");
-  grad.addColorStop(1, "rgba(0,0,0,0)");
+  // Edge shadow
+  const grad = ctx.createLinearGradient(panelW - 4, 0, panelW, 0);
+  grad.addColorStop(0, "rgba(0,0,0,0)");
+  grad.addColorStop(1, "rgba(0,0,0,0.10)");
   ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, plankW * 0.06, canvas.height);
+  ctx.fillRect(panelW - 4, 0, 4, canvas.height);
 
-  // Right edge highlight
-  const hl = ctx.createLinearGradient(plankW * 0.94, 0, plankW, 0);
-  hl.addColorStop(0, "rgba(255,255,255,0)");
-  hl.addColorStop(1, "rgba(255,255,255,0.05)");
+  // Left highlight
+  const hl = ctx.createLinearGradient(0, 0, 3, 0);
+  hl.addColorStop(0, "rgba(255,255,255,0.04)");
+  hl.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = hl;
-  ctx.fillRect(plankW * 0.94, 0, plankW * 0.06, canvas.height);
+  ctx.fillRect(0, 0, 3, canvas.height);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
@@ -408,7 +401,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const isAluminium = config.facade === "aluminium";
   const aluTex = useMemo(() => {
     if (!isAluminium) return null;
-    return createAluminiumPlankTexture(effectiveColor);
+    return createAluminiumPanelTexture(effectiveColor);
   }, [effectiveColor, isAluminium]);
 
   // Dimensions — all 4m depth, variable width

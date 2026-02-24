@@ -51,7 +51,7 @@ const materials: MaterialFamily[] = [
   {
     id: "aluminium",
     label: "Aluminium gevelbekleding",
-    desc: "Geborsteld aluminium planken · alle kleuren mogelijk",
+    desc: "Geborsteld aluminium platen · voeglijnen om de 1,5 m",
     facadeId: "aluminium",
     color: "hsl(210,5%,30%)",
     hasColorPicker: true,
@@ -71,15 +71,6 @@ function getActiveFamily(facade: FacadeId): string {
   }
   return materials[0].id;
 }
-
-const presetColors = [
-  { label: "Antraciet", hex: "#383a3b" },
-  { label: "Brons", hex: "#6e4e2e" },
-  { label: "Wit", hex: "#e8e6e2" },
-  { label: "Zwart", hex: "#1a1a1c" },
-  { label: "Groen", hex: "#2d4a3e" },
-  { label: "Blauw", hex: "#2a3d5c" },
-];
 
 export function ExteriorFacade({ config, updateConfig }: Props) {
   const [expandedFamily, setExpandedFamily] = useState(() => getActiveFamily(config.facade));
@@ -126,36 +117,17 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     animate={{ opacity: 1, height: "auto" }}
                     className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
                   >
-                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">Kleur kiezen</p>
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {presetColors.map((pc) => (
-                        <button
-                          key={pc.hex}
-                          onClick={() => updateConfig("aluminiumColor", pc.hex)}
-                          className={cn(
-                            "flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-colors",
-                            config.aluminiumColor === pc.hex
-                              ? "border-accent bg-accent/5"
-                              : "border-border hover:border-muted-foreground/30"
-                          )}
-                        >
-                          <div
-                            className="w-7 h-7 rounded-md border border-border"
-                            style={{ backgroundColor: pc.hex }}
-                          />
-                          <span className="text-[9px] font-medium">{pc.label}</span>
-                        </button>
-                      ))}
-                    </div>
                     <div className="flex items-center gap-3">
-                      <label className="text-xs text-muted-foreground">Custom:</label>
                       <input
                         type="color"
                         value={config.aluminiumColor}
                         onChange={(e) => updateConfig("aluminiumColor", e.target.value)}
-                        className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
+                        className="w-10 h-10 rounded-lg cursor-pointer border border-border bg-transparent p-0.5"
                       />
-                      <span className="text-xs font-mono text-muted-foreground">{config.aluminiumColor}</span>
+                      <div>
+                        <p className="text-xs font-medium">Kies een kleur</p>
+                        <p className="text-[11px] font-mono text-muted-foreground">{config.aluminiumColor}</p>
+                      </div>
                     </div>
                   </motion.div>
                 )}
