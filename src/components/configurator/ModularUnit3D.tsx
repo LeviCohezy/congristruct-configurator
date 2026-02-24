@@ -2471,37 +2471,40 @@ function FlowBWalls({
         const screenW = 0.54;
         const screenH = 0.34;
 
-        // Desk runs along Z (long side=deskW), side against partition wall
-        // Placed right after the room door, towards the front wall (+Z)
-        const doorEnd = doorCenterZ + roomDoorW / 2;
+        // Per floorplan: desk long side along X, against BACK WALL (-Z)
+        // Chair in front of desk (+Z side), facing back wall (-Z)
+        // Monitor on desk, screen facing chair (+Z)
+        const backInnerZ = -halfD + wallThick + 0.02;
         const chairYOff = 0.06;
 
-        // LEFT ROOM: desk side flush against left partition (X = leftPartX)
-        const lDeskCX = leftPartX - deskD / 2 - 0.02; // flush against partition
-        const lDeskCZ = doorEnd + 0.05 + deskW / 2; // just after door towards front
+        // LEFT ROOM center X
+        const leftRoomCX = (-halfW + wallThick + leftPartX) / 2;
+        const lDeskCX = leftRoomCX;
+        const lDeskCZ = backInnerZ + deskD / 2; // desk against back wall
 
-        // RIGHT ROOM: desk side flush against right partition (X = rightPartX + partT)
-        const rDeskCX = rightPartX + partT + deskD / 2 + 0.02;
-        const rDeskCZ = doorEnd + 0.05 + deskW / 2;
+        // RIGHT ROOM center X
+        const rightRoomCX = (rightPartX + partT + halfW - wallThick) / 2;
+        const rDeskCX = rightRoomCX;
+        const rDeskCZ = backInnerZ + deskD / 2;
 
         return (
           <>
-            {/* ═══ LEFT ROOM DESK — long side along Z, side against partition ═══ */}
+            {/* ═══ LEFT ROOM DESK — long side along X, against back wall ═══ */}
             <mesh position={[lDeskCX, deskH + floorThick, lDeskCZ]}>
-              <boxGeometry args={[deskD, topT, deskW]} />
+              <boxGeometry args={[deskW, topT, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            <mesh position={[lDeskCX, deskH / 2 + floorThick, lDeskCZ - deskW / 2 + 0.02]}>
-              <boxGeometry args={[deskD, deskH, 0.04]} />
+            <mesh position={[lDeskCX - deskW / 2 + 0.02, deskH / 2 + floorThick, lDeskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            <mesh position={[lDeskCX, deskH / 2 + floorThick, lDeskCZ + deskW / 2 - 0.02]}>
-              <boxGeometry args={[deskD, deskH, 0.04]} />
+            <mesh position={[lDeskCX + deskW / 2 - 0.02, deskH / 2 + floorThick, lDeskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* Monitor — back faces window (+Z), screen faces -Z (back wall/chair) */}
-            <group position={[lDeskCX, 0, lDeskCZ + deskW / 2 - 0.18]} rotation={[0, Math.PI, 0]}>
+            {/* Monitor — on desk near back wall, screen faces +Z (towards chair) */}
+            <group position={[lDeskCX, 0, lDeskCZ - deskD / 2 + 0.15]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -2519,14 +2522,14 @@ function FlowBWalls({
                 <meshStandardMaterial color="#1a1a2e" roughness={0.1} metalness={0.0} emissive="#0a0a15" emissiveIntensity={0.3} />
               </mesh>
             </group>
-            {/* Keyboard — between monitor and chair */}
+            {/* Keyboard — in front of monitor */}
             <mesh position={[lDeskCX, deskH + topT / 2 + 0.005 + floorThick, lDeskCZ + 0.05]}>
               <boxGeometry args={[0.35, 0.01, 0.12]} />
               <meshStandardMaterial color="#d4d4d4" roughness={0.6} metalness={0.1} />
             </mesh>
 
-            {/* Office chair — at back wall side (-Z end), facing +Z (towards monitor) */}
-            <group position={[lDeskCX, floorThick, lDeskCZ - deskW / 2 - 0.30]}>
+            {/* Office chair — in front of desk (+Z), facing -Z (towards desk/monitor) */}
+            <group position={[lDeskCX, floorThick, lDeskCZ + deskD / 2 + 0.35]}>
               <mesh position={[0, 0.22 + chairYOff, 0]}>
                 <cylinderGeometry args={[0.25, 0.25, 0.03, 12]} />
                 <meshStandardMaterial {...darkMetal} />
@@ -2539,28 +2542,28 @@ function FlowBWalls({
                 <boxGeometry args={[0.42, 0.06, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
               </mesh>
-              <mesh position={[0, 0.68 + chairYOff, -0.18]}>
+              <mesh position={[0, 0.68 + chairYOff, 0.18]}>
                 <boxGeometry args={[0.40, 0.44, 0.04]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
               </mesh>
             </group>
 
-            {/* ═══ RIGHT ROOM DESK — long side along Z, side against partition ═══ */}
+            {/* ═══ RIGHT ROOM DESK — long side along X, against back wall ═══ */}
             <mesh position={[rDeskCX, deskH + floorThick, rDeskCZ]}>
-              <boxGeometry args={[deskD, topT, deskW]} />
+              <boxGeometry args={[deskW, topT, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            <mesh position={[rDeskCX, deskH / 2 + floorThick, rDeskCZ - deskW / 2 + 0.02]}>
-              <boxGeometry args={[deskD, deskH, 0.04]} />
+            <mesh position={[rDeskCX - deskW / 2 + 0.02, deskH / 2 + floorThick, rDeskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
             <mesh position={[rDeskCX + deskW / 2 - 0.02, deskH / 2 + floorThick, rDeskCZ]}>
-              <boxGeometry args={[deskD, deskH, 0.04]} />
+              <boxGeometry args={[0.04, deskH, deskD]} />
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* Monitor — back faces window (+Z), screen faces -Z */}
-            <group position={[rDeskCX, 0, rDeskCZ + deskW / 2 - 0.18]} rotation={[0, Math.PI, 0]}>
+            {/* Monitor — on desk near back wall, screen faces +Z */}
+            <group position={[rDeskCX, 0, rDeskCZ - deskD / 2 + 0.15]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -2584,8 +2587,8 @@ function FlowBWalls({
               <meshStandardMaterial color="#d4d4d4" roughness={0.6} metalness={0.1} />
             </mesh>
 
-            {/* Office chair — at back wall side (-Z end), facing +Z (towards monitor) */}
-            <group position={[rDeskCX, floorThick, rDeskCZ - deskW / 2 - 0.30]}>
+            {/* Office chair — in front of desk (+Z), facing -Z */}
+            <group position={[rDeskCX, floorThick, rDeskCZ + deskD / 2 + 0.35]}>
               <mesh position={[0, 0.22 + chairYOff, 0]}>
                 <cylinderGeometry args={[0.25, 0.25, 0.03, 12]} />
                 <meshStandardMaterial {...darkMetal} />
@@ -2598,7 +2601,7 @@ function FlowBWalls({
                 <boxGeometry args={[0.42, 0.06, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
               </mesh>
-              <mesh position={[0, 0.68 + chairYOff, -0.18]}>
+              <mesh position={[0, 0.68 + chairYOff, 0.18]}>
                 <boxGeometry args={[0.40, 0.44, 0.04]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
               </mesh>
