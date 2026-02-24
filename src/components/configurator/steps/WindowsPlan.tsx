@@ -384,9 +384,9 @@ export function WindowsPlan({ config, updateConfig }: Props) {
         </div>
       </div>
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-3">
         {/* Tilt-turn toggle */}
-        <div className="flex items-center justify-between">
+        <div className="option-card flex items-center justify-between">
           <div>
             <p className="text-sm font-medium">Draai-kiepraam</p>
             <p className="text-xs text-muted-foreground">Vervang vast raam door draai-kiepraam · +€450</p>
@@ -394,7 +394,7 @@ export function WindowsPlan({ config, updateConfig }: Props) {
           <button
             onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}
             className={cn(
-              "w-12 h-7 rounded-full transition-all duration-200 relative",
+              "w-12 h-7 rounded-full transition-all duration-200 relative shrink-0 ml-3",
               config.tiltTurnWindow ? "bg-accent" : "bg-muted"
             )}
           >
@@ -406,25 +406,27 @@ export function WindowsPlan({ config, updateConfig }: Props) {
         </div>
 
         {/* Mirror toggle */}
-        <button
-          onClick={() => updateConfig("mirrorPlan", !config.mirrorPlan)}
-          className={cn(
-            "w-full option-card flex items-center justify-between",
-            config.mirrorPlan && "option-card-active"
-          )}
-        >
+        <div className="option-card flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FlipHorizontal className="w-5 h-5 text-muted-foreground" />
-            <div className="text-left">
+            <div>
               <p className="font-medium text-sm">Spiegel grondplan</p>
               <p className="text-xs text-muted-foreground">Draai de layout horizontaal om</p>
             </div>
           </div>
-          <div className={cn(
-            "w-5 h-5 rounded-full border-2 transition-colors",
-            config.mirrorPlan ? "bg-accent border-accent" : "border-muted-foreground/30"
-          )} />
-        </button>
+          <button
+            onClick={() => updateConfig("mirrorPlan", !config.mirrorPlan)}
+            className={cn(
+              "w-12 h-7 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+              config.mirrorPlan ? "bg-accent" : "bg-muted"
+            )}
+          >
+            <span className={cn(
+              "absolute top-0.5 w-6 h-6 rounded-full bg-card shadow transition-transform duration-200",
+              config.mirrorPlan ? "translate-x-5" : "translate-x-0.5"
+            )} />
+          </button>
+        </div>
       </div>
     </motion.div>
   );
