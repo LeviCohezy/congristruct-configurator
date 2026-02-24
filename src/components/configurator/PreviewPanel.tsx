@@ -185,7 +185,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
                   minPolarAngle={0.2}
                   maxPolarAngle={Math.PI / 2.1}
                   autoRotate={false}
-                  target={[0, -0.8, 0]}
+                  target={[0, 0.5, 0]}
                 />
               </Canvas>
             </Suspense>
