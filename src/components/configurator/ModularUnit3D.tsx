@@ -390,7 +390,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   return (
     <group scale={[scaleX, 1, 1]}>
-      {/* ── Floor slab ── */}
+      {/* ── Floor slab (hidden behind walls, no overhang) ── */}
       {slabShape ? (
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <extrudeGeometry args={[slabShape, { depth: floorThick, bevelEnabled: false }]} />
@@ -398,10 +398,32 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         </mesh>
       ) : (
         <mesh position={[0, floorThick / 2, 0]} receiveShadow>
-          <boxGeometry args={[width + 0.04, floorThick, depth + 0.04]} />
+          <boxGeometry args={[width - wallThick * 2, floorThick, depth - wallThick * 2]} />
           <meshStandardMaterial color={roofColor} roughness={0.5} metalness={0.3} />
         </mesh>
       )}
+
+      {/* ── Facade skirt — covers floor slab on all 4 sides ── */}
+      {/* Front */}
+      <mesh position={[0, floorThick / 2, depth / 2 - wallThick / 2]} castShadow>
+        <boxGeometry args={[width, floorThick, wallThick]} />
+        <CladMaterial {...woodBase} wallWidth={width} />
+      </mesh>
+      {/* Back */}
+      <mesh position={[0, floorThick / 2, -depth / 2 + wallThick / 2]} castShadow>
+        <boxGeometry args={[width, floorThick, wallThick]} />
+        <CladMaterial {...woodBase} wallWidth={width} />
+      </mesh>
+      {/* Left */}
+      <mesh position={[-width / 2 + wallThick / 2, floorThick / 2, 0]} castShadow>
+        <boxGeometry args={[wallThick, floorThick, depth]} />
+        <CladMaterial {...woodBase} wallWidth={depth} />
+      </mesh>
+      {/* Right */}
+      <mesh position={[width / 2 - wallThick / 2, floorThick / 2, 0]} castShadow>
+        <boxGeometry args={[wallThick, floorThick, depth]} />
+        <CladMaterial {...woodBase} wallWidth={depth} />
+      </mesh>
 
       {/* Walkable floor */}
       <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
