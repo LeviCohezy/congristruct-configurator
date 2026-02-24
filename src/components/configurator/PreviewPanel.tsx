@@ -25,6 +25,15 @@ import darkLightoak1 from "@/assets/start-interior-darkfloor-lightoak-1.png";
 import darkLightoak2 from "@/assets/start-interior-darkfloor-lightoak-2.png";
 import darkWhite1 from "@/assets/start-interior-darkfloor-white-1.png";
 import darkWhite2 from "@/assets/start-interior-darkfloor-white-2.png";
+// Interior images — stone floor
+import stoneFinished1 from "@/assets/start-interior-stonefloor-finished-1.png";
+import stoneFinished2 from "@/assets/start-interior-stonefloor-finished-2.png";
+import stoneBrown1 from "@/assets/start-interior-stonefloor-brown-1.png";
+import stoneBrown2 from "@/assets/start-interior-stonefloor-brown-2.png";
+import stoneLightoak1 from "@/assets/start-interior-stonefloor-lightoak-1.png";
+import stoneLightoak2 from "@/assets/start-interior-stonefloor-lightoak-2.png";
+import stoneWhite1 from "@/assets/start-interior-stonefloor-white-1.png";
+import stoneWhite2 from "@/assets/start-interior-stonefloor-white-2.png";
 
 const interiorImageMap: Record<string, [string, string]> = {
   // Light floor (default)
@@ -37,6 +46,11 @@ const interiorImageMap: Record<string, [string, string]> = {
   "fully-finished:brown:dark-vinyl": [darkBrown2, darkBrown1],
   "fully-finished:light-oak:dark-vinyl": [darkLightoak1, darkLightoak2],
   "fully-finished:white:dark-vinyl": [darkWhite2, darkWhite1],
+  // Stone floor
+  "finished:stone-vinyl": [stoneFinished2, stoneFinished1],
+  "fully-finished:brown:stone-vinyl": [stoneBrown2, stoneBrown1],
+  "fully-finished:light-oak:stone-vinyl": [stoneLightoak2, stoneLightoak1],
+  "fully-finished:white:stone-vinyl": [stoneWhite2, stoneWhite1],
   // Shell
   "shell:b": [cascoToiletImg1, cascoToiletImg2],
 };
