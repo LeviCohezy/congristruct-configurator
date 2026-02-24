@@ -113,15 +113,12 @@ export function ConfiguratorLayout() {
         </div>
 
         {/* Sticky price bar */}
-        <div className="sticky bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur-md px-5 sm:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider sm:mb-1">Prijsindicatie</p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-2xl font-display font-bold text-foreground">
-                €{totalPrice.toLocaleString("nl-NL")}
-              </p>
-              <p className="text-[11px] text-muted-foreground whitespace-nowrap">excl. BTW</p>
-            </div>
+        <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
+          <div className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5">
+            <p className="text-xl font-display font-bold text-foreground">
+              ± €{totalPrice.toLocaleString("nl-NL")}
+            </p>
+            <p className="text-[11px] text-muted-foreground whitespace-nowrap">excl. BTW</p>
           </div>
         </div>
       </div>
