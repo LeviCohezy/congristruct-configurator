@@ -95,9 +95,9 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
     const toiletDepth = vh * 0.45; // 45% of depth
     const toiletBottomY = wt + toiletDepth;
 
-    // Toilet door: ~70cm = 30 SVG, on LEFT side (near partition)
-    const toiletDoorW = 30;
-    const toiletDoorCx = partX + iw + toiletDoorW / 2 + 3; // left-aligned
+    // Toilet door: ~70cm = 35 SVG, on LEFT wall (vertical partition)
+    const toiletDoorH = 35;
+    const toiletDoorCy = wt + toiletDepth * 0.5; // centered in toilet depth
 
     return (
       <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 110 }}>
@@ -118,15 +118,17 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
           <path d={`M ${doorStart} ${vh - wt} A ${doorW} ${doorW} 0 0 0 ${doorStart + doorW} ${vh - wt - doorW}`}
             fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
 
-          {/* Vertical partition wall (toilet/storage strip) */}
-          <rect x={partX} y={wt} width={iw} height={toiletDepth} fill={wallColor} opacity={0.7} />
+          {/* Vertical partition wall — split around door */}
+          {/* Top segment (back wall to door) */}
+          <rect x={partX} y={wt} width={iw} height={toiletDoorCy - toiletDoorH / 2 - wt} fill={wallColor} opacity={0.7} />
+          {/* Bottom segment (door to horizontal wall) */}
+          <rect x={partX} y={toiletDoorCy + toiletDoorH / 2} width={iw} height={toiletBottomY - (toiletDoorCy + toiletDoorH / 2)} fill={wallColor} opacity={0.7} />
 
-          {/* Horizontal toilet wall */}
+          {/* Horizontal toilet wall — solid */}
           <rect x={partX} y={toiletBottomY} width={vw - wt - partX} height={iw} fill={wallColor} opacity={0.7} />
 
-          {/* Toilet door */}
-          <rect x={toiletDoorCx - toiletDoorW / 2} y={toiletBottomY} width={toiletDoorW} height={iw} fill="hsl(var(--background))" />
-          <path d={`M ${toiletDoorCx - toiletDoorW / 2} ${toiletBottomY + iw} A ${toiletDoorW} ${toiletDoorW} 0 0 1 ${toiletDoorCx + toiletDoorW / 2} ${toiletBottomY + iw + toiletDoorW}`}
+          {/* Toilet door swing arc (swings into main room) */}
+          <path d={`M ${partX} ${toiletDoorCy - toiletDoorH / 2} A ${toiletDoorH} ${toiletDoorH} 0 0 0 ${partX - toiletDoorH} ${toiletDoorCy + toiletDoorH / 2}`}
             fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
 
           {/* Toilet fixture — against right wall */}
