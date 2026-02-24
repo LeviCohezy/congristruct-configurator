@@ -6,6 +6,7 @@ import { getRoofColor } from "@/hooks/useConfigurator";
 import osbTextureUrl from "@/assets/osb-texture.png";
 import thermowoodBlackTextureUrl from "@/assets/thermowood-black-texture.png";
 import thermowoodNaturalTextureUrl from "@/assets/thermowood-natural-texture.png";
+import lightWoodFloorTextureUrl from "@/assets/light-wood-floor-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"]) {
@@ -366,7 +367,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const isShell = config.finishLevel === "shell";
   const interiorColor = isShell ? "#d4b88c" : "#ffffff";
   const interiorRoughness = isShell ? 0.85 : 0.9;
-  const floorColor = isShell ? "#d4b88c" : "#c9a97e";
+  const floorColor = isShell ? "#d4b88c" : config.floorOption === "dark-vinyl" ? "#5a4332" : config.floorOption === "stone-vinyl" ? "#9a9590" : "#c9a97e";
 
   // Load OSB texture for shell finish
   const osbTexRaw = useLoader(THREE.TextureLoader, osbTextureUrl);
@@ -378,6 +379,19 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     t.needsUpdate = true;
     return t;
   }, [osbTexRaw]);
+
+  // Load light wood floor texture
+  const lightWoodTexRaw = useLoader(THREE.TextureLoader, lightWoodFloorTextureUrl);
+  const lightWoodTex = useMemo(() => {
+    const t = lightWoodTexRaw.clone();
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(2, 2);
+    t.needsUpdate = true;
+    return t;
+  }, [lightWoodTexRaw]);
+
+  const floorTex = !isShell && config.floorOption === "light-vinyl" ? lightWoodTex : null;
 
   const scaleX = config.mirrorPlan ? -1 : 1;
 
@@ -412,7 +426,13 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {/* Walkable floor */}
       <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[width - wallThick * 2, depth - wallThick * 2]} />
-        <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={isShell ? 0.85 : 0.65} />
+        {isShell ? (
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
+        ) : floorTex ? (
+          <meshStandardMaterial map={floorTex} color="#ffffff" roughness={0.55} />
+        ) : (
+          <meshStandardMaterial color={floorColor} roughness={0.65} />
+        )}
       </mesh>
 
       {/* ── Roof slab — black, covers full unit ── */}
