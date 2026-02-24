@@ -387,6 +387,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     t.wrapS = THREE.RepeatWrapping;
     t.wrapT = THREE.RepeatWrapping;
     t.repeat.set(2, 2);
+    t.colorSpace = THREE.SRGBColorSpace;
     t.needsUpdate = true;
     return t;
   }, [lightWoodTexRaw]);
@@ -429,7 +430,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         {isShell ? (
           <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
         ) : floorTex ? (
-          <meshStandardMaterial map={floorTex} color="#ffffff" roughness={0.55} />
+          <meshStandardMaterial map={floorTex} color="#c8b8a8" roughness={0.7} toneMapped={false} />
         ) : (
           <meshStandardMaterial color={floorColor} roughness={0.65} />
         )}
