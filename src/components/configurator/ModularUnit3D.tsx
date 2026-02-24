@@ -31,6 +31,17 @@ function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) 
   }
 }
 
+function getShelfColors(shelfColor: ConfigState["shelfColor"]) {
+  switch (shelfColor) {
+    case "white":
+      return { cabinet: "#e8e6e2", counterTop: "#d5d3cf", doorLine: "#cccac6" };
+    case "light-oak":
+      return { cabinet: "#c4a872", counterTop: "#b09560", doorLine: "#a08850" };
+    default: // brown
+      return { cabinet: "#2a2118", counterTop: "#1a1510", doorLine: "#151010" };
+  }
+}
+
 // ─── Plank texture ────────────────────────────────────────────────────────────
 // The texture contains exactly ONE plank + gap. Repeat is set per real-world scale
 // so every plank everywhere is the same width regardless of wall size.
@@ -678,6 +689,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           claddingProps={claddingProps} woodBase={woodBase} frameColor={frameColor}
           cmToUnit={cmToUnit} cmToDepth={cmToDepth}
           floorPlan={config.floorPlan} finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
         />
@@ -691,6 +703,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
         />
       ) : isFlowB ? (
         <FlowBWalls
@@ -702,6 +715,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
         />
       ) : (
         <GenericWalls
@@ -743,6 +757,8 @@ function StartWalls({
   cmToDepth,
   floorPlan,
   finishLevel,
+  shelfColor,
+  ledStrip,
   interiorColor,
   interiorRoughness,
   osbTex,
@@ -993,7 +1009,10 @@ function StartWalls({
         const geo = (along: number, h: number, into: number): [number, number, number] =>
           isLeftWall ? [into, h, along] : [along, h, into];
 
-        const cabinetColor = "#2a2118";
+        const sc = getShelfColors(shelfColor);
+        const cabinetColor = sc.cabinet;
+        const counterTopColor = sc.counterTop;
+        const doorLineColor = sc.doorLine;
         const counterTop = height * 0.3;
         const nicheH = height * 0.3;
         const nicheTop = counterTop + nicheH;
@@ -1025,7 +1044,7 @@ function StartWalls({
             {/* Counter surface */}
             <mesh position={pos(shelfCenterAlongWall, counterTop + 0.015 + floorThick, shelfCenterIntoRoom)}>
               <boxGeometry args={geo(shelfW + 0.02, 0.03, shelfD + 0.02)} />
-              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial color={counterTopColor} roughness={0.4} metalness={0.1} />
             </mesh>
 
             {/* Upper cabinets */}
@@ -1068,7 +1087,7 @@ function StartWalls({
             {/* Niche — middle shelf */}
             <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)}>
               <boxGeometry args={geo(openW - 0.02, 0.025, shelfD - 0.02)} />
-              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial color={counterTopColor} roughness={0.4} metalness={0.1} />
             </mesh>
 
             {/* Cabinet door lines (upper) */}
@@ -1081,7 +1100,7 @@ function StartWalls({
                 )}
               >
                 <boxGeometry args={doorLineGeo(upperH - 0.02)} />
-                <meshStandardMaterial color="#151010" roughness={0.5} />
+                <meshStandardMaterial color={doorLineColor} roughness={0.5} />
               </mesh>
             ))}
             {/* Cabinet door lines (lower) */}
@@ -1091,10 +1110,11 @@ function StartWalls({
                 position={doorLinePos(shelfCenterAlongWall - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick)}
               >
                 <boxGeometry args={doorLineGeo(counterTop - 0.02)} />
-                <meshStandardMaterial color="#151010" roughness={0.5} />
+                <meshStandardMaterial color={doorLineColor} roughness={0.5} />
               </mesh>
             ))}
 
+            {ledStrip && <>
             {/* LED strip under upper cabinet — front edge */}
             <mesh position={pos(shelfCenterAlongWall, nicheTop - 0.005 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
               <boxGeometry args={geo(openW - 0.02, 0.01, 0.015)} />
@@ -1113,6 +1133,7 @@ function StartWalls({
             {/* Point lights for niche glow */}
             <pointLight position={pos(shelfCenterAlongWall, nicheTop - 0.05 + floorThick, shelfCenterIntoRoom)} intensity={0.5} distance={1.0} color="#fffde8" />
             <pointLight position={pos(shelfCenterAlongWall, counterTop + nicheH / 4 + floorThick, shelfCenterIntoRoom)} intensity={0.4} distance={0.8} color="#fffde8" />
+            </>}
           </group>
         );
       })()}
@@ -1526,6 +1547,8 @@ function FlowAWalls({
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
   finishLevel,
+  shelfColor,
+  ledStrip,
 }: any) {
   const halfW = width / 2;   // 3.0
   const halfD = depth / 2;   // 2.0
@@ -1839,8 +1862,8 @@ function FlowAWalls({
 
         const white = { color: "#f5f5f0", roughness: 0.25, metalness: 0.05 };
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
-        const cabinetColor = "#2a2118";
-        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
+        const sc = getShelfColors(shelfColor);
+        const matProps = { color: sc.cabinet, roughness: 0.75, metalness: 0.05 };
 
         // ── Back wall shelf/cabinet ──
         const shelfW = mainRoomW - 0.04;
@@ -1895,7 +1918,7 @@ function FlowAWalls({
             </mesh>
             <mesh position={[shelfCX, counterTop + 0.015 + floorThick, shelfCZ]}>
               <boxGeometry args={[shelfW + 0.02, 0.03, shelfD + 0.02]} />
-              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
             <mesh position={[shelfCX, upperBottom + upperH / 2 + floorThick, shelfCZ]}>
               <boxGeometry args={[shelfW, upperH, shelfD]} />
@@ -1916,21 +1939,22 @@ function FlowAWalls({
             </mesh>
             <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
               <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
-              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
             {/* Door lines */}
             {[0.25, 0.5, 0.75].map((frac, i) => (
               <mesh key={`su${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, upperBottom + upperH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
                 <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
-                <meshStandardMaterial color="#151010" roughness={0.5} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
               </mesh>
             ))}
             {[0.25, 0.5, 0.75].map((frac, i) => (
               <mesh key={`sl${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
                 <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
-                <meshStandardMaterial color="#151010" roughness={0.5} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
               </mesh>
             ))}
+            {ledStrip && <>
             {/* LED strip under upper cabinet — at back */}
             <mesh position={[shelfCX, upperBottom - 0.005 + floorThick, backPanelZ + 0.04]}>
               <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.01, 0.015]} />
@@ -1949,6 +1973,7 @@ function FlowAWalls({
             {/* Point lights for cabinet glow */}
             <pointLight position={[shelfCX, upperBottom - 0.05 + floorThick, shelfCZ]} intensity={0.5} distance={1.0} color="#fffde8" />
             <pointLight position={[shelfCX, counterTop + nicheH / 4 + floorThick, shelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+            </>}
 
             {/* ═══ DESK 1 (left, rotated 90°) ═══ */}
             <mesh position={[desk1CX, deskH + floorThick, deskCZ]} castShadow>
@@ -2121,7 +2146,7 @@ function FlowAWalls({
                   {/* Countertop */}
                   <mesh position={[rwShelfCX, rwCounterH + 0.015 + floorThick, rwShelfCZ]}>
                     <boxGeometry args={[rwShelfD + 0.02, 0.03, rwShelfW + 0.02]} />
-                    <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
                   </mesh>
                   {/* Upper cabinet (no middle shelf — just upper box) */}
                   <mesh position={[rwShelfCX, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ]}>
@@ -2136,8 +2161,9 @@ function FlowAWalls({
                       <>
                         <mesh position={[rwShelfCX, rwUpperBottom - 0.30 + floorThick, shelfZ]}>
                           <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
-                          <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                          <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
                         </mesh>
+                        {ledStrip && <>
                         {/* LED strip under shelf — at back wall */}
                         <mesh position={[rwBackX - 0.03, rwUpperBottom - 0.30 - 0.01 + floorThick, shelfZ]}>
                           <boxGeometry args={[0.012, 0.008, shelfLen - 0.04]} />
@@ -2157,6 +2183,7 @@ function FlowAWalls({
                         <pointLight position={[rwShelfCX, rwUpperBottom - 0.05 + floorThick, rwShelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
                         <pointLight position={[rwShelfCX, rwUpperBottom - 0.35 + floorThick, shelfZ]} intensity={0.3} distance={0.6} color="#fffde8" />
                         <pointLight position={[rwShelfCX, rwCounterH + floorThick, rwShelfCZ]} intensity={0.25} distance={0.5} color="#fffde8" />
+                        </>}
                       </>
                     );
                   })()}
@@ -2169,14 +2196,14 @@ function FlowAWalls({
                   {[0.33, 0.67].map((frac, i) => (
                     <mesh key={`rsl${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwCounterH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
                       <boxGeometry args={[0.004, rwCounterH - 0.02, 0.008]} />
-                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                      <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                     </mesh>
                   ))}
                   {/* Door lines upper */}
                   {[0.33, 0.67].map((frac, i) => (
                     <mesh key={`rsu${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
                       <boxGeometry args={[0.004, rwUpperH - 0.02, 0.008]} />
-                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                      <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                     </mesh>
                   ))}
                   {/* ── Integrated sink basin ── */}
@@ -2280,6 +2307,8 @@ function FlowBWalls({
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
   finishLevel,
+  shelfColor,
+  ledStrip,
 }: any) {
   const halfW = width / 2;
   const halfD = depth / 2;
@@ -2649,8 +2678,8 @@ function FlowBWalls({
         const white = { color: "#ffffff", roughness: 0.25, metalness: 0.05 };
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
-        const cabinetColor = "#2a2118";
-        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
+        const gsc = getShelfColors(shelfColor);
+        const matProps = { color: gsc.cabinet, roughness: 0.75, metalness: 0.05 };
         const deskW = 2.52;
         const deskD = 0.70;
         const deskH = 0.75;
@@ -2704,7 +2733,7 @@ function FlowBWalls({
               {/* Countertop */}
               <mesh position={[cx, counterTop + 0.015 + floorThick, shelfCZ]}>
                 <boxGeometry args={[sw + 0.02, 0.03, shelfD + 0.02]} />
-                <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                <meshStandardMaterial color={gsc.counterTop} roughness={0.4} metalness={0.1} />
               </mesh>
               {/* Upper cabinet */}
               <mesh position={[cx, upperBottom + upperH / 2 + floorThick, shelfCZ]}>
@@ -2728,22 +2757,23 @@ function FlowBWalls({
               {/* Middle shelf */}
               <mesh position={[cx, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
                 <boxGeometry args={[sw * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
-                <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                <meshStandardMaterial color={gsc.counterTop} roughness={0.4} metalness={0.1} />
               </mesh>
               {/* Door lines upper */}
               {[0.25, 0.5, 0.75].map((frac, i) => (
                 <mesh key={`su${i}`} position={[cx - sw / 2 + sw * frac, upperBottom + upperH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
                   <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
-                  <meshStandardMaterial color="#151010" roughness={0.5} />
+                  <meshStandardMaterial color={gsc.doorLine} roughness={0.5} />
                 </mesh>
               ))}
               {/* Door lines lower */}
               {[0.25, 0.5, 0.75].map((frac, i) => (
                 <mesh key={`sl${i}`} position={[cx - sw / 2 + sw * frac, counterTop / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
                   <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
-                  <meshStandardMaterial color="#151010" roughness={0.5} />
+                  <meshStandardMaterial color={gsc.doorLine} roughness={0.5} />
                 </mesh>
               ))}
+              {ledStrip && <>
               {/* LED strips */}
               <mesh position={[cx, upperBottom - 0.005 + floorThick, backPanelZ + 0.04]}>
                 <boxGeometry args={[sw * 4 / 6 - 0.02, 0.01, 0.015]} />
@@ -2759,6 +2789,7 @@ function FlowBWalls({
               </mesh>
               <pointLight position={[cx, upperBottom - 0.05 + floorThick, shelfCZ]} intensity={0.5} distance={1.0} color="#fffde8" />
               <pointLight position={[cx, counterTop + nicheH / 4 + floorThick, shelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+              </>}
             </>
           );
         };
