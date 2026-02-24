@@ -909,24 +909,24 @@ function StartWalls({
               </mesh>
             ))}
 
-            {/* LED strip under upper cabinet — at back */}
-            <mesh position={pos(shelfCenterAlongWall, nicheTop - 0.008 + floorThick, backPanelPos + 0.04)}>
-              <boxGeometry args={geo(openW - 0.04, 0.008, 0.012)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={3} roughness={0.2} toneMapped={false} />
+            {/* LED strip under upper cabinet — front edge */}
+            <mesh position={pos(shelfCenterAlongWall, nicheTop - 0.005 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
+              <boxGeometry args={geo(openW - 0.02, 0.01, 0.015)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
             </mesh>
-            {/* LED strip under middle shelf — at back */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 - 0.018 + floorThick, backPanelPos + 0.04)}>
-              <boxGeometry args={geo(openW - 0.04, 0.008, 0.012)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={3} roughness={0.2} toneMapped={false} />
+            {/* LED strip under middle shelf — front edge */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 - 0.018 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
+              <boxGeometry args={geo(openW - 0.02, 0.01, 0.015)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
             </mesh>
-            {/* LED strip under countertop — at back */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.03 - 0.008 + floorThick, backPanelPos + 0.04)}>
-              <boxGeometry args={geo(shelfW - 0.04, 0.008, 0.012)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={3} roughness={0.2} toneMapped={false} />
+            {/* LED strip under countertop — front edge */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.03 - 0.005 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
+              <boxGeometry args={geo(shelfW - 0.02, 0.01, 0.015)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
             </mesh>
             {/* Point lights for niche glow */}
-            <pointLight position={pos(shelfCenterAlongWall, nicheTop - 0.05 + floorThick, shelfCenterIntoRoom)} intensity={0.4} distance={0.8} color="#fffde8" />
-            <pointLight position={pos(shelfCenterAlongWall, counterTop + nicheH / 4 + floorThick, shelfCenterIntoRoom)} intensity={0.3} distance={0.6} color="#fffde8" />
+            <pointLight position={pos(shelfCenterAlongWall, nicheTop - 0.05 + floorThick, shelfCenterIntoRoom)} intensity={0.5} distance={1.0} color="#fffde8" />
+            <pointLight position={pos(shelfCenterAlongWall, counterTop + nicheH / 4 + floorThick, shelfCenterIntoRoom)} intensity={0.4} distance={0.8} color="#fffde8" />
           </group>
         );
       })()}
