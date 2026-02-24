@@ -2,6 +2,9 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import thermowoodBlackImg from "@/assets/thermowood-black-texture.png";
+import thermowoodNaturalImg from "@/assets/thermowood-natural-texture.png";
+import brickStripsImg from "@/assets/brick-strips-texture.png";
 
 interface Props {
   config: ConfigState;
@@ -16,6 +19,7 @@ interface MaterialFamily {
   desc: string;
   facadeId: FacadeId;
   color: string;
+  image?: string;
   hasColorPicker?: boolean;
 }
 
@@ -26,6 +30,7 @@ const materials: MaterialFamily[] = [
     desc: "Zwart gebrand hout",
     facadeId: "thermowood-black",
     color: "hsl(0,0%,12%)",
+    image: thermowoodBlackImg,
   },
   {
     id: "thermowood-natural",
@@ -33,6 +38,7 @@ const materials: MaterialFamily[] = [
     desc: "Natuurlijke houtlook",
     facadeId: "thermowood-natural",
     color: "hsl(32,50%,55%)",
+    image: thermowoodNaturalImg,
   },
   {
     id: "composite-white",
@@ -62,6 +68,7 @@ const materials: MaterialFamily[] = [
     desc: "Grijze steenstrips look",
     facadeId: "brick-grey",
     color: "hsl(0,0%,55%)",
+    image: brickStripsImg,
   },
 ];
 
@@ -101,8 +108,12 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-lg shrink-0 border border-border"
-                      style={{ backgroundColor: family.id === "aluminium" ? config.aluminiumColor : family.color }}
+                      className="w-10 h-10 rounded-lg shrink-0 border border-border overflow-hidden bg-cover bg-center"
+                      style={
+                        family.image
+                          ? { backgroundImage: `url(${family.image})` }
+                          : { backgroundColor: family.id === "aluminium" ? config.aluminiumColor : family.color }
+                      }
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">{family.label}</p>
