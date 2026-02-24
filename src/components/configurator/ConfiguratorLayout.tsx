@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from "react";
 import { useConfigurator } from "@/hooks/useConfigurator";
 import { PreviewPanel } from "./PreviewPanel";
 import { UnitSelection } from "./steps/UnitSelection";
@@ -12,12 +13,25 @@ import { motion } from "framer-motion";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
+  const [interiorInView, setInteriorInView] = useState(false);
+  const interiorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = interiorRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setInteriorInView(entry.isIntersecting),
+      { threshold: 0.3 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       {/* Preview panel - left side on desktop, top on mobile */}
       <div className="lg:w-[55%] lg:sticky lg:top-0 lg:h-screen h-[40vh] sticky top-0 z-20">
-        <PreviewPanel config={config} currentStep={0} />
+        <PreviewPanel config={config} currentStep={0} showInteriorImages={interiorInView && config.model === "start" && config.finishLevel !== "shell"} />
       </div>
 
       {/* Configuration panel - right side, scrollable */}
@@ -47,9 +61,11 @@ export function ConfiguratorLayout() {
             <Divider />
 
             {/* 4. Interieur */}
-            <Section delay={0.15}>
-              <InteriorFinish config={config} updateConfig={updateConfig} />
-            </Section>
+            <div ref={interiorRef}>
+              <Section delay={0.15}>
+                <InteriorFinish config={config} updateConfig={updateConfig} />
+              </Section>
+            </div>
 
             <Divider />
 
