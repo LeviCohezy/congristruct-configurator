@@ -9,6 +9,7 @@ import thermowoodNaturalTextureUrl from "@/assets/thermowood-natural-texture.png
 import lightWoodFloorTextureUrl from "@/assets/light-wood-floor-texture.png";
 import darkWoodFloorTextureUrl from "@/assets/dark-wood-floor-texture.png";
 import stoneFloorTextureUrl from "@/assets/stone-floor-texture.png";
+import brickStripsTextureUrl from "@/assets/brick-strips-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) {
@@ -367,9 +368,11 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   // Load real photo textures for thermowood
   const twBlackTexRaw = useLoader(THREE.TextureLoader, thermowoodBlackTextureUrl);
   const twNaturalTexRaw = useLoader(THREE.TextureLoader, thermowoodNaturalTextureUrl);
+  const brickTexRaw = useLoader(THREE.TextureLoader, brickStripsTextureUrl);
   const isThermowoodBlack = config.facade === "thermowood-black";
   const isThermowoodNatural = config.facade === "thermowood-natural";
-  const isPhotoTex = isThermowoodBlack || isThermowoodNatural;
+  const isBrick = config.facade === "brick-grey";
+  const isPhotoTex = isThermowoodBlack || isThermowoodNatural || isBrick;
 
   const plankTex = useMemo(() => {
     if (isPhotoTex) return null; // use photo texture instead
@@ -469,15 +472,24 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     return t;
   }, [twNaturalTexRaw, isThermowoodNatural]);
 
-  const activePhotoTex = isThermowoodBlack ? twBlackTex : isThermowoodNatural ? twNaturalTex : null;
+  const brickTex = useMemo(() => {
+    if (!isBrick) return null;
+    const t = brickTexRaw.clone();
+    t.needsUpdate = true;
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    return t;
+  }, [brickTexRaw, isBrick]);
+
+  const activePhotoTex = isThermowoodBlack ? twBlackTex : isThermowoodNatural ? twNaturalTex : isBrick ? brickTex : null;
 
   const woodBase = {
     baseTex: plankTex,
     compositeTex,
     aluTex,
     photoTex: activePhotoTex,
-    photoTint: isThermowoodBlack ? "#8a8a8a" : undefined, // darken black, no tint on Ayous
-    photoTexWidthM: 1,
+    photoTint: isThermowoodBlack ? "#8a8a8a" : undefined,
+    photoTexWidthM: isBrick ? 3 : 1,
     color: effectiveColor,
     roughness: fp.roughness,
     metalness: fp.metalness,
