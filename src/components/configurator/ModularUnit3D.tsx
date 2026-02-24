@@ -1900,7 +1900,7 @@ function FlowAWalls({
                     const shelfZ = (toiletWallZ + partT / 2 + frontInnerZ) / 2;
                     const shelfLen = frontInnerZ - (toiletWallZ + partT / 2) - 0.01;
                     return (
-                      <mesh position={[rwShelfCX, rwUpperBottom - 0.04 + floorThick, shelfZ]}>
+                      <mesh position={[rwShelfCX, rwUpperBottom - 0.15 + floorThick, shelfZ]}>
                         <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
                         <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
                       </mesh>
