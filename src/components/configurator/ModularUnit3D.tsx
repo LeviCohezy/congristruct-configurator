@@ -908,6 +908,24 @@ function StartWalls({
                 <meshStandardMaterial color="#151010" roughness={0.5} />
               </mesh>
             ))}
+
+            {/* LED strip under upper cabinet — at back */}
+            <mesh position={pos(shelfCenterAlongWall, nicheTop - 0.01 + floorThick, backPanelPos + 0.02)}>
+              <boxGeometry args={geo(openW - 0.04, 0.006, 0.008)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+            </mesh>
+            {/* LED strip under middle shelf — at back */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 - 0.018 + floorThick, backPanelPos + 0.02)}>
+              <boxGeometry args={geo(openW - 0.04, 0.006, 0.008)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+            </mesh>
+            {/* LED strip under countertop — at back */}
+            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.03 - 0.01 + floorThick, backPanelPos + 0.02)}>
+              <boxGeometry args={geo(shelfW - 0.04, 0.006, 0.008)} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+            </mesh>
+            {/* Point light for niche glow */}
+            <pointLight position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)} intensity={0.25} distance={0.5} color="#fffde8" />
           </group>
         );
       })()}
@@ -1915,20 +1933,25 @@ function FlowAWalls({
                           <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
                           <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
                         </mesh>
-                        {/* LED strip under shelf */}
-                        <mesh position={[rwShelfCX - rwShelfD / 2 + 0.02, rwUpperBottom - 0.30 - 0.012 + floorThick, shelfZ]}>
+                        {/* LED strip under shelf — at back wall */}
+                        <mesh position={[rwBackX - 0.02, rwUpperBottom - 0.30 - 0.012 + floorThick, shelfZ]}>
                           <boxGeometry args={[0.008, 0.006, shelfLen - 0.04]} />
                           <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
                         </mesh>
-                        {/* LED strip under upper cabinet */}
-                        <mesh position={[rwShelfCX - rwShelfD / 2 + 0.02, rwUpperBottom - 0.012 + floorThick, rwShelfCZ]}>
+                        {/* LED strip under upper cabinet — at back wall */}
+                        <mesh position={[rwBackX - 0.02, rwUpperBottom - 0.012 + floorThick, rwShelfCZ]}>
                           <boxGeometry args={[0.008, 0.006, rwShelfW - 0.04]} />
                           <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
                         </mesh>
-                        {/* Point light for LED glow under upper cabinet */}
+                        {/* LED strip under countertop — at back wall */}
+                        <mesh position={[rwBackX - 0.02, rwCounterH + 0.03 - 0.012 + floorThick, rwShelfCZ]}>
+                          <boxGeometry args={[0.008, 0.006, rwShelfW - 0.04]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+                        </mesh>
+                        {/* Point lights for LED glow */}
                         <pointLight position={[rwShelfCX, rwUpperBottom - 0.05 + floorThick, rwShelfCZ]} intensity={0.3} distance={0.6} color="#fffde8" />
-                        {/* Point light for LED glow under shelf */}
                         <pointLight position={[rwShelfCX, rwUpperBottom - 0.35 + floorThick, shelfZ]} intensity={0.2} distance={0.5} color="#fffde8" />
+                        <pointLight position={[rwShelfCX, rwCounterH + floorThick, rwShelfCZ]} intensity={0.15} distance={0.4} color="#fffde8" />
                       </>
                     );
                   })()}
