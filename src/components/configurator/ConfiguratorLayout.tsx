@@ -32,7 +32,7 @@ export function ConfiguratorLayout() {
     return () => observer.disconnect();
   }, []);
 
-  const showImages = !force3D && interiorInView && config.model === "start" && config.finishLevel !== "shell";
+  const showImages = !force3D && interiorInView && config.model === "start" && !(config.finishLevel === "shell" && config.floorPlan === "a");
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
