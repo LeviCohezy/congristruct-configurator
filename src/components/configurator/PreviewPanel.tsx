@@ -121,9 +121,9 @@ const modelLabels: Record<ConfigState["model"], string> = {
 // Camera distance per model to ensure full visibility
 const cameraDistances: Record<ConfigState["model"], number> = {
   start: 12,
-  flow: 12,
-  hub: 15,
-  base: 18,
+  flow: 17,
+  hub: 20,
+  base: 23,
 };
 
 export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
