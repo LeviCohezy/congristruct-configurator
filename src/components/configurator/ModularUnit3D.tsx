@@ -367,7 +367,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   // Interior: OSB texture when shell (casco), white when finished
   const isShell = config.finishLevel === "shell";
-  const interiorColor = isShell ? "#d4b88c" : "#ffffff";
+  const interiorColor = isShell ? "#d4b88c" : "#f5f0ea";
   const interiorRoughness = isShell ? 0.85 : 0.9;
   const floorColor = isShell ? "#d4b88c" : config.floorOption === "dark-vinyl" ? "#5a4332" : config.floorOption === "stone-vinyl" ? "#9a9590" : "#c9a97e";
 
@@ -472,6 +472,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
         </mesh>
       )}
+
+      {/* ── Warm interior lighting ── */}
+      <pointLight position={[0, height * 0.8 + floorThick, 0]} intensity={0.6} distance={width} color="#ffe8cc" />
 
       {/* ── Rounded corners — exterior cladding ── */}
       {cornerShapes &&
