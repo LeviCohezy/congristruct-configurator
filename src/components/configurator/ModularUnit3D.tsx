@@ -7,6 +7,7 @@ import osbTextureUrl from "@/assets/osb-texture.png";
 import thermowoodBlackTextureUrl from "@/assets/thermowood-black-texture.png";
 import thermowoodNaturalTextureUrl from "@/assets/thermowood-natural-texture.png";
 import lightWoodFloorTextureUrl from "@/assets/light-wood-floor-texture.png";
+import darkWoodFloorTextureUrl from "@/assets/dark-wood-floor-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"]) {
@@ -392,7 +393,18 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     return t;
   }, [lightWoodTexRaw]);
 
-  const floorTex = !isShell && config.floorOption === "light-vinyl" ? lightWoodTex : null;
+  const darkWoodTexRaw = useLoader(THREE.TextureLoader, darkWoodFloorTextureUrl);
+  const darkWoodTex = useMemo(() => {
+    const t = darkWoodTexRaw.clone();
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(2, 2);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.needsUpdate = true;
+    return t;
+  }, [darkWoodTexRaw]);
+
+  const floorTex = !isShell && config.floorOption === "light-vinyl" ? lightWoodTex : !isShell && config.floorOption === "dark-vinyl" ? darkWoodTex : null;
 
   const scaleX = config.mirrorPlan ? -1 : 1;
 
