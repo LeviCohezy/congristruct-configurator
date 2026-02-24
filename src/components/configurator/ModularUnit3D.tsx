@@ -1875,11 +1875,17 @@ function FlowAWalls({
 
               return (
                 <group>
-                  {/* Back panel on right wall */}
-                  <mesh position={[rwBackX, height / 2 + floorThick, rwShelfCZ]}>
-                    <boxGeometry args={[0.02, height, rwShelfW]} />
-                    <meshStandardMaterial {...matProps} />
-                  </mesh>
+                  {/* Back panel on right wall — full height, full width between toilet wall and front wall */}
+                  {(() => {
+                    const fullZ = (toiletWallZ + partT / 2 + frontInnerZ) / 2;
+                    const fullLen = frontInnerZ - (toiletWallZ + partT / 2);
+                    return (
+                      <mesh position={[rwBackX, height / 2 + floorThick, fullZ]}>
+                        <boxGeometry args={[0.02, height, fullLen]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                    );
+                  })()}
                   {/* Lower cabinet */}
                   <mesh position={[rwShelfCX, rwCounterH / 2 + floorThick, rwShelfCZ]}>
                     <boxGeometry args={[rwShelfD, rwCounterH, rwShelfW]} />
