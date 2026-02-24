@@ -133,7 +133,7 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   return tex;
 }
 
-// ─── Composite panel texture: single cell with a black joint on the right ───
+// ─── Composite panel texture: single cell with a joint line on the right ───
 function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 256;
@@ -144,12 +144,17 @@ function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
   const gapPx = Math.max(1, Math.round(canvas.width * gapFrac));
   const panelW = canvas.width - gapPx;
 
+  // Determine if panel is dark — use light gray gap for dark panels, black for light
+  const c = new THREE.Color(baseColor);
+  const isDark = c.r + c.g + c.b < 1.0;
+  const gapCol = isDark ? "#5a5a5a" : "#0a0a0a";
+
   // Fill panel
   ctx.fillStyle = baseColor;
   ctx.fillRect(0, 0, panelW, canvas.height);
 
-  // Black joint line
-  ctx.fillStyle = "#0a0a0a";
+  // Joint line
+  ctx.fillStyle = gapCol;
   ctx.fillRect(panelW, 0, gapPx, canvas.height);
 
   // Subtle edge shadow on right side of panel
