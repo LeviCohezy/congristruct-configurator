@@ -284,6 +284,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const roofThick = 0.07;
   const floorThick = 0.18;
   const PILLAR_W = 0.38;
+  // Exterior walls extend down to cover floor slab (no visible black strip)
+  const extWallH = height + floorThick; // full exterior wall height
+  const extWallCY = extWallH / 2;       // center Y for exterior walls
 
   // Window heights — floor-to-ceiling (same height as doors)
   const winBot = 0;
@@ -390,40 +393,18 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   return (
     <group scale={[scaleX, 1, 1]}>
-      {/* ── Floor slab (hidden behind walls, no overhang) ── */}
+      {/* ── Floor slab — uses facade color to blend with walls ── */}
       {slabShape ? (
         <mesh position={[0, 0, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <extrudeGeometry args={[slabShape, { depth: floorThick, bevelEnabled: false }]} />
-          <meshStandardMaterial color={roofColor} roughness={0.5} metalness={0.3} />
+          <meshStandardMaterial color={effectiveColor} roughness={fp.roughness} metalness={fp.metalness} />
         </mesh>
       ) : (
         <mesh position={[0, floorThick / 2, 0]} receiveShadow>
-          <boxGeometry args={[width - wallThick * 2, floorThick, depth - wallThick * 2]} />
-          <meshStandardMaterial color={roofColor} roughness={0.5} metalness={0.3} />
+          <boxGeometry args={[width + 0.04, floorThick, depth + 0.04]} />
+          <meshStandardMaterial color={effectiveColor} roughness={fp.roughness} metalness={fp.metalness} />
         </mesh>
       )}
-
-      {/* ── Facade skirt — covers floor slab on all 4 sides ── */}
-      {/* Front */}
-      <mesh position={[0, floorThick / 2, depth / 2 - wallThick / 2]} castShadow>
-        <boxGeometry args={[width, floorThick, wallThick]} />
-        <CladMaterial {...woodBase} wallWidth={width} />
-      </mesh>
-      {/* Back */}
-      <mesh position={[0, floorThick / 2, -depth / 2 + wallThick / 2]} castShadow>
-        <boxGeometry args={[width, floorThick, wallThick]} />
-        <CladMaterial {...woodBase} wallWidth={width} />
-      </mesh>
-      {/* Left */}
-      <mesh position={[-width / 2 + wallThick / 2, floorThick / 2, 0]} castShadow>
-        <boxGeometry args={[wallThick, floorThick, depth]} />
-        <CladMaterial {...woodBase} wallWidth={depth} />
-      </mesh>
-      {/* Right */}
-      <mesh position={[width / 2 - wallThick / 2, floorThick / 2, 0]} castShadow>
-        <boxGeometry args={[wallThick, floorThick, depth]} />
-        <CladMaterial {...woodBase} wallWidth={depth} />
-      </mesh>
 
       {/* Walkable floor */}
       <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
