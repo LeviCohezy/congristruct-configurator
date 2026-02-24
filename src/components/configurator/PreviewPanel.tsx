@@ -32,6 +32,7 @@ interface PreviewPanelProps {
   currentStep: number;
   onOverrideWoodColor?: (color: string | null) => void;
   showInteriorImages?: boolean;
+  onToggleInteriorView?: () => void;
 }
 
 function SceneContent({ config }: { config: ConfigState }) {
@@ -80,8 +81,9 @@ const modelLabels: Record<ConfigState["model"], string> = {
   base: "BLOQ BASE · 50m²",
 };
 
-export function PreviewPanel({ config, showInteriorImages }: PreviewPanelProps) {
+export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
   const images = getInteriorImages(config);
+  const canToggle = showInteriorImages !== undefined && onToggleInteriorView;
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
@@ -109,6 +111,16 @@ export function PreviewPanel({ config, showInteriorImages }: PreviewPanelProps) 
           Sleep om te draaien · Scroll om te zoomen
         </span>
       </div>
+
+      {/* Toggle button: switch between photos and 3D */}
+      {canToggle && (
+        <button
+          onClick={onToggleInteriorView}
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10 px-3 py-1.5 rounded-full bg-card/80 backdrop-blur-sm border border-border text-xs font-medium text-foreground hover:bg-card transition-colors"
+        >
+          {showInteriorImages ? "3D weergave" : "Foto's bekijken"}
+        </button>
+      )}
 
       {/* 3D Canvas */}
       <AnimatePresence>

@@ -14,24 +14,36 @@ import { motion } from "framer-motion";
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
   const [interiorInView, setInteriorInView] = useState(false);
+  const [force3D, setForce3D] = useState(false);
   const interiorRef = useRef<HTMLDivElement>(null);
 
+  // Reset force3D when interior leaves view
   useEffect(() => {
     const el = interiorRef.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setInteriorInView(entry.isIntersecting),
+      ([entry]) => {
+        setInteriorInView(entry.isIntersecting);
+        if (!entry.isIntersecting) setForce3D(false);
+      },
       { threshold: 0.3 }
     );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
 
+  const showImages = !force3D && interiorInView && config.model === "start" && config.finishLevel !== "shell";
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
       {/* Preview panel - left side on desktop, top on mobile */}
       <div className="lg:w-[55%] lg:sticky lg:top-0 lg:h-screen h-[40vh] sticky top-0 z-20">
-        <PreviewPanel config={config} currentStep={0} showInteriorImages={interiorInView && config.model === "start" && config.finishLevel !== "shell"} />
+        <PreviewPanel
+          config={config}
+          currentStep={0}
+          showInteriorImages={showImages}
+          onToggleInteriorView={() => setForce3D((v) => !v)}
+        />
       </div>
 
       {/* Configuration panel - right side, scrollable */}
