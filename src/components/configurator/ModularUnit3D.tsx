@@ -1745,6 +1745,24 @@ function FlowAWalls({
                 <meshStandardMaterial color="#151010" roughness={0.5} />
               </mesh>
             ))}
+            {/* LED strip under upper cabinet — front edge */}
+            <mesh position={[shelfCX, upperBottom - 0.005 + floorThick, shelfCZ + shelfD / 2 - 0.02]}>
+              <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.01, 0.015]} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+            </mesh>
+            {/* LED strip under middle shelf — front edge */}
+            <mesh position={[shelfCX, counterTop + nicheH / 2 - 0.018 + floorThick, shelfCZ + shelfD / 2 - 0.02]}>
+              <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.01, 0.015]} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+            </mesh>
+            {/* LED strip under countertop — front edge */}
+            <mesh position={[shelfCX, counterTop + 0.03 - 0.005 + floorThick, shelfCZ + shelfD / 2 - 0.02]}>
+              <boxGeometry args={[shelfW - 0.02, 0.01, 0.015]} />
+              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+            </mesh>
+            {/* Point lights for cabinet glow */}
+            <pointLight position={[shelfCX, upperBottom - 0.05 + floorThick, shelfCZ]} intensity={0.5} distance={1.0} color="#fffde8" />
+            <pointLight position={[shelfCX, counterTop + nicheH / 4 + floorThick, shelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
 
             {/* ═══ DESK 1 (left, rotated 90°) ═══ */}
             <mesh position={[desk1CX, deskH + floorThick, deskCZ]} castShadow>
