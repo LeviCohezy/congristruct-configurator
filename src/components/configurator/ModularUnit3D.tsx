@@ -285,9 +285,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const floorThick = 0.18;
   const PILLAR_W = 0.38;
 
-  // Window heights
-  const winH = height * 0.72;
-  const winBot = height * 0.09;
+  // Window heights — floor-to-ceiling (same height as doors)
+  const winBot = 0;
+  const winH = height * 0.81;
   const winTop = winBot + winH;
   const winCY = winBot + winH / 2;
 
@@ -811,11 +811,6 @@ function StartWalls({
         frameColor={frameColor}
         z={doorCenterZ}
       />
-      {/* Door step */}
-      <mesh position={[halfW + 0.18, floorThick / 2, doorCenterZ]} castShadow>
-        <boxGeometry args={[0.32, floorThick, doorH + 0.15]} />
-        <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
-      </mesh>
 
       {/* ── Furniture (only when fully finished) ── */}
       {finishLevel === "fully-finished" && <>
@@ -1245,7 +1240,6 @@ function GlassPane({
       {(
         [
           [0, height / 2 - fw / 2, 0, width, fw, 0.06],
-          [0, -height / 2 + fw / 2, 0, width, fw, 0.06],
           [-width / 2 + fw / 2, 0, 0, fw, height, 0.06],
           [width / 2 - fw / 2, 0, 0, fw, height, 0.06],
           ...(hasDivider ? [[0, 0, 0.004, fw, height - fw * 2, 0.05]] : []),
@@ -1512,10 +1506,6 @@ function FlowAWalls({
               <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
-            <mesh position={[seg.cx, floorThick / 2, halfD + 0.18]} castShadow>
-              <boxGeometry args={[seg.w + 0.15, floorThick, 0.32]} />
-              <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
-            </mesh>
           </group>
         );
       })}
@@ -1801,11 +1791,6 @@ function FlowBWalls({
               <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
-            {/* Door step */}
-            <mesh position={[seg.cx, floorThick / 2, halfD + 0.18]} castShadow>
-              <boxGeometry args={[seg.w + 0.15, floorThick, 0.32]} />
-              <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
-            </mesh>
           </group>
         );
       })}
@@ -2206,10 +2191,6 @@ function Room2Facade({
         <CladMaterial {...woodBase} wallWidth={DOOR_W} />
       </mesh>
       <GlassPane posX={doorCX} posY={winCY} width={DOOR_W} height={winH} frameColor={frameColor} />
-      <mesh position={[doorCX, -floorThick * 0.5, wallThick + 0.18]} castShadow>
-        <boxGeometry args={[DOOR_W + 0.15, floorThick, 0.32]} />
-        <meshStandardMaterial color="#c0bbb5" roughness={0.6} />
-      </mesh>
 
       <mesh position={[room2StartX + PILLAR_W + DOOR_W + PILLAR_W / 2, height / 2, 0]} castShadow>
         <boxGeometry args={[PILLAR_W, height, wallThick]} />
