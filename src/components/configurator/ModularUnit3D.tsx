@@ -2466,7 +2466,7 @@ function FlowBWalls({
         const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
         const cabinetColor = "#2a2118";
         const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
-        const deskW = 1.68;
+        const deskW = 2.52;
         const deskD = 0.70;
         const deskH = 0.75;
         const topT = 0.04;
