@@ -94,7 +94,7 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
       <div>
         <h3 className="text-lg font-display font-semibold mb-1">Gevelmateriaal</h3>
         <p className="text-sm text-muted-foreground mb-4">Kies je buitenbekleding</p>
-        <div className="grid gap-3">
+        <div className="grid grid-cols-2 gap-3">
           {materials.map((family) => {
             const isActive = expandedFamily === family.id;
             return (
