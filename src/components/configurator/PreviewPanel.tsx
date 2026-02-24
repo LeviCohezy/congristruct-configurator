@@ -153,17 +153,17 @@ export function PreviewPanel({ config, showInteriorImages }: PreviewPanelProps) 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 grid grid-cols-2 gap-1 p-1"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 overflow-auto"
           >
             <img
               src={images[0]}
               alt="Interieur aanzicht 1"
-              className="w-full h-full object-cover rounded-l-lg"
+              className="w-full max-w-2xl rounded-lg object-contain"
             />
             <img
               src={images[1]}
               alt="Interieur aanzicht 2"
-              className="w-full h-full object-cover rounded-r-lg"
+              className="w-full max-w-2xl rounded-lg object-contain"
             />
           </motion.div>
         )}
