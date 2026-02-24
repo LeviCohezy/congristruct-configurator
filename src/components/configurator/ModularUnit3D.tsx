@@ -1649,14 +1649,13 @@ function FlowAWalls({
         const upperH = height - upperBottom;
         const nicheH = upperBottom - counterTop;
 
-        // ── Two desks side by side (rotated 90°) ──
-        const deskW = 1.6; // length along Z per desk
+        // ── Two desks side by side (rotated 90°, no gap) ──
+        const deskW = 3.2; // length along Z per desk (2x longer)
         const deskD = 0.80; // width along X per desk
         const deskH = 0.75;
         const topT = 0.04;
-        const deskGap = 0.05;
-        const desk1CX = mainRoomCX - deskD / 2 - deskGap / 2;
-        const desk2CX = mainRoomCX + deskD / 2 + deskGap / 2;
+        const desk1CX = mainRoomCX - deskD / 2;
+        const desk2CX = mainRoomCX + deskD / 2;
         const deskCZ = backInnerZ + shelfD + deskW / 2 + 0.05;
 
         // ── Office chairs ──
@@ -1742,7 +1741,7 @@ function FlowAWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ═══ DESK 2 (right, rotated 90°) ═══ */}
+            {/* ═══ DESK 2 (right, flush against desk 1) ═══ */}
             <mesh position={[desk2CX, deskH + floorThick, deskCZ]} castShadow>
               <boxGeometry args={[deskD, topT, deskW]} />
               <meshStandardMaterial {...white} />
@@ -1756,8 +1755,8 @@ function FlowAWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ═══ MONITOR 1 — on desk 1, facing left chair (-X) ═══ */}
-            <group position={[desk1CX, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
+            {/* ═══ MONITOR 1 — near left edge of desk 1, facing left chair ═══ */}
+            <group position={[desk1CX - deskD / 2 + 0.20, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1776,8 +1775,18 @@ function FlowAWalls({
               </mesh>
             </group>
 
-            {/* ═══ MONITOR 2 — on desk 2, facing right chair (+X) ═══ */}
-            <group position={[desk2CX, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
+            {/* ═══ KEYBOARD 1 + MOUSE 1 on desk 1 ═══ */}
+            <mesh position={[desk1CX - deskD / 2 + 0.45, deskH + topT / 2 + 0.01 + floorThick, deskCZ]}>
+              <boxGeometry args={[0.02, 0.015, 0.35]} />
+              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            </mesh>
+            <mesh position={[desk1CX - deskD / 2 + 0.52, deskH + topT / 2 + 0.008 + floorThick, deskCZ + 0.12]}>
+              <boxGeometry args={[0.04, 0.012, 0.06]} />
+              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            </mesh>
+
+            {/* ═══ MONITOR 2 — near right edge of desk 2, facing right chair ═══ */}
+            <group position={[desk2CX + deskD / 2 - 0.20, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1795,6 +1804,16 @@ function FlowAWalls({
                 <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
               </mesh>
             </group>
+
+            {/* ═══ KEYBOARD 2 + MOUSE 2 on desk 2 ═══ */}
+            <mesh position={[desk2CX + deskD / 2 - 0.45, deskH + topT / 2 + 0.01 + floorThick, deskCZ]}>
+              <boxGeometry args={[0.02, 0.015, 0.35]} />
+              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            </mesh>
+            <mesh position={[desk2CX + deskD / 2 - 0.52, deskH + topT / 2 + 0.008 + floorThick, deskCZ + 0.12]}>
+              <boxGeometry args={[0.04, 0.012, 0.06]} />
+              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            </mesh>
 
             {/* ═══ LEFT OFFICE CHAIR — facing desk 1 (+X) ═══ */}
             <group position={[chair1X, 0, deskCZ]}>
