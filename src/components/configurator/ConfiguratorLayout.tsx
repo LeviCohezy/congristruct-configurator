@@ -26,7 +26,7 @@ export function ConfiguratorLayout() {
         setInteriorInView(entry.isIntersecting);
         if (!entry.isIntersecting) setForce3D(false);
       },
-      { threshold: 0.3 }
+      { threshold: 0.5 }
     );
     observer.observe(el);
     return () => observer.disconnect();
