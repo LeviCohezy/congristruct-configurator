@@ -1659,8 +1659,8 @@ function FlowAWalls({
         const deskCZ = backInnerZ + shelfD + deskW / 2 + 0.05;
 
         // ── Office chairs ──
-        const chair1X = desk1CX - deskD / 2 - 0.45;
-        const chair2X = desk2CX + deskD / 2 + 0.45;
+        const chair1X = desk1CX - deskD / 2 - 0.15;
+        const chair2X = desk2CX + deskD / 2 + 0.15;
 
         // ── Monitors ──
         const screenW = 0.54;
@@ -1854,6 +1854,94 @@ function FlowAWalls({
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
             </group>
+
+            {/* ═══ RIGHT WALL SHELF (between front wall and toilet wall) with integrated sink ═══ */}
+            {(() => {
+              const frontInnerZ = halfD - wallThick;
+              const rwShelfDepth = frontInnerZ - toiletWallZ - partT / 2 - 0.04; // available space minus margins
+              const rwShelfD = 0.40;
+              const rwShelfCX = halfW - wallThick - rwShelfD / 2;
+              const rwShelfCZ = toiletWallZ + partT / 2 + 0.02 + rwShelfDepth / 2;
+              const rwShelfW = rwShelfDepth; // along Z
+              const rwBackX = halfW - wallThick - 0.04;
+              const rwCounterH = height * 0.25;
+              const rwUpperBottom = height * 0.65;
+              const rwUpperH = height - rwUpperBottom;
+
+              // Sink dimensions
+              const sinkW = 0.40;
+              const sinkD = 0.30;
+              const sinkDepth = 0.12;
+
+              return (
+                <group>
+                  {/* Back panel on right wall */}
+                  <mesh position={[rwBackX, height / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[0.02, height, rwShelfW]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                  {/* Lower cabinet */}
+                  <mesh position={[rwShelfCX, rwCounterH / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[rwShelfD, rwCounterH, rwShelfW]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                  {/* Countertop */}
+                  <mesh position={[rwShelfCX, rwCounterH + 0.015 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[rwShelfD + 0.02, 0.03, rwShelfW + 0.02]} />
+                    <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                  </mesh>
+                  {/* Upper cabinet (no middle shelf — just upper box) */}
+                  <mesh position={[rwShelfCX, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[rwShelfD, rwUpperH, rwShelfW]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                  {/* Open niche back panel */}
+                  <mesh position={[rwBackX - 0.005, rwCounterH + (rwUpperBottom - rwCounterH) / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[0.01, (rwUpperBottom - rwCounterH) - 0.06, rwShelfW - 0.04]} />
+                    <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+                  </mesh>
+                  {/* Door lines lower */}
+                  {[0.33, 0.67].map((frac, i) => (
+                    <mesh key={`rsl${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwCounterH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
+                      <boxGeometry args={[0.004, rwCounterH - 0.02, 0.008]} />
+                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                    </mesh>
+                  ))}
+                  {/* Door lines upper */}
+                  {[0.33, 0.67].map((frac, i) => (
+                    <mesh key={`rsu${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
+                      <boxGeometry args={[0.004, rwUpperH - 0.02, 0.008]} />
+                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                    </mesh>
+                  ))}
+                  {/* ── Integrated sink basin ── */}
+                  <mesh position={[rwShelfCX, rwCounterH + 0.03 + 0.001 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[sinkD, 0.003, sinkW]} />
+                    <meshStandardMaterial color="#e8e8e8" roughness={0.1} metalness={0.6} />
+                  </mesh>
+                  {/* Sink basin hole (recessed) */}
+                  <mesh position={[rwShelfCX, rwCounterH + 0.03 - sinkDepth / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[sinkD - 0.02, sinkDepth, sinkW - 0.02]} />
+                    <meshStandardMaterial color="#d0d0d0" roughness={0.15} metalness={0.5} />
+                  </mesh>
+                  {/* Faucet base */}
+                  <mesh position={[rwShelfCX + sinkD / 2 - 0.02, rwCounterH + 0.03 + 0.01 + floorThick, rwShelfCZ]}>
+                    <cylinderGeometry args={[0.015, 0.02, 0.02, 8]} />
+                    <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+                  </mesh>
+                  {/* Faucet stem */}
+                  <mesh position={[rwShelfCX + sinkD / 2 - 0.02, rwCounterH + 0.03 + 0.12 + floorThick, rwShelfCZ]}>
+                    <cylinderGeometry args={[0.008, 0.008, 0.20, 8]} />
+                    <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+                  </mesh>
+                  {/* Faucet spout */}
+                  <mesh position={[rwShelfCX + sinkD / 2 - 0.08, rwCounterH + 0.03 + 0.21 + floorThick, rwShelfCZ]} rotation={[0, 0, Math.PI / 6]}>
+                    <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
+                    <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+                  </mesh>
+                </group>
+              );
+            })()}
 
             {/* ═══ TOILET ROOM SHELF ═══ */}
             <mesh position={[toiletShelfCX, height / 2 + floorThick, toiletBackZ]}>
