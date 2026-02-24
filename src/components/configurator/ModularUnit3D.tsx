@@ -1650,7 +1650,7 @@ function FlowAWalls({
         const nicheH = upperBottom - counterTop;
 
         // ── Two desks side by side (rotated 90°, no gap) ──
-        const deskW = 3.2; // length along Z per desk (2x longer)
+        const deskW = 1.92; // length along Z per desk (20% longer than 1.6)
         const deskD = 0.80; // width along X per desk
         const deskH = 0.75;
         const topT = 0.04;
