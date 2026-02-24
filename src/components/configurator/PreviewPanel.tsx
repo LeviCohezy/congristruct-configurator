@@ -33,10 +33,10 @@ const interiorImageMap: Record<string, [string, string]> = {
   "fully-finished:light-oak:light-vinyl": [lightoakImg1, lightoakImg2],
   "fully-finished:white:light-vinyl": [whiteImg1, whiteImg2],
   // Dark floor
-  "finished:dark-vinyl": [darkFinished1, darkFinished2],
-  "fully-finished:brown:dark-vinyl": [darkBrown1, darkBrown2],
-  "fully-finished:light-oak:dark-vinyl": [darkLightoak1, darkLightoak2],
-  "fully-finished:white:dark-vinyl": [darkWhite1, darkWhite2],
+  "finished:dark-vinyl": [darkFinished2, darkFinished1],
+  "fully-finished:brown:dark-vinyl": [darkBrown2, darkBrown1],
+  "fully-finished:light-oak:dark-vinyl": [darkLightoak2, darkLightoak1],
+  "fully-finished:white:dark-vinyl": [darkWhite2, darkWhite1],
   // Shell
   "shell:b": [cascoToiletImg1, cascoToiletImg2],
 };
