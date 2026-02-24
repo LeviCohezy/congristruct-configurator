@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ModularUnit3D } from "./ModularUnit3D";
 import type { ConfigState } from "@/hooks/useConfigurator";
 
-// Interior images for BLOQ START
+// Interior images for BLOQ START — light floor (default)
 import brownImg1 from "@/assets/start-interior-brown-1.avif";
 import brownImg2 from "@/assets/start-interior-brown-2.avif";
 import lightoakImg1 from "@/assets/start-interior-lightoak-1.avif";
@@ -16,20 +16,41 @@ import instapklaarImg1 from "@/assets/start-interior-instapklaar-1.avif";
 import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
 import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
 import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
+// Interior images — dark floor
+import darkFinished1 from "@/assets/start-interior-darkfloor-finished-1.png";
+import darkFinished2 from "@/assets/start-interior-darkfloor-finished-2.png";
+import darkBrown1 from "@/assets/start-interior-darkfloor-brown-1.png";
+import darkBrown2 from "@/assets/start-interior-darkfloor-brown-2.png";
+import darkLightoak1 from "@/assets/start-interior-darkfloor-lightoak-1.png";
+import darkLightoak2 from "@/assets/start-interior-darkfloor-lightoak-2.png";
+import darkWhite1 from "@/assets/start-interior-darkfloor-white-1.png";
+import darkWhite2 from "@/assets/start-interior-darkfloor-white-2.png";
 
 const interiorImageMap: Record<string, [string, string]> = {
-  "finished": [instapklaarImg1, instapklaarImg2],
-  "fully-finished:brown": [brownImg1, brownImg2],
-  "fully-finished:light-oak": [lightoakImg1, lightoakImg2],
-  "fully-finished:white": [whiteImg1, whiteImg2],
+  // Light floor (default)
+  "finished:light-vinyl": [instapklaarImg1, instapklaarImg2],
+  "fully-finished:brown:light-vinyl": [brownImg1, brownImg2],
+  "fully-finished:light-oak:light-vinyl": [lightoakImg1, lightoakImg2],
+  "fully-finished:white:light-vinyl": [whiteImg1, whiteImg2],
+  // Dark floor
+  "finished:dark-vinyl": [darkFinished1, darkFinished2],
+  "fully-finished:brown:dark-vinyl": [darkBrown1, darkBrown2],
+  "fully-finished:light-oak:dark-vinyl": [darkLightoak1, darkLightoak2],
+  "fully-finished:white:dark-vinyl": [darkWhite1, darkWhite2],
+  // Shell
   "shell:b": [cascoToiletImg1, cascoToiletImg2],
 };
 
 function getInteriorImages(config: ConfigState): [string, string] | null {
   if (config.finishLevel === "shell" && config.floorPlan === "b") return interiorImageMap["shell:b"];
   if (config.finishLevel === "shell") return null;
-  if (config.finishLevel === "finished") return interiorImageMap["finished"];
-  return interiorImageMap[`fully-finished:${config.shelfColor}`] ?? interiorImageMap["fully-finished:brown"];
+  const floor = config.floorOption;
+  if (config.finishLevel === "finished") {
+    return interiorImageMap[`finished:${floor}`] ?? interiorImageMap["finished:light-vinyl"];
+  }
+  return interiorImageMap[`fully-finished:${config.shelfColor}:${floor}`]
+    ?? interiorImageMap[`fully-finished:${config.shelfColor}:light-vinyl`]
+    ?? interiorImageMap["fully-finished:brown:light-vinyl"];
 }
 
 interface PreviewPanelProps {
