@@ -10,6 +10,7 @@ import lightWoodFloorTextureUrl from "@/assets/light-wood-floor-texture.png";
 import darkWoodFloorTextureUrl from "@/assets/dark-wood-floor-texture.png";
 import stoneFloorTextureUrl from "@/assets/stone-floor-texture.png";
 import brickStripsTextureUrl from "@/assets/brick-strips-texture.png";
+import lightOakTextureUrl from "@/assets/light-oak-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
 function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) {
@@ -564,6 +565,18 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     return t;
   }, [stoneTexRaw]);
 
+  // Light oak cabinet texture
+  const lightOakTexRaw = useLoader(THREE.TextureLoader, lightOakTextureUrl);
+  const lightOakTex = useMemo(() => {
+    const t = lightOakTexRaw.clone();
+    t.wrapS = THREE.RepeatWrapping;
+    t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(1, 1);
+    t.colorSpace = THREE.SRGBColorSpace;
+    t.needsUpdate = true;
+    return t;
+  }, [lightOakTexRaw]);
+
   const floorTex = !isShell ? (config.floorOption === "light-vinyl" ? lightWoodTex : config.floorOption === "dark-vinyl" ? darkWoodTex : config.floorOption === "stone-vinyl" ? stoneTex : null) : null;
 
   const scaleX = config.mirrorPlan ? -1 : 1;
@@ -692,6 +705,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           shelfColor={config.shelfColor} ledStrip={config.ledStrip}
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
+          lightOakTex={lightOakTex}
         />
       ) : isFlowA ? (
         <FlowAWalls
@@ -704,6 +718,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
           shelfColor={config.shelfColor} ledStrip={config.ledStrip}
+          lightOakTex={lightOakTex}
         />
       ) : isFlowB ? (
         <FlowBWalls
@@ -716,6 +731,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
           shelfColor={config.shelfColor} ledStrip={config.ledStrip}
+          lightOakTex={lightOakTex}
         />
       ) : (
         <GenericWalls
@@ -763,6 +779,7 @@ function StartWalls({
   interiorRoughness,
   osbTex,
   isShell,
+  lightOakTex,
 }: any) {
   const halfW = width / 2;
   const halfD = depth / 2;
@@ -1007,7 +1024,7 @@ function StartWalls({
           isLeftWall ? [into, h, along] : [along, h, into];
 
         const sc = getShelfColors(shelfColor);
-        const matProps = { color: sc.cabinet, roughness: 0.75, metalness: 0.05 };
+        const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
         // Front face offset (for door lines)
         const frontFace = isLeftWall ? -halfW + wallThick + shelfD + 0.002 : -halfD + wallThick + shelfD + 0.002;
@@ -1458,6 +1475,7 @@ function FlowAWalls({
   finishLevel,
   shelfColor,
   ledStrip,
+  lightOakTex,
 }: any) {
   const halfW = width / 2;   // 3.0
   const halfD = depth / 2;   // 2.0
@@ -1772,7 +1790,7 @@ function FlowAWalls({
         const white = { color: "#f5f5f0", roughness: 0.25, metalness: 0.05 };
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const sc = getShelfColors(shelfColor);
-        const matProps = { color: sc.cabinet, roughness: 0.75, metalness: 0.05 };
+        const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
         // ── Back wall shelf/cabinet ──
         const shelfW = mainRoomW - 0.04;
@@ -2218,6 +2236,7 @@ function FlowBWalls({
   finishLevel,
   shelfColor,
   ledStrip,
+  lightOakTex,
 }: any) {
   const halfW = width / 2;
   const halfD = depth / 2;
@@ -2588,7 +2607,7 @@ function FlowBWalls({
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
         const gsc = getShelfColors(shelfColor);
-        const matProps = { color: gsc.cabinet, roughness: 0.75, metalness: 0.05 };
+        const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : gsc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
         const deskW = 2.52;
         const deskD = 0.70;
         const deskH = 0.75;
