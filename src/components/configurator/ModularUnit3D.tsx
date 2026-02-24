@@ -1370,16 +1370,16 @@ function FlowAWalls({
   });
 
   // Toilet compartment: back-right corner
-  // ~120cm wide strip (interior), ~100cm deep from back
+  // ~120cm wide strip (interior), 45% of depth from back
   const toiletStripW = 1.20;
-  const toiletDepth = 1.0;
+  const toiletDepth = depth * 0.45; // 45% of 3.5m = 1.575m
   const partX = halfW - wallThick - toiletStripW; // vertical partition x
   const toiletWallZ = -halfD + wallThick + toiletDepth; // horizontal wall z
 
-  // Toilet door: 70cm = 0.70m, in horizontal wall
+  // Toilet door: 70cm = 0.70m, on the LEFT side of horizontal wall (near partition)
   const toiletDoorW = 0.70;
   const toiletDoorH = 2.1;
-  const toiletDoorCX = partX + partT + toiletStripW / 2; // center of strip
+  const toiletDoorCX = partX + partT + toiletDoorW / 2 + 0.05; // left-aligned with small margin
 
   // Horizontal wall segments (split around door)
   const horizTotalW = toiletStripW - partT;

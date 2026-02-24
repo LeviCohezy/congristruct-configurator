@@ -92,12 +92,12 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
     // Toilet compartment: back-right corner
     // Strip width ~120cm = 60 SVG from inner right wall
     const partX = vw - wt - 60; // vertical partition x
-    const toiletDepth = 50; // ~100cm = 50 SVG from back
+    const toiletDepth = vh * 0.45; // 45% of depth
     const toiletBottomY = wt + toiletDepth;
 
-    // Toilet door: ~70cm = 35 SVG, in horizontal wall
+    // Toilet door: ~70cm = 30 SVG, on LEFT side (near partition)
     const toiletDoorW = 30;
-    const toiletDoorCx = partX + iw + (vw - wt - partX - iw) / 2;
+    const toiletDoorCx = partX + iw + toiletDoorW / 2 + 3; // left-aligned
 
     return (
       <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 110 }}>
