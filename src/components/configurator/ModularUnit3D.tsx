@@ -1756,7 +1756,7 @@ function FlowAWalls({
             </mesh>
 
             {/* ═══ MONITOR 1 — center of desk, near shared edge, facing left chair ═══ */}
-            <group position={[mainRoomCX, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
+            <group position={[mainRoomCX - 0.12, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1776,7 +1776,7 @@ function FlowAWalls({
             </group>
 
             {/* ═══ MONITOR 2 — center of desk, near shared edge, facing right chair ═══ */}
-            <group position={[mainRoomCX, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
+            <group position={[mainRoomCX + 0.12, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
