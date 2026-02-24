@@ -1890,34 +1890,30 @@ function FlowAWalls({
                     <boxGeometry args={[rwShelfD + 0.02, 0.03, rwShelfW + 0.02]} />
                     <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
                   </mesh>
-                  {/* Two small open shelves above counter, each divided in 2 */}
-                  {[0, 1].map((si) => {
-                    const shelfY = rwCounterH + 0.45 + si * 0.35;
-                    return (
-                      <group key={`ows${si}`}>
-                        {/* Shelf plank */}
-                        <mesh position={[rwShelfCX, shelfY + floorThick, rwShelfCZ]}>
-                          <boxGeometry args={[rwShelfD - 0.02, 0.02, rwShelfW - 0.04]} />
-                          <meshStandardMaterial {...matProps} />
-                        </mesh>
-                        {/* Center divider */}
-                        <mesh position={[rwShelfCX, shelfY + 0.15 + floorThick, rwShelfCZ]}>
-                          <boxGeometry args={[rwShelfD - 0.04, 0.28, 0.015]} />
-                          <meshStandardMaterial {...matProps} />
-                        </mesh>
-                        {/* Left side panel */}
-                        <mesh position={[rwShelfCX, shelfY + 0.15 + floorThick, rwShelfCZ - rwShelfW / 2 + 0.03]}>
-                          <boxGeometry args={[rwShelfD - 0.04, 0.28, 0.015]} />
-                          <meshStandardMaterial {...matProps} />
-                        </mesh>
-                        {/* Right side panel */}
-                        <mesh position={[rwShelfCX, shelfY + 0.15 + floorThick, rwShelfCZ + rwShelfW / 2 - 0.03]}>
-                          <boxGeometry args={[rwShelfD - 0.04, 0.28, 0.015]} />
-                          <meshStandardMaterial {...matProps} />
-                        </mesh>
-                      </group>
-                    );
-                  })}
+                  {/* Upper cabinet (no middle shelf — just upper box) */}
+                  <mesh position={[rwShelfCX, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[rwShelfD, rwUpperH, rwShelfW]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                  {/* Open niche back panel */}
+                  <mesh position={[rwBackX - 0.005, rwCounterH + (rwUpperBottom - rwCounterH) / 2 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[0.01, (rwUpperBottom - rwCounterH) - 0.06, rwShelfW - 0.04]} />
+                    <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+                  </mesh>
+                  {/* Door lines lower */}
+                  {[0.33, 0.67].map((frac, i) => (
+                    <mesh key={`rsl${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwCounterH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
+                      <boxGeometry args={[0.004, rwCounterH - 0.02, 0.008]} />
+                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                    </mesh>
+                  ))}
+                  {/* Door lines upper */}
+                  {[0.33, 0.67].map((frac, i) => (
+                    <mesh key={`rsu${i}`} position={[rwShelfCX - rwShelfD / 2 - 0.002, rwUpperBottom + rwUpperH / 2 + floorThick, rwShelfCZ - rwShelfW / 2 + rwShelfW * frac]}>
+                      <boxGeometry args={[0.004, rwUpperH - 0.02, 0.008]} />
+                      <meshStandardMaterial color="#151010" roughness={0.5} />
+                    </mesh>
+                  ))}
                   {/* ── Integrated sink basin ── */}
                   <mesh position={[rwShelfCX, rwCounterH + 0.03 + 0.001 + floorThick, rwShelfCZ]}>
                     <boxGeometry args={[sinkD, 0.003, sinkW]} />
@@ -1943,8 +1939,8 @@ function FlowAWalls({
                     <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
                     <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                   </mesh>
-                  {/* ── Coffee machine (left corner, near toilet wall) ── */}
-                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, rwShelfCZ - rwShelfW / 2 + 0.15]}>
+                  {/* ── Coffee machine (left of sink) ── */}
+                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, rwShelfCZ - sinkW / 2 - 0.18]}>
                     {/* Base body */}
                     <mesh position={[0, 0.14, 0]}>
                       <boxGeometry args={[0.18, 0.28, 0.25]} />
@@ -1965,7 +1961,7 @@ function FlowAWalls({
                       <boxGeometry args={[0.04, 0.04, 0.04]} />
                       <meshStandardMaterial color="#222222" roughness={0.5} metalness={0.4} />
                     </mesh>
-                    {/* Control panel */}
+                    {/* Control panel / buttons */}
                     <mesh position={[-0.091, 0.20, 0]}>
                       <boxGeometry args={[0.005, 0.08, 0.10]} />
                       <meshStandardMaterial color="#444444" roughness={0.3} metalness={0.2} />
@@ -1974,24 +1970,6 @@ function FlowAWalls({
                     <mesh position={[-0.092, 0.12, 0]}>
                       <boxGeometry args={[0.004, 0.02, 0.14]} />
                       <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
-                    </mesh>
-                  </group>
-                  {/* ── Stacked cups next to coffee machine ── */}
-                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, rwShelfCZ - rwShelfW / 2 + 0.35]}>
-                    {/* Cup 1 (bottom) */}
-                    <mesh position={[0, 0.04, 0]}>
-                      <cylinderGeometry args={[0.035, 0.03, 0.08, 12]} />
-                      <meshStandardMaterial color="#f0f0f0" roughness={0.3} metalness={0.1} />
-                    </mesh>
-                    {/* Cup 2 (stacked, slightly offset) */}
-                    <mesh position={[0.01, 0.12, 0.01]}>
-                      <cylinderGeometry args={[0.035, 0.03, 0.08, 12]} />
-                      <meshStandardMaterial color="#f0f0f0" roughness={0.3} metalness={0.1} />
-                    </mesh>
-                    {/* Cup 3 (top) */}
-                    <mesh position={[-0.01, 0.20, -0.005]}>
-                      <cylinderGeometry args={[0.035, 0.03, 0.08, 12]} />
-                      <meshStandardMaterial color="#e8e0d8" roughness={0.3} metalness={0.1} />
                     </mesh>
                   </group>
                 </group>
