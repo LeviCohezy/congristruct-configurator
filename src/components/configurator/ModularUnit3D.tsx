@@ -401,7 +401,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         </mesh>
       ) : (
         <mesh position={[0, floorThick / 2, 0]} receiveShadow>
-          <boxGeometry args={[width + 0.04, floorThick, depth + 0.04]} />
+          <boxGeometry args={[width - wallThick * 2, floorThick, depth - wallThick * 2]} />
           <meshStandardMaterial color={effectiveColor} roughness={fp.roughness} metalness={fp.metalness} />
         </mesh>
       )}
