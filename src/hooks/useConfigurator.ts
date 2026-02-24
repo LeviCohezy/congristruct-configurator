@@ -1,10 +1,13 @@
 import { useState, useCallback, useMemo } from "react";
 
 export interface ConfigState {
-  // Step 1
+  // Unit
   model: "start" | "flow" | "hub" | "base";
   roundedCorners: boolean;
-  // Step 2
+  // Indeling
+  floorPlan: "a" | "b";
+  mirrorPlan: boolean;
+  // Exterieur
   facade:
     | "thermowood-black"
     | "thermowood-natural"
@@ -12,24 +15,24 @@ export interface ConfigState {
     | "composite-black"
     | "aluminium"
     | "brick-grey";
-  aluminiumColor: string; // hex color for aluminium facade
-  // Step 3
-  floorPlan: "a" | "b";
-  tiltTurnWindow: boolean;
-  mirrorPlan: boolean;
-  // Step 4
+  aluminiumColor: string;
+  // Interieur
   finishLevel: "shell" | "finished" | "fully-finished";
   floorOption: "light-vinyl" | "dark-vinyl" | "stone-vinyl";
-  // Step 5
-  lightingPackage: "base" | "full";
-  // Step 6
+  ledStrip: boolean;
+  shelfColor: "brown" | "light-oak" | "white";
+  // Ramen
+  tiltTurnWindow: boolean;
+  // Extra's
   awning: boolean;
   solarPanels: boolean;
   batterySystem: boolean;
   foundation: boolean;
-  // Step 7
+  // Transport
   transportDistance: number;
-  // Step 8
+  // Verlichting
+  lightingPackage: "base" | "full";
+  // Contact
   contact: {
     firstName: string;
     lastName: string;
@@ -43,13 +46,15 @@ export interface ConfigState {
 const defaultConfig: ConfigState = {
   model: "flow",
   roundedCorners: false,
+  floorPlan: "a",
+  mirrorPlan: false,
   facade: "thermowood-black",
   aluminiumColor: "#383a3b",
-  floorPlan: "a",
-  tiltTurnWindow: false,
-  mirrorPlan: false,
   finishLevel: "shell",
   floorOption: "light-vinyl",
+  ledStrip: false,
+  shelfColor: "brown",
+  tiltTurnWindow: false,
   lightingPackage: "base",
   awning: false,
   solarPanels: false,
@@ -65,17 +70,6 @@ const defaultConfig: ConfigState = {
     address: "",
   },
 };
-
-const STEP_LABELS = [
-  "Unit",
-  "Exterieur",
-  "Ramen",
-  "Interieur",
-  "Verlichting",
-  "Extra's",
-  "Transport",
-  "Contact",
-] as const;
 
 // Pricing
 const basePrices: Record<string, number> = {
@@ -108,7 +102,6 @@ export function getRoofColor(facade: ConfigState["facade"]) {
 }
 
 export function useConfigurator() {
-  const [currentStep, setCurrentStep] = useState(0);
   const [config, setConfig] = useState<ConfigState>(defaultConfig);
 
   const updateConfig = useCallback(<K extends keyof ConfigState>(key: K, value: ConfigState[K]) => {
@@ -129,6 +122,7 @@ export function useConfigurator() {
     if (config.roundedCorners) price += 1500;
     if (config.tiltTurnWindow) price += 450;
     if (config.lightingPackage === "full") price += 1800;
+    if (config.ledStrip) price += 650;
     if (config.awning) price += 2400;
     if (config.solarPanels) price += 4800;
     if (config.batterySystem) price += 3200;
@@ -137,20 +131,10 @@ export function useConfigurator() {
     return price;
   }, [config]);
 
-  const nextStep = useCallback(() => setCurrentStep((s) => Math.min(s + 1, 7)), []);
-  const prevStep = useCallback(() => setCurrentStep((s) => Math.max(s - 1, 0)), []);
-  const goToStep = useCallback((step: number) => setCurrentStep(step), []);
-
   return {
-    currentStep,
     config,
     updateConfig,
     updateContact,
     totalPrice,
-    nextStep,
-    prevStep,
-    goToStep,
-    stepLabels: STEP_LABELS,
-    totalSteps: STEP_LABELS.length,
   };
 }

@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
 
@@ -10,7 +10,7 @@ interface Props {
 const finishLevels = [
   { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
   { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten (toestellen en stoelen niet inbegrepen)", price: "+€16.500" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€16.500" },
 ];
 
 const floorOptions = [
@@ -19,46 +19,121 @@ const floorOptions = [
   { id: "stone-vinyl" as const, label: "Steenlook", color: "hsl(30,5%,65%)" },
 ];
 
+const shelfColors = [
+  { id: "brown" as const, label: "Walnoot bruin", color: "hsl(25,30%,35%)" },
+  { id: "light-oak" as const, label: "Licht eiken", color: "hsl(40,30%,72%)" },
+  { id: "white" as const, label: "Wit", color: "hsl(0,0%,95%)" },
+];
+
+const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
+const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-finished";
+
 export function InteriorFinish({ config, updateConfig }: Props) {
   return (
-    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
-      <div>
-        <h3 className="text-lg font-display font-semibold mb-1">Interieur & afwerking</h3>
-        <p className="text-sm text-muted-foreground mb-4">Kies je afwerkingsniveau en vloer</p>
-        <div className="grid gap-3">
-          {finishLevels.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => updateConfig("finishLevel", f.id)}
-              className={cn("option-card text-left", config.finishLevel === f.id && "option-card-active")}
-            >
-              <div className="flex justify-between">
-                <div>
-                  <p className="font-medium">{f.label}</p>
-                  <p className="text-sm text-muted-foreground">{f.desc}</p>
-                </div>
-                <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+    <div className="config-section">
+      <h3 className="text-lg font-display font-semibold mb-1">Interieur & afwerking</h3>
+      <p className="text-sm text-muted-foreground mb-4">Kies je afwerkingsniveau</p>
+
+      {/* Finish levels */}
+      <div className="grid gap-3">
+        {finishLevels.map((f) => (
+          <button
+            key={f.id}
+            onClick={() => updateConfig("finishLevel", f.id)}
+            className={cn("option-card text-left", config.finishLevel === f.id && "option-card-active")}
+          >
+            <div className="flex justify-between">
+              <div>
+                <p className="font-medium">{f.label}</p>
+                <p className="text-sm text-muted-foreground">{f.desc}</p>
               </div>
-            </button>
-          ))}
-        </div>
+              <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+            </div>
+          </button>
+        ))}
       </div>
 
-      <div className="mt-6">
-        <p className="config-label mb-3">Vloerkeuze (Clickvinyl)</p>
-        <div className="grid grid-cols-3 gap-3">
-          {floorOptions.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => updateConfig("floorOption", f.id)}
-              className={cn("option-card text-center", config.floorOption === f.id && "option-card-active")}
-            >
-              <div className="w-full h-10 rounded-lg mb-2" style={{ backgroundColor: f.color }} />
-              <p className="text-xs font-medium">{f.label}</p>
-            </button>
-          ))}
-        </div>
-      </div>
-    </motion.div>
+      {/* Floor option — only if finished or fully-finished */}
+      <AnimatePresence>
+        {showFloor(config.finishLevel) && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-6">
+              <p className="config-label mb-3">Vloerkeuze (Clickvinyl)</p>
+              <div className="grid grid-cols-3 gap-3">
+                {floorOptions.map((f) => (
+                  <button
+                    key={f.id}
+                    onClick={() => updateConfig("floorOption", f.id)}
+                    className={cn("option-card text-center", config.floorOption === f.id && "option-card-active")}
+                  >
+                    <div className="w-full h-10 rounded-lg mb-2" style={{ backgroundColor: f.color }} />
+                    <p className="text-xs font-medium">{f.label}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Furnished options — only if fully-finished */}
+      <AnimatePresence>
+        {showFurnished(config.finishLevel) && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="overflow-hidden"
+          >
+            <div className="mt-6 space-y-4">
+              {/* LED strip toggle */}
+              <div className="option-card flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium">LED-strip verlichting</p>
+                  <p className="text-xs text-muted-foreground">LED-strips in kasten en minikeuken</p>
+                  <p className="text-xs font-medium text-accent mt-1">+€650</p>
+                </div>
+                <button
+                  onClick={() => updateConfig("ledStrip", !config.ledStrip)}
+                  className={cn(
+                    "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+                    config.ledStrip ? "bg-accent" : "bg-muted"
+                  )}
+                >
+                  <span className={cn(
+                    "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+                    config.ledStrip ? "translate-x-5" : "translate-x-0"
+                  )} />
+                </button>
+              </div>
+
+              {/* Shelf color */}
+              <div>
+                <p className="config-label mb-3">Kleur kasten & legplanken</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {shelfColors.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => updateConfig("shelfColor", c.id)}
+                      className={cn("option-card text-center", config.shelfColor === c.id && "option-card-active")}
+                    >
+                      <div className="w-full h-10 rounded-lg mb-2 border border-border" style={{ backgroundColor: c.color }} />
+                      <p className="text-xs font-medium">{c.label}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
