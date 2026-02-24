@@ -2464,30 +2464,151 @@ function FlowBWalls({
         const white = { color: "#ffffff", roughness: 0.25, metalness: 0.05 };
         const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
         const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
-        const deskW = 1.68; // 1.40 * 1.2 = 20% longer, now along X
-        const deskD = 0.70; // depth along Z
+        const cabinetColor = "#2a2118";
+        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
+        const deskW = 1.68;
+        const deskD = 0.70;
         const deskH = 0.75;
         const topT = 0.04;
         const screenW = 0.54;
         const screenH = 0.34;
 
-        // Per floorplan: desk long side along X, against BACK WALL (-Z)
-        // Chair in front of desk (+Z side), facing back wall (-Z)
-        // Monitor on desk, screen facing chair (+Z)
         const backInnerZ = -halfD + wallThick + 0.02;
-        const chairYOff = 0.06;
 
-        // LEFT ROOM desk — right edge against partition wall, front edge at doorframe
+        // LEFT ROOM bounds
+        const leftRoomLeft = -halfW + wallThick;
+        const leftRoomRight = leftPartX;
+        const leftRoomW = leftRoomRight - leftRoomLeft;
+        const leftRoomCX = (leftRoomLeft + leftRoomRight) / 2;
+
+        // RIGHT ROOM bounds
+        const rightRoomLeft = rightPartX + partT;
+        const rightRoomRight = halfW - wallThick;
+        const rightRoomW = rightRoomRight - rightRoomLeft;
+        const rightRoomCX = (rightRoomLeft + rightRoomRight) / 2;
+
+        // Shelf dimensions
+        const shelfD = 0.40;
+        const counterTop = height * 0.25;
+        const upperBottom = height * 0.65;
+        const upperH = height - upperBottom;
+        const nicheH = upperBottom - counterTop;
+
+        // Desk positions — side against partition, front edge at doorframe
         const lDeskCX = leftPartX - deskW / 2;
         const lDeskCZ = doorCenterZ - roomDoorW / 2 - deskD / 2;
-
-        // RIGHT ROOM desk — left edge against partition wall, front edge at doorframe
         const rDeskCX = rightPartX + partT + deskW / 2;
         const rDeskCZ = doorCenterZ - roomDoorW / 2 - deskD / 2;
 
+        // Helper to render a shelf closet across the back wall
+        const renderShelf = (cx: number, sw: number) => {
+          const shelfCZ = backInnerZ + shelfD / 2;
+          const backPanelZ = backInnerZ + 0.06;
+          return (
+            <>
+              {/* Back panel */}
+              <mesh position={[cx, height / 2 + floorThick, backPanelZ]}>
+                <boxGeometry args={[sw, height, 0.02]} />
+                <meshStandardMaterial {...matProps} />
+              </mesh>
+              {/* Lower cabinet */}
+              <mesh position={[cx, counterTop / 2 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw, counterTop, shelfD]} />
+                <meshStandardMaterial {...matProps} />
+              </mesh>
+              {/* Countertop */}
+              <mesh position={[cx, counterTop + 0.015 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw + 0.02, 0.03, shelfD + 0.02]} />
+                <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              </mesh>
+              {/* Upper cabinet */}
+              <mesh position={[cx, upperBottom + upperH / 2 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw, upperH, shelfD]} />
+                <meshStandardMaterial {...matProps} />
+              </mesh>
+              {/* Niche side panels */}
+              <mesh position={[cx - sw / 2 + sw / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw / 6, nicheH, shelfD]} />
+                <meshStandardMaterial {...matProps} />
+              </mesh>
+              <mesh position={[cx + sw / 2 - sw / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw / 6, nicheH, shelfD]} />
+                <meshStandardMaterial {...matProps} />
+              </mesh>
+              {/* Niche back */}
+              <mesh position={[cx, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
+                <boxGeometry args={[sw * 4 / 6 - 0.02, nicheH - 0.06, 0.01]} />
+                <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+              </mesh>
+              {/* Middle shelf */}
+              <mesh position={[cx, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                <boxGeometry args={[sw * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
+                <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+              </mesh>
+              {/* Door lines upper */}
+              {[0.25, 0.5, 0.75].map((frac, i) => (
+                <mesh key={`su${i}`} position={[cx - sw / 2 + sw * frac, upperBottom + upperH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                  <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
+                  <meshStandardMaterial color="#151010" roughness={0.5} />
+                </mesh>
+              ))}
+              {/* Door lines lower */}
+              {[0.25, 0.5, 0.75].map((frac, i) => (
+                <mesh key={`sl${i}`} position={[cx - sw / 2 + sw * frac, counterTop / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                  <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
+                  <meshStandardMaterial color="#151010" roughness={0.5} />
+                </mesh>
+              ))}
+              {/* LED strips */}
+              <mesh position={[cx, upperBottom - 0.005 + floorThick, backPanelZ + 0.04]}>
+                <boxGeometry args={[sw * 4 / 6 - 0.02, 0.01, 0.015]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <mesh position={[cx, counterTop + nicheH / 2 - 0.018 + floorThick, backPanelZ + 0.04]}>
+                <boxGeometry args={[sw * 4 / 6 - 0.02, 0.01, 0.015]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <mesh position={[cx, counterTop + 0.03 - 0.005 + floorThick, backPanelZ + 0.04]}>
+                <boxGeometry args={[sw - 0.02, 0.01, 0.015]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <pointLight position={[cx, upperBottom - 0.05 + floorThick, shelfCZ]} intensity={0.5} distance={1.0} color="#fffde8" />
+              <pointLight position={[cx, counterTop + nicheH / 4 + floorThick, shelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+            </>
+          );
+        };
+
+        // Office chair facing +Z (backrest at -Z)
+        const renderChair = (cx: number, cz: number) => (
+          <group position={[cx, 0, cz]}>
+            <mesh position={[0, 0.05 + floorThick, 0]}>
+              <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
+              <meshStandardMaterial {...darkMetal} />
+            </mesh>
+            <mesh position={[0, 0.24 + floorThick, 0]}>
+              <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
+              <meshStandardMaterial {...darkMetal} />
+            </mesh>
+            <mesh position={[0, 0.44 + floorThick, 0]}>
+              <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+            </mesh>
+            <mesh position={[0, 0.72 + floorThick, -0.18]}>
+              <boxGeometry args={[0.05, 0.5, 0.42]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+            </mesh>
+          </group>
+        );
+
         return (
           <>
-            {/* ═══ LEFT ROOM DESK — long side along X, against back wall ═══ */}
+            {/* ═══ LEFT ROOM SHELF CLOSET ═══ */}
+            {renderShelf(leftRoomCX, leftRoomW - 0.04)}
+
+            {/* ═══ RIGHT ROOM SHELF CLOSET ═══ */}
+            {renderShelf(rightRoomCX, rightRoomW - 0.04)}
+
+            {/* ═══ LEFT ROOM DESK ═══ */}
             <mesh position={[lDeskCX, deskH + floorThick, lDeskCZ]}>
               <boxGeometry args={[deskW, topT, deskD]} />
               <meshStandardMaterial {...white} />
@@ -2501,7 +2622,7 @@ function FlowBWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* Monitor — on desk near window side (+Z), screen faces -Z (towards chair) */}
+            {/* Monitor — window side (+Z), screen faces -Z */}
             <group position={[lDeskCX, 0, lDeskCZ + deskD / 2 - 0.15]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
@@ -2520,33 +2641,16 @@ function FlowBWalls({
                 <meshStandardMaterial color="#1a1a2e" roughness={0.1} metalness={0.0} emissive="#0a0a15" emissiveIntensity={0.3} />
               </mesh>
             </group>
-            {/* Keyboard — in front of monitor, facing -Z */}
+            {/* Keyboard */}
             <mesh position={[lDeskCX, deskH + topT / 2 + 0.005 + floorThick, lDeskCZ - 0.05]}>
               <boxGeometry args={[0.35, 0.01, 0.12]} />
               <meshStandardMaterial color="#d4d4d4" roughness={0.6} metalness={0.1} />
             </mesh>
 
-            {/* Office chair — behind desk (-Z / back wall side), facing +Z (towards desk/monitor) */}
-            <group position={[lDeskCX, floorThick, lDeskCZ - deskD / 2 - 0.35]}>
-              <mesh position={[0, 0.22 + chairYOff, 0]}>
-                <cylinderGeometry args={[0.25, 0.25, 0.03, 12]} />
-                <meshStandardMaterial {...darkMetal} />
-              </mesh>
-              <mesh position={[0, 0.32 + chairYOff, 0]}>
-                <cylinderGeometry args={[0.03, 0.03, 0.18, 8]} />
-                <meshStandardMaterial {...silver} />
-              </mesh>
-              <mesh position={[0, 0.44 + chairYOff, 0]}>
-                <boxGeometry args={[0.42, 0.06, 0.42]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
-              </mesh>
-              <mesh position={[0, 0.68 + chairYOff, -0.18]}>
-                <boxGeometry args={[0.40, 0.44, 0.04]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
-              </mesh>
-            </group>
+            {/* Left room office chair — back wall side, facing +Z */}
+            {renderChair(lDeskCX, lDeskCZ - deskD / 2 - 0.35)}
 
-            {/* ═══ RIGHT ROOM DESK — long side along X, against back wall ═══ */}
+            {/* ═══ RIGHT ROOM DESK ═══ */}
             <mesh position={[rDeskCX, deskH + floorThick, rDeskCZ]}>
               <boxGeometry args={[deskW, topT, deskD]} />
               <meshStandardMaterial {...white} />
@@ -2560,7 +2664,7 @@ function FlowBWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* Monitor — on desk near window side (+Z), screen faces -Z */}
+            {/* Monitor — window side (+Z), screen faces -Z */}
             <group position={[rDeskCX, 0, rDeskCZ + deskD / 2 - 0.15]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
@@ -2585,25 +2689,8 @@ function FlowBWalls({
               <meshStandardMaterial color="#d4d4d4" roughness={0.6} metalness={0.1} />
             </mesh>
 
-            {/* Office chair — behind desk (-Z / back wall side), facing +Z */}
-            <group position={[rDeskCX, floorThick, rDeskCZ - deskD / 2 - 0.35]}>
-              <mesh position={[0, 0.22 + chairYOff, 0]}>
-                <cylinderGeometry args={[0.25, 0.25, 0.03, 12]} />
-                <meshStandardMaterial {...darkMetal} />
-              </mesh>
-              <mesh position={[0, 0.32 + chairYOff, 0]}>
-                <cylinderGeometry args={[0.03, 0.03, 0.18, 8]} />
-                <meshStandardMaterial {...silver} />
-              </mesh>
-              <mesh position={[0, 0.44 + chairYOff, 0]}>
-                <boxGeometry args={[0.42, 0.06, 0.42]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
-              </mesh>
-              <mesh position={[0, 0.68 + chairYOff, -0.18]}>
-                <boxGeometry args={[0.40, 0.44, 0.04]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.8} />
-              </mesh>
-            </group>
+            {/* Right room office chair — back wall side, facing +Z */}
+            {renderChair(rDeskCX, rDeskCZ - deskD / 2 - 0.35)}
           </>
         );
       })()}
