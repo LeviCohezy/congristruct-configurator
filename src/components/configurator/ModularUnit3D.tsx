@@ -1524,15 +1524,17 @@ function FlowBWalls({
         <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
       </mesh>
       {/* Left door handle (both sides) */}
-      {[-0.025, 0.025].map((xOff, i) => (
-        <group key={`lh${i}`} position={[leftPartX + partT / 2 + xOff, 1.0 + floorThick, doorCenterZ + 0.3]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.01, 0.01, 0.12, 8]} />
-            <meshStandardMaterial color="#b0b0b0" roughness={0.15} metalness={0.85} />
+      {[-1, 1].map((side, i) => (
+        <group key={`lh${i}`} position={[leftPartX + partT / 2 + side * 0.035, 1.0 + floorThick, doorCenterZ + 0.3]}>
+          {/* Square rosette plate flush on door surface */}
+          <mesh>
+            <boxGeometry args={[0.012, 0.06, 0.06]} />
+            <meshStandardMaterial color="#a8a8a8" roughness={0.2} metalness={0.85} />
           </mesh>
-          <mesh position={[0, 0, -0.02]}>
-            <boxGeometry args={[0.025, 0.025, 0.04]} />
-            <meshStandardMaterial color="#a0a0a0" roughness={0.2} metalness={0.8} />
+          {/* Lever handle extending horizontally */}
+          <mesh position={[side * 0.015, 0, -side * 0.06]}>
+            <boxGeometry args={[0.018, 0.018, 0.12]} />
+            <meshStandardMaterial color="#b8b8b8" roughness={0.15} metalness={0.9} />
           </mesh>
         </group>
       ))}
@@ -1576,15 +1578,17 @@ function FlowBWalls({
         <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
       </mesh>
       {/* Right door handle (both sides) */}
-      {[-0.025, 0.025].map((xOff, i) => (
-        <group key={`rh${i}`} position={[rightPartX + partT / 2 + xOff, 1.0 + floorThick, doorCenterZ - 0.3]}>
-          <mesh rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.01, 0.01, 0.12, 8]} />
-            <meshStandardMaterial color="#b0b0b0" roughness={0.15} metalness={0.85} />
+      {[-1, 1].map((side, i) => (
+        <group key={`rh${i}`} position={[rightPartX + partT / 2 + side * 0.035, 1.0 + floorThick, doorCenterZ - 0.3]}>
+          {/* Square rosette plate flush on door surface */}
+          <mesh>
+            <boxGeometry args={[0.012, 0.06, 0.06]} />
+            <meshStandardMaterial color="#a8a8a8" roughness={0.2} metalness={0.85} />
           </mesh>
-          <mesh position={[0, 0, 0.02]}>
-            <boxGeometry args={[0.025, 0.025, 0.04]} />
-            <meshStandardMaterial color="#a0a0a0" roughness={0.2} metalness={0.8} />
+          {/* Lever handle extending horizontally */}
+          <mesh position={[side * 0.015, 0, side * 0.06]}>
+            <boxGeometry args={[0.018, 0.018, 0.12]} />
+            <meshStandardMaterial color="#b8b8b8" roughness={0.15} metalness={0.9} />
           </mesh>
         </group>
       ))}
@@ -1627,15 +1631,17 @@ function FlowBWalls({
               <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
             </mesh>
             {/* Toilet door handle (both sides) */}
-            {[-0.02, 0.02].map((zOff, i) => (
-              <group key={`th${i}`} position={[toiletDoorCX + 0.25, 1.0 + floorThick, toiletWallZ + zOff]}>
-                <mesh rotation={[0, 0, Math.PI / 2]}>
-                  <cylinderGeometry args={[0.01, 0.01, 0.12, 8]} />
-                  <meshStandardMaterial color="#b0b0b0" roughness={0.15} metalness={0.85} />
+            {[-1, 1].map((side, i) => (
+              <group key={`th${i}`} position={[toiletDoorCX + 0.25, 1.0 + floorThick, toiletWallZ + side * 0.032]}>
+                {/* Square rosette plate flush on door surface */}
+                <mesh>
+                  <boxGeometry args={[0.06, 0.06, 0.012]} />
+                  <meshStandardMaterial color="#a8a8a8" roughness={0.2} metalness={0.85} />
                 </mesh>
-                <mesh position={[0, 0, zOff > 0 ? 0.02 : -0.02]}>
-                  <boxGeometry args={[0.025, 0.025, 0.04]} />
-                  <meshStandardMaterial color="#a0a0a0" roughness={0.2} metalness={0.8} />
+                {/* Lever handle extending horizontally */}
+                <mesh position={[-side * 0.06, 0, side * 0.015]}>
+                  <boxGeometry args={[0.12, 0.018, 0.018]} />
+                  <meshStandardMaterial color="#b8b8b8" roughness={0.15} metalness={0.9} />
                 </mesh>
               </group>
             ))}
