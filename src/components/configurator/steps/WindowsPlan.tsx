@@ -124,9 +124,6 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
           <rect x={winStart} y={vh - wt} width={winW} height={wt} fill="hsl(var(--background))" />
           <line x1={winStart} y1={vh - wt / 2} x2={winStart + winW} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
 
-          {/* Back window: 200cm wide on the left (main room) side */}
-          <rect x={winStart} y={0} width={winW} height={wt} fill="hsl(var(--background))" />
-          <line x1={winStart} y1={wt / 2} x2={winStart + winW} y2={wt / 2} stroke={winColor} strokeWidth={2.5} />
 
           {/* Front entrance door: 100cm wide */}
           <rect x={doorStart} y={vh - wt} width={doorW} height={wt} fill="hsl(var(--background))" />
