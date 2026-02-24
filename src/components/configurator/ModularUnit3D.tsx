@@ -1376,17 +1376,11 @@ function FlowAWalls({
   const partX = halfW - wallThick - toiletStripW; // vertical partition x
   const toiletWallZ = -halfD + wallThick + toiletDepth; // horizontal wall z
 
-  // Toilet door: 70cm = 0.70m, on the LEFT side of horizontal wall (near partition)
+  // Toilet door: 70cm = 0.70m, on the LEFT wall (vertical partition) of toilet room
   const toiletDoorW = 0.70;
   const toiletDoorH = 2.1;
-  const toiletDoorCX = partX + partT + toiletDoorW / 2 + 0.05; // left-aligned with small margin
-
-  // Horizontal wall segments (split around door)
-  const horizTotalW = toiletStripW - partT;
-  const leftSegW = (toiletDoorCX - toiletDoorW / 2) - (partX + partT);
-  const rightSegW = (halfW - wallThick) - (toiletDoorCX + toiletDoorW / 2);
-  const leftSegCX = partX + partT + leftSegW / 2;
-  const rightSegCX = halfW - wallThick - rightSegW / 2;
+  // Door positioned in the vertical partition, centered vertically in the toilet room
+  const toiletDoorCZ = -halfD + wallThick + toiletDepth * 0.5; // center of toilet depth
 
   return (
     <group>
@@ -1476,59 +1470,76 @@ function FlowAWalls({
       })}
 
       {/* ── TOILET COMPARTMENT — back-right corner ── */}
-      {/* Vertical partition wall (from back wall to toilet horizontal wall) */}
-      <mesh position={[partX + partT / 2, height / 2 + floorThick, -halfD + wallThick + (toiletDepth + partT / 2) / 2]}>
-        <boxGeometry args={[partT, height, toiletDepth + partT / 2]} />
-        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
-      </mesh>
+      {/* Vertical partition wall — split around door */}
+      {(() => {
+        const partFullLen = toiletDepth + partT / 2;
+        const doorStartZ = toiletDoorCZ - toiletDoorW / 2;
+        const doorEndZ = toiletDoorCZ + toiletDoorW / 2;
+        const backWallInner = -halfD + wallThick;
+        
+        // Bottom segment (from back wall to door)
+        const bottomLen = doorStartZ - backWallInner;
+        // Top segment (from door to horizontal wall)
+        const topLen = (toiletWallZ - partT / 2) - doorEndZ;
 
-      {/* Horizontal toilet wall — left segment */}
-      {leftSegW > 0.01 && (
-        <mesh position={[leftSegCX, height / 2 + floorThick, toiletWallZ]}>
-          <boxGeometry args={[leftSegW, height, partT]} />
-          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
-        </mesh>
-      )}
-      {/* Horizontal toilet wall — right segment */}
-      {rightSegW > 0.01 && (
-        <mesh position={[rightSegCX, height / 2 + floorThick, toiletWallZ]}>
-          <boxGeometry args={[rightSegW, height, partT]} />
-          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
-        </mesh>
-      )}
-      {/* Header above toilet door */}
-      <mesh position={[toiletDoorCX, toiletDoorH + (height - toiletDoorH) / 2 + floorThick, toiletWallZ]}>
-        <boxGeometry args={[toiletDoorW, height - toiletDoorH, partT]} />
+        return (
+          <group>
+            {/* Bottom segment of vertical partition */}
+            {bottomLen > 0.01 && (
+              <mesh position={[partX + partT / 2, height / 2 + floorThick, backWallInner + bottomLen / 2]}>
+                <boxGeometry args={[partT, height, bottomLen]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Top segment of vertical partition */}
+            {topLen > 0.01 && (
+              <mesh position={[partX + partT / 2, height / 2 + floorThick, doorEndZ + topLen / 2]}>
+                <boxGeometry args={[partT, height, topLen]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Header above door */}
+            <mesh position={[partX + partT / 2, toiletDoorH + (height - toiletDoorH) / 2 + floorThick, toiletDoorCZ]}>
+              <boxGeometry args={[partT, height - toiletDoorH, toiletDoorW]} />
+              <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+            </mesh>
+          </group>
+        );
+      })()}
+
+      {/* Horizontal toilet wall — solid (no door) */}
+      <mesh position={[partX + partT + (toiletStripW - partT) / 2, height / 2 + floorThick, toiletWallZ]}>
+        <boxGeometry args={[toiletStripW - partT, height, partT]} />
         <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
       </mesh>
 
       {/* Toilet door frame */}
-      <mesh position={[toiletDoorCX - toiletDoorW / 2 - 0.015, toiletDoorH / 2 + floorThick, toiletWallZ]}>
-        <boxGeometry args={[0.03, toiletDoorH, partT + 0.01]} />
+      <mesh position={[partX + partT / 2, toiletDoorH / 2 + floorThick, toiletDoorCZ - toiletDoorW / 2 - 0.015]}>
+        <boxGeometry args={[partT + 0.01, toiletDoorH, 0.03]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
       </mesh>
-      <mesh position={[toiletDoorCX + toiletDoorW / 2 + 0.015, toiletDoorH / 2 + floorThick, toiletWallZ]}>
-        <boxGeometry args={[0.03, toiletDoorH, partT + 0.01]} />
+      <mesh position={[partX + partT / 2, toiletDoorH / 2 + floorThick, toiletDoorCZ + toiletDoorW / 2 + 0.015]}>
+        <boxGeometry args={[partT + 0.01, toiletDoorH, 0.03]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
       </mesh>
-      <mesh position={[toiletDoorCX, toiletDoorH + floorThick + 0.015, toiletWallZ]}>
-        <boxGeometry args={[toiletDoorW + 0.06, 0.03, partT + 0.01]} />
+      <mesh position={[partX + partT / 2, toiletDoorH + floorThick + 0.015, toiletDoorCZ]}>
+        <boxGeometry args={[partT + 0.01, 0.03, toiletDoorW + 0.06]} />
         <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
       </mesh>
       {/* Toilet door panel */}
-      <mesh position={[toiletDoorCX, toiletDoorH / 2 + floorThick, toiletWallZ]}>
-        <boxGeometry args={[toiletDoorW - 0.04, toiletDoorH - 0.02, 0.035]} />
+      <mesh position={[partX + partT / 2, toiletDoorH / 2 + floorThick, toiletDoorCZ]}>
+        <boxGeometry args={[0.035, toiletDoorH - 0.02, toiletDoorW - 0.04]} />
         <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
       </mesh>
-      {/* Toilet door handle (both sides) */}
+      {/* Toilet door handles (both sides of partition) */}
       {[-1, 1].map((side, i) => (
-        <group key={`th${i}`} position={[toiletDoorCX + 0.2, 1.0 + floorThick, toiletWallZ + side * 0.032]}>
+        <group key={`th${i}`} position={[partX + partT / 2 + side * 0.032, 1.0 + floorThick, toiletDoorCZ + 0.2]}>
           <mesh>
-            <boxGeometry args={[0.06, 0.06, 0.012]} />
+            <boxGeometry args={[0.012, 0.06, 0.06]} />
             <meshStandardMaterial color="#a8a8a8" roughness={0.2} metalness={0.85} />
           </mesh>
-          <mesh position={[-side * 0.06, 0, side * 0.015]}>
-            <boxGeometry args={[0.12, 0.018, 0.018]} />
+          <mesh position={[side * 0.015, 0, -side * 0.06]}>
+            <boxGeometry args={[0.018, 0.018, 0.12]} />
             <meshStandardMaterial color="#b8b8b8" roughness={0.15} metalness={0.9} />
           </mesh>
         </group>
