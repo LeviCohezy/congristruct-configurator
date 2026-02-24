@@ -2477,15 +2477,13 @@ function FlowBWalls({
         const backInnerZ = -halfD + wallThick + 0.02;
         const chairYOff = 0.06;
 
-        // LEFT ROOM center X
-        const leftRoomCX = (-halfW + wallThick + leftPartX) / 2;
-        const lDeskCX = leftRoomCX;
-        const lDeskCZ = backInnerZ + deskD / 2; // desk against back wall
+        // LEFT ROOM desk — right edge against partition wall, front edge at doorframe
+        const lDeskCX = leftPartX - deskW / 2;
+        const lDeskCZ = doorCenterZ - roomDoorW / 2 - deskD / 2;
 
-        // RIGHT ROOM center X
-        const rightRoomCX = (rightPartX + partT + halfW - wallThick) / 2;
-        const rDeskCX = rightRoomCX;
-        const rDeskCZ = backInnerZ + deskD / 2;
+        // RIGHT ROOM desk — left edge against partition wall, front edge at doorframe
+        const rDeskCX = rightPartX + partT + deskW / 2;
+        const rDeskCZ = doorCenterZ - roomDoorW / 2 - deskD / 2;
 
         return (
           <>
