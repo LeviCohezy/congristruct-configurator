@@ -1910,10 +1910,26 @@ function FlowAWalls({
                     const shelfZ = (toiletWallZ + partT / 2 + frontInnerZ) / 2;
                     const shelfLen = frontInnerZ - (toiletWallZ + partT / 2) - 0.01;
                     return (
-                      <mesh position={[rwShelfCX, rwUpperBottom - 0.30 + floorThick, shelfZ]}>
-                        <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
-                        <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
-                      </mesh>
+                      <>
+                        <mesh position={[rwShelfCX, rwUpperBottom - 0.30 + floorThick, shelfZ]}>
+                          <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
+                          <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                        </mesh>
+                        {/* LED strip under shelf */}
+                        <mesh position={[rwShelfCX - rwShelfD / 2 + 0.02, rwUpperBottom - 0.30 - 0.012 + floorThick, shelfZ]}>
+                          <boxGeometry args={[0.008, 0.006, shelfLen - 0.04]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+                        </mesh>
+                        {/* LED strip under upper cabinet */}
+                        <mesh position={[rwShelfCX - rwShelfD / 2 + 0.02, rwUpperBottom - 0.012 + floorThick, rwShelfCZ]}>
+                          <boxGeometry args={[0.008, 0.006, rwShelfW - 0.04]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={2.5} roughness={0.2} />
+                        </mesh>
+                        {/* Point light for LED glow under upper cabinet */}
+                        <pointLight position={[rwShelfCX, rwUpperBottom - 0.05 + floorThick, rwShelfCZ]} intensity={0.3} distance={0.6} color="#fffde8" />
+                        {/* Point light for LED glow under shelf */}
+                        <pointLight position={[rwShelfCX, rwUpperBottom - 0.35 + floorThick, shelfZ]} intensity={0.2} distance={0.5} color="#fffde8" />
+                      </>
                     );
                   })()}
                   {/* Open niche back panel */}
