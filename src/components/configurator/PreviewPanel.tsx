@@ -14,6 +14,9 @@ import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
 import furnishedShared from "@/assets/start-interior-furnished-shared.avif";
 import cascoImg1 from "@/assets/start-interior-casco-1.avif";
 import cascoImg2 from "@/assets/start-interior-casco-2.avif";
+// Plan B (with toilet) — light floor
+import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
+import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
 // Interior images — dark floor
 import darkFinished1 from "@/assets/start-interior-darkfloor-finished-1.png";
 import darkFinished2 from "@/assets/start-interior-darkfloor-finished-2.png";
@@ -49,12 +52,14 @@ const interiorImageMap: Record<string, [string, string]> = {
   "fully-finished:brown:stone-vinyl": [stoneBrown2, stoneBrown1],
   "fully-finished:light-oak:stone-vinyl": [stoneLightoak2, stoneLightoak1],
   "fully-finished:white:stone-vinyl": [stoneWhite2, stoneWhite1],
-  // Shell (casco)
-  "shell": [cascoImg1, cascoImg2],
+  // Shell (casco) — Plan A (open plan)
+  "shell:a": [cascoImg1, cascoImg2],
+  // Shell (casco) — Plan B (with toilet)
+  "shell:b": [cascoToiletImg1, cascoToiletImg2],
 };
 
 function getInteriorImages(config: ConfigState): [string, string] | null {
-  if (config.finishLevel === "shell") return interiorImageMap["shell"];
+  if (config.finishLevel === "shell") return interiorImageMap[`shell:${config.floorPlan}`] ?? interiorImageMap["shell:a"];
   const floor = config.floorOption;
   if (config.finishLevel === "finished") {
     return interiorImageMap[`finished:${floor}`] ?? interiorImageMap["finished:light-vinyl"];
