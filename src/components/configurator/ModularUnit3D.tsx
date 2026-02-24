@@ -1563,7 +1563,7 @@ function FlowBWalls({
       {/* ── TOILET ROOM WALL (horizontal, between partitions) ── */}
       {/* Split around toilet door opening */}
       {(() => {
-        const toiletDoorW = 0.70;
+        const toiletDoorW = 0.84;
         const hallW = rightPartX - leftPartX - partT;
         const toiletDoorCX = toiletCenterX;
         const leftSegW = (hallW - toiletDoorW) / 2;
