@@ -1655,7 +1655,7 @@ function FlowAWalls({
         const deskH = 0.75;
         const topT = 0.04;
         const deskCX = mainRoomCX;
-        const deskCZ = backInnerZ + shelfD + deskD / 2 + 0.05;
+        const deskCZ = backInnerZ + shelfD + deskW / 2 + 0.05;
 
         // ── Office chairs ──
         const chairOffsetX = deskW / 2 + 0.35;
@@ -1728,26 +1728,27 @@ function FlowAWalls({
               </mesh>
             ))}
 
-            {/* ═══ WIDE DESK TABLE ═══ */}
+            {/* ═══ WIDE DESK TABLE (rotated 90°) ═══ */}
             <mesh position={[deskCX, deskH + floorThick, deskCZ]} castShadow>
-              <boxGeometry args={[deskW, topT, deskD]} />
+              <boxGeometry args={[deskD, topT, deskW]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            <mesh position={[deskCX - deskW / 2 + 0.02, deskH / 2 + floorThick, deskCZ]}>
-              <boxGeometry args={[0.04, deskH, deskD]} />
+            {/* Desk legs — front/back along Z */}
+            <mesh position={[deskCX, deskH / 2 + floorThick, deskCZ - deskW / 2 + 0.02]}>
+              <boxGeometry args={[deskD, deskH, 0.04]} />
               <meshStandardMaterial {...white} />
             </mesh>
-            <mesh position={[deskCX + deskW / 2 - 0.02, deskH / 2 + floorThick, deskCZ]}>
-              <boxGeometry args={[0.04, deskH, deskD]} />
+            <mesh position={[deskCX, deskH / 2 + floorThick, deskCZ + deskW / 2 - 0.02]}>
+              <boxGeometry args={[deskD, deskH, 0.04]} />
               <meshStandardMaterial {...white} />
             </mesh>
             <mesh position={[deskCX, deskH / 2 + floorThick, deskCZ]}>
-              <boxGeometry args={[0.04, deskH, deskD]} />
+              <boxGeometry args={[deskD, deskH, 0.04]} />
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ═══ LEFT MONITOR — facing left chair ═══ */}
-            <group position={[deskCX - monSpacing, 0, deskCZ]} rotation={[0, Math.PI * 0.35, 0]}>
+            {/* ═══ LEFT MONITOR — facing left chair (-X) ═══ */}
+            <group position={[deskCX, 0, deskCZ - monSpacing]} rotation={[0, Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1766,8 +1767,8 @@ function FlowAWalls({
               </mesh>
             </group>
 
-            {/* ═══ RIGHT MONITOR — facing right chair ═══ */}
-            <group position={[deskCX + monSpacing, 0, deskCZ]} rotation={[0, -Math.PI * 0.35, 0]}>
+            {/* ═══ RIGHT MONITOR — facing right chair (+X) ═══ */}
+            <group position={[deskCX, 0, deskCZ + monSpacing]} rotation={[0, -Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1786,28 +1787,8 @@ function FlowAWalls({
               </mesh>
             </group>
 
-            {/* ═══ LEFT OFFICE CHAIR — facing right ═══ */}
-            <group position={[chair1X, 0, deskCZ]}>
-              <mesh position={[0, 0.05 + floorThick, 0]}>
-                <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
-                <meshStandardMaterial {...darkMetal} />
-              </mesh>
-              <mesh position={[0, 0.24 + floorThick, 0]}>
-                <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
-                <meshStandardMaterial {...darkMetal} />
-              </mesh>
-              <mesh position={[0, 0.44 + floorThick, 0]}>
-                <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
-              </mesh>
-              <mesh position={[0.18, 0.72 + floorThick, 0]}>
-                <boxGeometry args={[0.05, 0.5, 0.42]} />
-                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
-              </mesh>
-            </group>
-
-            {/* ═══ RIGHT OFFICE CHAIR — facing left ═══ */}
-            <group position={[chair2X, 0, deskCZ]}>
+            {/* ═══ LEFT OFFICE CHAIR — facing desk (+X) ═══ */}
+            <group position={[deskCX - deskD / 2 - 0.45, 0, deskCZ]}>
               <mesh position={[0, 0.05 + floorThick, 0]}>
                 <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
                 <meshStandardMaterial {...darkMetal} />
@@ -1821,6 +1802,26 @@ function FlowAWalls({
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
               <mesh position={[-0.18, 0.72 + floorThick, 0]}>
+                <boxGeometry args={[0.05, 0.5, 0.42]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+            </group>
+
+            {/* ═══ RIGHT OFFICE CHAIR — facing desk (-X) ═══ */}
+            <group position={[deskCX + deskD / 2 + 0.45, 0, deskCZ]}>
+              <mesh position={[0, 0.05 + floorThick, 0]}>
+                <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.24 + floorThick, 0]}>
+                <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.44 + floorThick, 0]}>
+                <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+              <mesh position={[0.18, 0.72 + floorThick, 0]}>
                 <boxGeometry args={[0.05, 0.5, 0.42]} />
                 <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
               </mesh>
