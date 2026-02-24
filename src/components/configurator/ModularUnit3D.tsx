@@ -1895,11 +1895,17 @@ function FlowAWalls({
                     <boxGeometry args={[rwShelfD, rwUpperH, rwShelfW]} />
                     <meshStandardMaterial {...matProps} />
                   </mesh>
-                  {/* Shelf just under upper cabinet */}
-                  <mesh position={[rwShelfCX, rwUpperBottom - 0.01 + floorThick, rwShelfCZ]}>
-                    <boxGeometry args={[rwShelfD + 0.01, 0.02, rwShelfW + 0.01]} />
-                    <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
-                  </mesh>
+                  {/* Shelf just under upper cabinet — spans full width from toilet wall to front wall */}
+                  {(() => {
+                    const shelfZ = (toiletWallZ + partT / 2 + frontInnerZ) / 2;
+                    const shelfLen = frontInnerZ - (toiletWallZ + partT / 2) - 0.01;
+                    return (
+                      <mesh position={[rwShelfCX, rwUpperBottom - 0.04 + floorThick, shelfZ]}>
+                        <boxGeometry args={[rwShelfD + 0.01, 0.02, shelfLen]} />
+                        <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                      </mesh>
+                    );
+                  })()}
                   {/* Open niche back panel */}
                   <mesh position={[rwBackX - 0.005, rwCounterH + (rwUpperBottom - rwCounterH) / 2 + floorThick, rwShelfCZ]}>
                     <boxGeometry args={[0.01, (rwUpperBottom - rwCounterH) - 0.06, rwShelfW - 0.04]} />
