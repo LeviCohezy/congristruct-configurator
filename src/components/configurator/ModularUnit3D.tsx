@@ -442,7 +442,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
         {isShell ? (
           <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
         ) : floorTex ? (
-          <meshStandardMaterial map={floorTex} color="#c8b8a8" roughness={0.7} toneMapped={false} />
+          <meshStandardMaterial map={floorTex} color="#ffffff" roughness={0.7} toneMapped={false} />
         ) : (
           <meshStandardMaterial color={floorColor} roughness={0.65} />
         )}
