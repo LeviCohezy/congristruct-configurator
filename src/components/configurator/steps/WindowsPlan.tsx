@@ -15,7 +15,7 @@ const planOptions: Record<ConfigState["model"], { a: { label: string; desc: stri
     b: { label: "Met toilet", desc: "Compacte ruimte met apart toilet" },
   },
   flow: {
-    a: { label: "21 m² open", desc: "Eén open ruimte" },
+    a: { label: "21 m² open", desc: "Open ruimte met toilet + berging" },
     b: { label: "28 m² gesplitst", desc: "Aparte inkom + tweede ruimte" },
   },
   hub: {
@@ -76,8 +76,29 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
 
   if (plan === "a") {
     // Plan A: 600×350cm → 300×175 SVG units
+    // Front: 75 wall | 200 window | 100 wall | 100 door | 125 wall
     const vw = 300;
+    const iw = 5; // internal wall thickness (10cm / 2)
     const transform = mirrored ? `scale(-1,1) translate(${-vw},0)` : undefined;
+
+    // Front layout in SVG units (cm/2): 37.5 | 100 | 50 | 50 | 62.5
+    const winStart = 37.5;
+    const winW = 100;
+    const wallMidStart = 137.5;
+    const wallMidW = 50;
+    const doorStart = 187.5;
+    const doorW = 50;
+
+    // Toilet compartment: back-right corner
+    // Strip width ~120cm = 60 SVG from inner right wall
+    const partX = vw - wt - 60; // vertical partition x
+    const toiletDepth = 50; // ~100cm = 50 SVG from back
+    const toiletBottomY = wt + toiletDepth;
+
+    // Toilet door: ~70cm = 35 SVG, in horizontal wall
+    const toiletDoorW = 30;
+    const toiletDoorCx = partX + iw + (vw - wt - partX - iw) / 2;
+
     return (
       <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 110 }}>
         <g transform={transform}>
@@ -87,37 +108,47 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
           <rect x={0} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
           <rect x={vw - wt} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
 
-          {/* Left wall window: 75cm from top, 200cm tall → y=37.5, h=100 */}
-          <rect x={0} y={37.5} width={wt} height={100} fill="hsl(var(--background))" />
-          <line x1={wt / 2} y1={37.5} x2={wt / 2} y2={137.5} stroke={winColor} strokeWidth={2.5} />
+          {/* Front window: 200cm wide */}
+          <rect x={winStart} y={vh - wt} width={winW} height={wt} fill="hsl(var(--background))" />
+          <line x1={winStart} y1={vh - wt / 2} x2={winStart + winW} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
 
-          {/* Front (bottom) windows: 75+200+100+100+125=600 → two windows */}
-          {/* Window 1: x=37.5, w=100 */}
-          <rect x={37.5} y={vh - wt} width={100} height={wt} fill="hsl(var(--background))" />
-          <line x1={37.5} y1={vh - wt / 2} x2={137.5} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
-          {/* Window 2: x=187.5, w=50 */}
-          <rect x={187.5} y={vh - wt} width={50} height={wt} fill="hsl(var(--background))" />
-          <line x1={187.5} y1={vh - wt / 2} x2={237.5} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
+          {/* Front entrance door: 100cm wide */}
+          <rect x={doorStart} y={vh - wt} width={doorW} height={wt} fill="hsl(var(--background))" />
+          {/* Door swing arc */}
+          <path d={`M ${doorStart} ${vh - wt} A ${doorW} ${doorW} 0 0 0 ${doorStart + doorW} ${vh - wt - doorW}`}
+            fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
 
-          {/* Door on right wall: centered, 100cm opening → y=37.5, h=50 */}
-          <rect x={vw - wt} y={62.5} width={wt} height={50} fill="hsl(var(--background))" />
-          <path d={`M ${vw - wt} ${62.5} A 50 50 0 0 0 ${vw - wt - 50} ${112.5}`}
-            fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+          {/* Vertical partition wall (toilet/storage strip) */}
+          <rect x={partX} y={wt} width={iw} height={toiletDepth} fill={wallColor} opacity={0.7} />
 
-          {/* Toilet compartment top-right */}
-          <rect x={220} y={wt} width={wt / 1.5} height={55} fill={wallColor} opacity={0.7} />
-          <rect x={220} y={55 + wt} width={vw - wt - 220} height={wt / 1.5} fill={wallColor} opacity={0.7} />
-          {/* Toilet */}
-          <ellipse cx={260} cy={35} rx={7} ry={9} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
-          <rect x={254} y={23} width={12} height={7} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
-          {/* Sink */}
-          <rect x={vw - wt - 12} y={50} width={9} height={8} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
+          {/* Horizontal toilet wall */}
+          <rect x={partX} y={toiletBottomY} width={vw - wt - partX} height={iw} fill={wallColor} opacity={0.7} />
 
-          {/* Desk centered in main area */}
-          <rect x={70} y={55} width={65} height={35} fill="none" stroke={furnitureColor} strokeWidth={1} opacity={0.35} rx={1} />
+          {/* Toilet door */}
+          <rect x={toiletDoorCx - toiletDoorW / 2} y={toiletBottomY} width={toiletDoorW} height={iw} fill="hsl(var(--background))" />
+          <path d={`M ${toiletDoorCx - toiletDoorW / 2} ${toiletBottomY + iw} A ${toiletDoorW} ${toiletDoorW} 0 0 1 ${toiletDoorCx + toiletDoorW / 2} ${toiletBottomY + iw + toiletDoorW}`}
+            fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+
+          {/* Toilet fixture — against right wall */}
+          <ellipse cx={vw - wt - 15} cy={wt + 25} rx={7} ry={9} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+          <rect x={vw - wt - 21} y={wt + 12} width={12} height={7} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+          {/* Sink — near partition */}
+          <rect x={partX + iw + 3} y={wt + 8} width={8} height={7} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
+
+          {/* Storage cabinets along right wall (below toilet room) */}
+          <rect x={partX + iw + 2} y={toiletBottomY + iw + 5} width={vw - wt - partX - iw - 5} height={vh - wt - toiletBottomY - iw - 8}
+            fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.25} />
+          {/* Shelf lines */}
+          {[0.25, 0.5, 0.75].map((f, i) => {
+            const sy = toiletBottomY + iw + 5 + (vh - wt - toiletBottomY - iw - 8) * f;
+            return <line key={i} x1={partX + iw + 2} y1={sy} x2={vw - wt - 3} y2={sy} stroke={furnitureColor} strokeWidth={0.5} opacity={0.2} />;
+          })}
+
+          {/* Desk in main room */}
+          <rect x={55} y={55} width={65} height={35} fill="none" stroke={furnitureColor} strokeWidth={1} opacity={0.35} rx={1} />
           {/* Chairs */}
-          <circle cx={85} cy={100} r={7} fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.3} />
-          <circle cx={120} cy={100} r={7} fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.3} />
+          <circle cx={70} cy={100} r={7} fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.3} />
+          <circle cx={105} cy={100} r={7} fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.3} />
         </g>
       </svg>
     );
