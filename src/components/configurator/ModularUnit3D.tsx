@@ -245,12 +245,13 @@ function makeCladdingMat(
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
 // photoTex: optional real photo texture (overrides baseTex procedural)
 // photoTexWidthM: real-world width the photo covers (for repeat calc)
-function CladMaterial({ baseTex, compositeTex, aluTex, photoTex, photoTexWidthM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
+function CladMaterial({ baseTex, compositeTex, aluTex, photoTex, photoTexWidthM, photoTexHeightM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
   baseTex: THREE.CanvasTexture | null;
   compositeTex?: THREE.CanvasTexture | null;
   aluTex?: THREE.CanvasTexture | null;
   photoTex?: THREE.Texture | null;
   photoTexWidthM?: number;
+  photoTexHeightM?: number;
   photoTint?: string;
   wallWidth: number;
   wallHeight?: number;
@@ -261,21 +262,25 @@ function CladMaterial({ baseTex, compositeTex, aluTex, photoTex, photoTexWidthM,
   isWood: boolean;
   [k: string]: any;
 }) {
+  const actualH = wallHeight || fullWallHeight || 3;
   const yRepeat = (wallHeight && fullWallHeight && fullWallHeight > 0) ? wallHeight / fullWallHeight : 1;
   const [map, bumpMap] = useMemo(() => {
     // Photo texture takes priority
     if (photoTex) {
       const pw = photoTexWidthM || 1;
+      const ph = photoTexHeightM || actualH; // if no height given, fill wall once
+      const xRep = wallWidth / pw;
+      const yRep = actualH / ph;
       const t = photoTex.clone();
       t.needsUpdate = true;
       t.wrapS = THREE.RepeatWrapping;
       t.wrapT = THREE.RepeatWrapping;
-      t.repeat.set(wallWidth / pw, yRepeat);
+      t.repeat.set(xRep, yRep);
       const b = photoTex.clone();
       b.needsUpdate = true;
       b.wrapS = THREE.RepeatWrapping;
       b.wrapT = THREE.RepeatWrapping;
-      b.repeat.set(wallWidth / pw, yRepeat);
+      b.repeat.set(xRep, yRep);
       return [t, b];
     }
     // Aluminium plank texture
@@ -490,6 +495,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     photoTex: activePhotoTex,
     photoTint: isThermowoodBlack ? "#8a8a8a" : undefined,
     photoTexWidthM: isBrick ? 3 : 1,
+    photoTexHeightM: isBrick ? 1 : undefined,
     color: effectiveColor,
     roughness: fp.roughness,
     metalness: fp.metalness,
