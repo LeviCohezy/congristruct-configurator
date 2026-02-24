@@ -505,6 +505,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           woodBase={woodBase} frameColor={frameColor}
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
+          finishLevel={config.finishLevel}
         />
       ) : isFlowB ? (
         <FlowBWalls
@@ -1319,6 +1320,7 @@ function FlowAWalls({
   extWallH, extWallCY,
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
+  finishLevel,
 }: any) {
   const halfW = width / 2;   // 3.0
   const halfD = depth / 2;   // 2.0
@@ -1617,6 +1619,237 @@ function FlowAWalls({
             <mesh position={[wallX - 0.14, 0.94 + floorThick, sinkZ]} rotation={[0, 0, Math.PI / 2]}>
               <cylinderGeometry args={[0.01, 0.01, 0.12, 8]} />
               <meshStandardMaterial {...chrome} />
+            </mesh>
+          </group>
+        );
+      })()}
+
+      {/* ── FURNITURE (only when fully finished) ── */}
+      {finishLevel === "fully-finished" && (() => {
+        const mainRoomLeft = -halfW + wallThick;
+        const mainRoomRight = partX; // toilet partition x
+        const mainRoomW = mainRoomRight - mainRoomLeft;
+        const mainRoomCX = (mainRoomLeft + mainRoomRight) / 2;
+        const backInnerZ = -halfD + wallThick;
+
+        const white = { color: "#f5f5f0", roughness: 0.25, metalness: 0.05 };
+        const darkMetal = { color: "#2a2a2a", roughness: 0.4, metalness: 0.6 };
+        const cabinetColor = "#2a2118";
+        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
+
+        // ── Back wall shelf/cabinet ──
+        const shelfW = mainRoomW - 0.04;
+        const shelfD = 0.40;
+        const shelfCX = mainRoomCX;
+        const shelfCZ = backInnerZ + shelfD / 2;
+        const backPanelZ = backInnerZ + 0.06;
+
+        const counterTop = height * 0.25;
+        const upperBottom = height * 0.65;
+        const upperH = height - upperBottom;
+        const nicheH = upperBottom - counterTop;
+
+        // ── Wide desk table ──
+        const deskW = 3.0;
+        const deskD = 0.80;
+        const deskH = 0.75;
+        const topT = 0.04;
+        const deskCX = mainRoomCX;
+        const deskCZ = backInnerZ + shelfD + deskD / 2 + 0.05;
+
+        // ── Office chairs ──
+        const chairOffsetX = deskW / 2 + 0.35;
+        const chair1X = deskCX - chairOffsetX;
+        const chair2X = deskCX + chairOffsetX;
+
+        // ── Monitors ──
+        const monSpacing = 0.35;
+        const screenW = 0.54;
+        const screenH = 0.34;
+        const silver = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
+
+        // ── Toilet room shelf ──
+        const toiletShelfW = toiletStripW - 0.10;
+        const toiletShelfD = 0.35;
+        const toiletShelfCX = partX + partT + toiletStripW / 2;
+        const toiletShelfCZ = backInnerZ + toiletShelfD / 2;
+        const toiletBackZ = backInnerZ + 0.04;
+        const toiletCounterH = height * 0.3;
+        const toiletUpperBottom = height * 0.6;
+        const toiletUpperH = height - toiletUpperBottom;
+
+        return (
+          <group>
+            {/* ═══ BACK WALL SHELF/CABINET ═══ */}
+            <mesh position={[shelfCX, height / 2 + floorThick, backPanelZ]}>
+              <boxGeometry args={[shelfW, height, 0.02]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[shelfCX, counterTop / 2 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW, counterTop, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[shelfCX, counterTop + 0.015 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW + 0.02, 0.03, shelfD + 0.02]} />
+              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+            </mesh>
+            <mesh position={[shelfCX, upperBottom + upperH / 2 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW, upperH, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Niche side panels */}
+            <mesh position={[shelfCX - shelfW / 2 + shelfW / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW / 6, nicheH, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[shelfCX + shelfW / 2 - shelfW / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW / 6, nicheH, shelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
+              <boxGeometry args={[shelfW * 4 / 6 - 0.02, nicheH - 0.06, 0.01]} />
+              <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+            </mesh>
+            <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+              <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
+              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+            </mesh>
+            {/* Door lines */}
+            {[0.25, 0.5, 0.75].map((frac, i) => (
+              <mesh key={`su${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, upperBottom + upperH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
+                <meshStandardMaterial color="#151010" roughness={0.5} />
+              </mesh>
+            ))}
+            {[0.25, 0.5, 0.75].map((frac, i) => (
+              <mesh key={`sl${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
+                <meshStandardMaterial color="#151010" roughness={0.5} />
+              </mesh>
+            ))}
+
+            {/* ═══ WIDE DESK TABLE ═══ */}
+            <mesh position={[deskCX, deskH + floorThick, deskCZ]} castShadow>
+              <boxGeometry args={[deskW, topT, deskD]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            <mesh position={[deskCX - deskW / 2 + 0.02, deskH / 2 + floorThick, deskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            <mesh position={[deskCX + deskW / 2 - 0.02, deskH / 2 + floorThick, deskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+            <mesh position={[deskCX, deskH / 2 + floorThick, deskCZ]}>
+              <boxGeometry args={[0.04, deskH, deskD]} />
+              <meshStandardMaterial {...white} />
+            </mesh>
+
+            {/* ═══ LEFT MONITOR — facing left chair ═══ */}
+            <group position={[deskCX - monSpacing, 0, deskCZ]} rotation={[0, Math.PI * 0.35, 0]}>
+              <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
+                <boxGeometry args={[0.2, 0.008, 0.18]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.1 + floorThick, 0]}>
+                <boxGeometry args={[0.06, 0.18, 0.02]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01]}>
+                <boxGeometry args={[screenW, screenH, 0.02]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, 0.002]}>
+                <boxGeometry args={[screenW - 0.03, screenH - 0.03, 0.002]} />
+                <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
+              </mesh>
+            </group>
+
+            {/* ═══ RIGHT MONITOR — facing right chair ═══ */}
+            <group position={[deskCX + monSpacing, 0, deskCZ]} rotation={[0, -Math.PI * 0.35, 0]}>
+              <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
+                <boxGeometry args={[0.2, 0.008, 0.18]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.1 + floorThick, 0]}>
+                <boxGeometry args={[0.06, 0.18, 0.02]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, -0.01]}>
+                <boxGeometry args={[screenW, screenH, 0.02]} />
+                <meshStandardMaterial {...silver} />
+              </mesh>
+              <mesh position={[0, deskH + topT / 2 + 0.22 + screenH / 2 + floorThick, 0.002]}>
+                <boxGeometry args={[screenW - 0.03, screenH - 0.03, 0.002]} />
+                <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
+              </mesh>
+            </group>
+
+            {/* ═══ LEFT OFFICE CHAIR — facing right ═══ */}
+            <group position={[chair1X, 0, deskCZ]}>
+              <mesh position={[0, 0.05 + floorThick, 0]}>
+                <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.24 + floorThick, 0]}>
+                <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.44 + floorThick, 0]}>
+                <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+              <mesh position={[0.18, 0.72 + floorThick, 0]}>
+                <boxGeometry args={[0.05, 0.5, 0.42]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+            </group>
+
+            {/* ═══ RIGHT OFFICE CHAIR — facing left ═══ */}
+            <group position={[chair2X, 0, deskCZ]}>
+              <mesh position={[0, 0.05 + floorThick, 0]}>
+                <cylinderGeometry args={[0.28, 0.28, 0.025, 16]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.24 + floorThick, 0]}>
+                <cylinderGeometry args={[0.02, 0.025, 0.36, 8]} />
+                <meshStandardMaterial {...darkMetal} />
+              </mesh>
+              <mesh position={[0, 0.44 + floorThick, 0]}>
+                <cylinderGeometry args={[0.22, 0.24, 0.07, 16]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+              <mesh position={[-0.18, 0.72 + floorThick, 0]}>
+                <boxGeometry args={[0.05, 0.5, 0.42]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
+              </mesh>
+            </group>
+
+            {/* ═══ TOILET ROOM SHELF ═══ */}
+            <mesh position={[toiletShelfCX, height / 2 + floorThick, toiletBackZ]}>
+              <boxGeometry args={[toiletShelfW, height, 0.02]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[toiletShelfCX, toiletCounterH / 2 + floorThick, toiletShelfCZ]}>
+              <boxGeometry args={[toiletShelfW, toiletCounterH, toiletShelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[toiletShelfCX, toiletCounterH + 0.015 + floorThick, toiletShelfCZ]}>
+              <boxGeometry args={[toiletShelfW + 0.02, 0.03, toiletShelfD + 0.02]} />
+              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+            </mesh>
+            <mesh position={[toiletShelfCX, toiletUpperBottom + toiletUpperH / 2 + floorThick, toiletShelfCZ]}>
+              <boxGeometry args={[toiletShelfW, toiletUpperH, toiletShelfD]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[toiletShelfCX, toiletCounterH + (toiletUpperBottom - toiletCounterH) / 2 + floorThick, toiletBackZ + 0.005]}>
+              <boxGeometry args={[toiletShelfW - 0.04, (toiletUpperBottom - toiletCounterH) - 0.06, 0.01]} />
+              <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+            </mesh>
+            <mesh position={[toiletShelfCX, toiletCounterH + (toiletUpperBottom - toiletCounterH) / 2 + floorThick, toiletShelfCZ]}>
+              <boxGeometry args={[toiletShelfW - 0.04, 0.025, toiletShelfD - 0.02]} />
+              <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
             </mesh>
           </group>
         );
