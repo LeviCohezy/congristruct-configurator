@@ -1,13 +1,37 @@
 import { Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
+import { AnimatePresence, motion } from "framer-motion";
 import { ModularUnit3D } from "./ModularUnit3D";
 import type { ConfigState } from "@/hooks/useConfigurator";
+
+// Interior images for BLOQ START
+import brownImg1 from "@/assets/start-interior-brown-1.avif";
+import brownImg2 from "@/assets/start-interior-brown-2.avif";
+import lightoakImg1 from "@/assets/start-interior-lightoak-1.avif";
+import lightoakImg2 from "@/assets/start-interior-lightoak-2.avif";
+import whiteImg1 from "@/assets/start-interior-white-1.avif";
+import whiteImg2 from "@/assets/start-interior-white-2.avif";
+import instapklaarImg1 from "@/assets/start-interior-instapklaar-1.avif";
+import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
+
+const interiorImageMap: Record<string, [string, string]> = {
+  "finished": [instapklaarImg1, instapklaarImg2],
+  "fully-finished:brown": [brownImg1, brownImg2],
+  "fully-finished:light-oak": [lightoakImg1, lightoakImg2],
+  "fully-finished:white": [whiteImg1, whiteImg2],
+};
+
+function getInteriorImages(config: ConfigState): [string, string] {
+  if (config.finishLevel === "finished") return interiorImageMap["finished"];
+  return interiorImageMap[`fully-finished:${config.shelfColor}`] ?? interiorImageMap["fully-finished:brown"];
+}
 
 interface PreviewPanelProps {
   config: ConfigState;
   currentStep: number;
   onOverrideWoodColor?: (color: string | null) => void;
+  showInteriorImages?: boolean;
 }
 
 function SceneContent({ config }: { config: ConfigState }) {
@@ -56,7 +80,9 @@ const modelLabels: Record<ConfigState["model"], string> = {
   base: "BLOQ BASE · 50m²",
 };
 
-export function PreviewPanel({ config }: PreviewPanelProps) {
+export function PreviewPanel({ config, showInteriorImages }: PreviewPanelProps) {
+  const images = getInteriorImages(config);
+
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
 
@@ -84,25 +110,64 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         </span>
       </div>
 
-      <Suspense fallback={<LoadingFallback />}>
-        <Canvas
-          shadows
-          camera={{ position: [7, 3.5, 7], fov: 38 }}
-          gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.9 }}
-          style={{ width: "100%", height: "100%" }}
-        >
-          <SceneContent config={config} />
-          <OrbitControls
-            enablePan={false}
-            minDistance={5}
-            maxDistance={18}
-            minPolarAngle={0.2}
-            maxPolarAngle={Math.PI / 2.1}
-            autoRotate={false}
-            target={[0, 0, 0]}
-          />
-        </Canvas>
-      </Suspense>
+      {/* 3D Canvas */}
+      <AnimatePresence>
+        {!showInteriorImages && (
+          <motion.div
+            key="canvas"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0"
+          >
+            <Suspense fallback={<LoadingFallback />}>
+              <Canvas
+                shadows
+                camera={{ position: [7, 3.5, 7], fov: 38 }}
+                gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.9 }}
+                style={{ width: "100%", height: "100%" }}
+              >
+                <SceneContent config={config} />
+                <OrbitControls
+                  enablePan={false}
+                  minDistance={5}
+                  maxDistance={18}
+                  minPolarAngle={0.2}
+                  maxPolarAngle={Math.PI / 2.1}
+                  autoRotate={false}
+                  target={[0, 0, 0]}
+                />
+              </Canvas>
+            </Suspense>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Interior images overlay for BLOQ START */}
+      <AnimatePresence>
+        {showInteriorImages && (
+          <motion.div
+            key="interior-images"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            className="absolute inset-0 grid grid-cols-2 gap-1 p-1"
+          >
+            <img
+              src={images[0]}
+              alt="Interieur aanzicht 1"
+              className="w-full h-full object-cover rounded-l-lg"
+            />
+            <img
+              src={images[1]}
+              alt="Interieur aanzicht 2"
+              className="w-full h-full object-cover rounded-r-lg"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2 justify-center pointer-events-none">
         <Chip label={config.facade.replace(/-/g, " ")} />
