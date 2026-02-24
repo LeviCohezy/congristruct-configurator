@@ -17,6 +17,7 @@ interface MaterialFamily {
   id: string;
   label: string;
   desc: string;
+  desc2?: string;
   facadeId: FacadeId;
   color: string;
   image?: string;
@@ -43,21 +44,24 @@ const materials: MaterialFamily[] = [
   {
     id: "composite-white",
     label: "Composiet Wit",
-    desc: "Vlakke platen 1,22 m · verticale voeg ± 5 mm",
+    desc: "Vlakke platen 1,22 m",
+    desc2: "Verticale voeg ± 5 mm",
     facadeId: "composite-white",
     color: "hsl(0,0%,95%)",
   },
   {
     id: "composite-black",
     label: "Composiet Zwart",
-    desc: "Vlakke platen 1,22 m · verticale voeg ± 5 mm",
+    desc: "Vlakke platen 1,22 m",
+    desc2: "Verticale voeg ± 5 mm",
     facadeId: "composite-black",
     color: "hsl(0,0%,8%)",
   },
   {
     id: "aluminium",
     label: "Aluminium gevelbekleding",
-    desc: "Geborsteld aluminium platen · voeglijnen om de 1,5 m",
+    desc: "Aluminium platen",
+    desc2: "Voeglijnen om de 1,5 m",
     facadeId: "aluminium",
     color: "hsl(210,5%,30%)",
     hasColorPicker: true,
@@ -118,6 +122,7 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">{family.label}</p>
                       <p className="text-xs text-muted-foreground truncate">{family.desc}</p>
+                      {family.desc2 && <p className="text-xs text-muted-foreground truncate">{family.desc2}</p>}
                     </div>
                   </div>
                 </button>
