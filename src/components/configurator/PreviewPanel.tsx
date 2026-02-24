@@ -13,10 +13,10 @@ interface PreviewPanelProps {
 function SceneContent({ config }: { config: ConfigState }) {
   return (
     <>
-      <ambientLight intensity={0.45} color="#f0ece8" />
+      <ambientLight intensity={0.3} color="#f0ece8" />
       <directionalLight
         position={[7, 9, 6]}
-        intensity={2.2}
+        intensity={1.8}
         castShadow
         shadow-mapSize={[2048, 2048]}
         shadow-camera-far={35}
@@ -25,8 +25,8 @@ function SceneContent({ config }: { config: ConfigState }) {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      <directionalLight position={[-5, 3, 4]} intensity={0.6} color="#e8f0f8" />
-      <directionalLight position={[0, -3, 3]} intensity={0.25} color="#f5f0ea" />
+      <directionalLight position={[-5, 3, 4]} intensity={0.4} color="#e8f0f8" />
+      <directionalLight position={[0, -3, 3]} intensity={0.15} color="#f5f0ea" />
       <Environment preset="city" />
       <ModularUnit3D config={config} />
       <ContactShadows position={[0, -1.41, 0]} opacity={0.35} scale={20} blur={2.5} far={4} color="#000000" />
@@ -114,7 +114,7 @@ export function PreviewPanel({ config }: PreviewPanelProps) {
         <Canvas
           shadows
           camera={{ position: [7, 3.5, 7], fov: 38 }}
-          gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 1.1 }}
+          gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.9 }}
           style={{ width: "100%", height: "100%" }}
         >
           <SceneContent config={patchedConfig} />
