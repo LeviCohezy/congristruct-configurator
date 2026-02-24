@@ -202,17 +202,17 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-2 sm:gap-3 p-3 sm:p-6 overflow-auto"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-0 p-0 sm:gap-3 sm:p-6 overflow-hidden"
           >
             <img
               src={images[0]}
               alt="Interieur aanzicht 1"
-              className="w-full max-w-[85%] sm:max-w-2xl rounded-lg object-contain"
+              className="w-full h-1/2 sm:max-w-2xl rounded-lg object-contain"
             />
             <img
               src={images[1]}
               alt="Interieur aanzicht 2"
-              className="w-full max-w-[85%] sm:max-w-2xl rounded-lg object-contain"
+              className="w-full h-1/2 sm:max-w-2xl rounded-lg object-contain"
             />
           </motion.div>
         )}
