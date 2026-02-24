@@ -202,26 +202,38 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 overflow-auto"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 sm:gap-3 p-3 sm:p-6 overflow-auto"
           >
             <img
               src={images[0]}
               alt="Interieur aanzicht 1"
-              className="w-full max-w-2xl rounded-lg object-contain"
+              className="w-full max-w-[85%] sm:max-w-2xl rounded-lg object-contain"
             />
             <img
               src={images[1]}
               alt="Interieur aanzicht 2"
-              className="w-full max-w-2xl rounded-lg object-contain"
+              className="w-full max-w-[85%] sm:max-w-2xl rounded-lg object-contain"
             />
           </motion.div>
         )}
       </AnimatePresence>
 
       <div className="absolute bottom-4 left-4 right-4 flex flex-wrap gap-2 justify-center pointer-events-none">
-        <Chip label={config.facade.replace(/-/g, " ")} />
-        <Chip label={config.floorPlan === "a" ? "Plan A" : "Plan B"} />
-        <Chip label={config.finishLevel.replace(/-/g, " ")} />
+        {showInteriorImages ? (
+          <>
+            <Chip label={config.finishLevel === "shell" ? "Casco" : config.finishLevel === "finished" ? "Instapklaar" : "Volledig ingericht"} />
+            <Chip label={config.floorOption === "light-vinyl" ? "Licht hout" : config.floorOption === "dark-vinyl" ? "Donker hout" : "Steenlook"} />
+            {config.finishLevel === "fully-finished" && (
+              <Chip label={config.shelfColor === "brown" ? "Walnoot bruin" : config.shelfColor === "light-oak" ? "Licht eiken" : "Wit"} />
+            )}
+          </>
+        ) : (
+          <>
+            <Chip label={config.facade.replace(/-/g, " ")} />
+            <Chip label={config.floorPlan === "a" ? "Plan A" : "Plan B"} />
+            <Chip label={config.finishLevel.replace(/-/g, " ")} />
+          </>
+        )}
       </div>
     </div>
   );
