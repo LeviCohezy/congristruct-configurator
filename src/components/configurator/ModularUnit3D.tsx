@@ -22,7 +22,7 @@ function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) 
     case "composite-black":
       return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium":
-      return { color: aluminiumColor || "#383a3b", roughness: 0.5, metalness: 0.15, isWood: false };
+      return { color: aluminiumColor || "#383a3b", roughness: 1.0, metalness: 0.0, isWood: false };
     case "brick-grey":
       return { color: "#7a7a78", roughness: 0.95, metalness: 0.0, isWood: false };
     default:
