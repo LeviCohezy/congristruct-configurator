@@ -39,7 +39,11 @@ function getFacadeProps(facade: ConfigState["facade"]) {
 // so every plank everywhere is the same width regardless of wall size.
 const PLANK_WIDTH_M = 0.13; // 130mm real-world plank width
 const GAP_WIDTH_M = 0.0075;  // 7.5mm gap
-const CELL_M = PLANK_WIDTH_M + GAP_WIDTH_M; // one repeating cell = 70mm
+const CELL_M = PLANK_WIDTH_M + GAP_WIDTH_M; // one repeating cell
+
+const COMPOSITE_PANEL_M = 1.22; // 1.22m panel width
+const COMPOSITE_GAP_M = 0.005;  // 5mm joint
+const COMPOSITE_CELL_M = COMPOSITE_PANEL_M + COMPOSITE_GAP_M;
 
 function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: string): THREE.CanvasTexture | null {
   if (!isWood) return null;
@@ -129,6 +133,45 @@ function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: strin
   return tex;
 }
 
+// ─── Composite panel texture: single cell with a black joint on the right ───
+function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 64;
+  const ctx = canvas.getContext("2d")!;
+
+  const gapFrac = COMPOSITE_GAP_M / COMPOSITE_CELL_M;
+  const gapPx = Math.max(1, Math.round(canvas.width * gapFrac));
+  const panelW = canvas.width - gapPx;
+
+  // Fill panel
+  ctx.fillStyle = baseColor;
+  ctx.fillRect(0, 0, panelW, canvas.height);
+
+  // Black joint line
+  ctx.fillStyle = "#0a0a0a";
+  ctx.fillRect(panelW, 0, gapPx, canvas.height);
+
+  // Subtle edge shadow on right side of panel
+  const grad = ctx.createLinearGradient(panelW - 4, 0, panelW, 0);
+  grad.addColorStop(0, "rgba(0,0,0,0)");
+  grad.addColorStop(1, "rgba(0,0,0,0.12)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(panelW - 4, 0, 4, canvas.height);
+
+  // Subtle highlight on left edge
+  const hl = ctx.createLinearGradient(0, 0, 3, 0);
+  hl.addColorStop(0, "rgba(255,255,255,0.04)");
+  hl.addColorStop(1, "rgba(255,255,255,0)");
+  ctx.fillStyle = hl;
+  ctx.fillRect(0, 0, 3, canvas.height);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
+
 // ─── Cladding material with real-world plank repeat ─────────────────────────
 // wallWidthM = how wide the wall face is in meters. The texture repeats so
 // every plank is exactly CELL_M wide, and if it doesn't divide evenly it just
@@ -161,8 +204,9 @@ function makeCladdingMat(
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
 // photoTex: optional real photo texture (overrides baseTex procedural)
 // photoTexWidthM: real-world width the photo covers (for repeat calc)
-function CladMaterial({ baseTex, photoTex, photoTexWidthM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
+function CladMaterial({ baseTex, compositeTex, photoTex, photoTexWidthM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
   baseTex: THREE.CanvasTexture | null;
+  compositeTex?: THREE.CanvasTexture | null;
   photoTex?: THREE.Texture | null;
   photoTexWidthM?: number;
   photoTint?: string;
@@ -192,6 +236,15 @@ function CladMaterial({ baseTex, photoTex, photoTexWidthM, photoTint, wallWidth,
       b.repeat.set(wallWidth / pw, yRepeat);
       return [t, b];
     }
+    // Composite panel texture
+    if (compositeTex && !isWood) {
+      const t = compositeTex.clone();
+      t.needsUpdate = true;
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(wallWidth / COMPOSITE_CELL_M, 1);
+      return [t, undefined];
+    }
     if (!baseTex || !isWood) return [undefined, undefined];
     const t = baseTex.clone();
     t.needsUpdate = true;
@@ -204,7 +257,7 @@ function CladMaterial({ baseTex, photoTex, photoTexWidthM, photoTint, wallWidth,
     b.wrapT = THREE.RepeatWrapping;
     b.repeat.set(wallWidth / CELL_M, yRepeat);
     return [t, b];
-  }, [baseTex, photoTex, photoTexWidthM, wallWidth, isWood, yRepeat]);
+  }, [baseTex, compositeTex, photoTex, photoTexWidthM, wallWidth, isWood, yRepeat]);
 
   return (
     <meshStandardMaterial
@@ -270,6 +323,12 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     if (isPhotoTex) return null; // use photo texture instead
     return createPlankTexture(effectiveColor, fp.isWood, gapColorOverride);
   }, [effectiveColor, fp.isWood, gapColorOverride, isThermowoodBlack]);
+
+  const isComposite = config.facade === "composite-white" || config.facade === "composite-black";
+  const compositeTex = useMemo(() => {
+    if (!isComposite) return null;
+    return createCompositePanelTexture(effectiveColor);
+  }, [effectiveColor, isComposite]);
 
   // Dimensions — all 4m depth, variable width
   const { width, height, depth } = useMemo(() => {
@@ -356,6 +415,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   const woodBase = {
     baseTex: plankTex,
+    compositeTex,
     photoTex: activePhotoTex,
     photoTint: isThermowoodBlack ? "#8a8a8a" : undefined, // darken black, no tint on Ayous
     photoTexWidthM: 1,
