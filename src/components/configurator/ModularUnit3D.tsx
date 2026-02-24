@@ -1030,8 +1030,8 @@ function StartWalls({
               <meshStandardMaterial {...matProps} />
             </mesh>
 
-            {/* 3 door lines (dividing into 3 equal doors) */}
-            {[1 / 3, 2 / 3].map((frac, i) => (
+            {/* Door lines: 6 doors for open plan (A), 3 doors for toilet plan (B) */}
+            {(isLeftWall ? [1/6, 2/6, 3/6, 4/6, 5/6] : [1/3, 2/3]).map((frac, i) => (
               <mesh
                 key={`d${i}`}
                 position={doorLinePos(
