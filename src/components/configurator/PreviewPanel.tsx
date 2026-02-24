@@ -14,15 +14,20 @@ import whiteImg1 from "@/assets/start-interior-white-1.avif";
 import whiteImg2 from "@/assets/start-interior-white-2.avif";
 import instapklaarImg1 from "@/assets/start-interior-instapklaar-1.avif";
 import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
+import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
+import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
 
 const interiorImageMap: Record<string, [string, string]> = {
   "finished": [instapklaarImg1, instapklaarImg2],
   "fully-finished:brown": [brownImg1, brownImg2],
   "fully-finished:light-oak": [lightoakImg1, lightoakImg2],
   "fully-finished:white": [whiteImg1, whiteImg2],
+  "shell:b": [cascoToiletImg1, cascoToiletImg2],
 };
 
-function getInteriorImages(config: ConfigState): [string, string] {
+function getInteriorImages(config: ConfigState): [string, string] | null {
+  if (config.finishLevel === "shell" && config.floorPlan === "b") return interiorImageMap["shell:b"];
+  if (config.finishLevel === "shell") return null;
   if (config.finishLevel === "finished") return interiorImageMap["finished"];
   return interiorImageMap[`fully-finished:${config.shelfColor}`] ?? interiorImageMap["fully-finished:brown"];
 }
@@ -83,7 +88,7 @@ const modelLabels: Record<ConfigState["model"], string> = {
 
 export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
   const images = getInteriorImages(config);
-  const canToggle = showInteriorImages !== undefined && onToggleInteriorView;
+  const canToggle = images && showInteriorImages !== undefined && onToggleInteriorView;
 
   return (
     <div className="relative w-full h-full bg-surface flex flex-col overflow-hidden">
