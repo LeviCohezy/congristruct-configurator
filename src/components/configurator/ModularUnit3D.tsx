@@ -1476,13 +1476,13 @@ function FlowAWalls({
           <group key={`fs${i}`}>
             <mesh position={[seg.cx, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
               <boxGeometry args={[seg.w, height - winTop, wallThick]} />
-              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} wallHeight={height - winTop} fullWallHeight={extWallH} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
             {/* Wall below door — covers floor slab */}
             <mesh position={[seg.cx, floorThick / 2, halfD - wallThick / 2]} castShadow>
               <boxGeometry args={[seg.w, floorThick, wallThick]} />
-              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} wallHeight={floorThick} fullWallHeight={extWallH} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
           </group>
         );
@@ -1767,13 +1767,13 @@ function FlowBWalls({
             {/* Header above door */}
             <mesh position={[seg.cx, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
               <boxGeometry args={[seg.w, height - winTop, wallThick]} />
-              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} wallHeight={height - winTop} fullWallHeight={extWallH} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
             {/* Wall below door — covers floor slab */}
             <mesh position={[seg.cx, floorThick / 2, halfD - wallThick / 2]} castShadow>
               <boxGeometry args={[seg.w, floorThick, wallThick]} />
-              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} wallHeight={floorThick} fullWallHeight={extWallH} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
           </group>
         );
