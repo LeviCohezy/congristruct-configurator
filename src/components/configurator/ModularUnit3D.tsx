@@ -637,8 +637,8 @@ function StartWalls({
         </mesh>
       )}
       {/* Window area — spandrel below + header above + glass */}
-      <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
-        <boxGeometry args={[backWinW, winBot, wallThick]} />
+      <mesh position={[backWinCenterX, (winBot + floorThick) / 2, -halfD + wallThick / 2]} castShadow>
+        <boxGeometry args={[backWinW, winBot + floorThick, wallThick]} />
         <CladMaterial {...woodBase} wallWidth={backWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick / 2]} castShadow>
@@ -667,8 +667,8 @@ function StartWalls({
         </mesh>
       )}
       {/* Interior back wall — above & below window */}
-      <mesh position={[backWinCenterX, winBot / 2 + floorThick, -halfD + wallThick + 0.005]}>
-        <boxGeometry args={[backWinW, winBot, 0.01]} />
+      <mesh position={[backWinCenterX, (winBot + floorThick) / 2, -halfD + wallThick + 0.005]}>
+        <boxGeometry args={[backWinW, winBot + floorThick, 0.01]} />
         <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
       <mesh position={[backWinCenterX, winTop + (height - winTop) / 2 + floorThick, -halfD + wallThick + 0.005]}>
@@ -690,8 +690,8 @@ function StartWalls({
         </mesh>
       )}
       {/* Window spandrel + header */}
-      <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
-        <boxGeometry args={[frontWinW, winBot, wallThick]} />
+      <mesh position={[frontWinCenterX, (winBot + floorThick) / 2, halfD - wallThick / 2]} castShadow>
+        <boxGeometry args={[frontWinW, winBot + floorThick, wallThick]} />
         <CladMaterial {...woodBase} wallWidth={frontWinW} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
       </mesh>
       <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
@@ -720,8 +720,8 @@ function StartWalls({
         </mesh>
       )}
       {/* Interior front — above & below window */}
-      <mesh position={[frontWinCenterX, winBot / 2 + floorThick, halfD - wallThick - 0.005]}>
-        <boxGeometry args={[frontWinW, winBot, 0.01]} />
+      <mesh position={[frontWinCenterX, (winBot + floorThick) / 2, halfD - wallThick - 0.005]}>
+        <boxGeometry args={[frontWinW, winBot + floorThick, 0.01]} />
         <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
       <mesh position={[frontWinCenterX, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick - 0.005]}>
@@ -745,6 +745,11 @@ function StartWalls({
       {/* Door header above opening */}
       <mesh position={[halfW - wallThick / 2, winTop + (height - winTop) / 2 + floorThick, doorCenterZ]} castShadow>
         <boxGeometry args={[wallThick, height - winTop, doorH]} />
+        <CladMaterial {...woodBase} wallWidth={doorH} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
+      </mesh>
+      {/* Wall below door opening — covers floor slab */}
+      <mesh position={[halfW - wallThick / 2, floorThick / 2, doorCenterZ]} castShadow>
+        <boxGeometry args={[wallThick, floorThick, doorH]} />
         <CladMaterial {...woodBase} wallWidth={doorH} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
       </mesh>
       {/* Interior right wall segments */}
@@ -1379,8 +1384,8 @@ function FlowAWalls({
               </mesh>
             )}
             {/* Window spandrel + header */}
-            <mesh position={[-halfW + wallThick / 2, winBot / 2 + floorThick, leftWinCZ]} castShadow>
-              <boxGeometry args={[wallThick, winBot, leftWinW]} />
+            <mesh position={[-halfW + wallThick / 2, (winBot + floorThick) / 2, leftWinCZ]} castShadow>
+              <boxGeometry args={[wallThick, winBot + floorThick, leftWinW]} />
               <CladMaterial {...woodBase} wallWidth={leftWinW} polygonOffset polygonOffsetFactor={1} polygonOffsetUnits={1} />
             </mesh>
             <mesh position={[-halfW + wallThick / 2, winTop + (height - winTop) / 2 + floorThick, leftWinCZ]} castShadow>
@@ -1402,8 +1407,8 @@ function FlowAWalls({
                 <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
               </mesh>
             )}
-            <mesh position={[-halfW + wallThick + 0.005, winBot / 2 + floorThick, leftWinCZ]}>
-              <boxGeometry args={[0.01, winBot, leftWinW]} />
+            <mesh position={[-halfW + wallThick + 0.005, (winBot + floorThick) / 2, leftWinCZ]}>
+              <boxGeometry args={[0.01, winBot + floorThick, leftWinW]} />
               <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
             </mesh>
             <mesh position={[-halfW + wallThick + 0.005, winTop + (height - winTop) / 2 + floorThick, leftWinCZ]}>
@@ -1443,8 +1448,8 @@ function FlowAWalls({
         if (seg.type === "window") {
           return (
             <group key={`fs${i}`}>
-              <mesh position={[seg.cx, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
-                <boxGeometry args={[seg.w, winBot, wallThick]} />
+              <mesh position={[seg.cx, (winBot + floorThick) / 2, halfD - wallThick / 2]} castShadow>
+                <boxGeometry args={[seg.w, winBot + floorThick, wallThick]} />
                 <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
               </mesh>
               <mesh position={[seg.cx, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick / 2]} castShadow>
@@ -1452,8 +1457,8 @@ function FlowAWalls({
                 <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
               </mesh>
               <GlassPane posX={seg.cx} posY={winCY + floorThick} width={seg.w} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} />
-              <mesh position={[seg.cx, winBot / 2 + floorThick, halfD - wallThick - 0.005]}>
-                <boxGeometry args={[seg.w, winBot, 0.01]} />
+              <mesh position={[seg.cx, (winBot + floorThick) / 2, halfD - wallThick - 0.005]}>
+                <boxGeometry args={[seg.w, winBot + floorThick, 0.01]} />
                 <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
               </mesh>
               <mesh position={[seg.cx, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick - 0.005]}>
@@ -1471,6 +1476,11 @@ function FlowAWalls({
               <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
+            {/* Wall below door — covers floor slab */}
+            <mesh position={[seg.cx, floorThick / 2, halfD - wallThick / 2]} castShadow>
+              <boxGeometry args={[seg.w, floorThick, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+            </mesh>
           </group>
         );
       })}
@@ -1726,8 +1736,8 @@ function FlowBWalls({
           return (
             <group key={`fs${i}`}>
               {/* Spandrel below window */}
-              <mesh position={[seg.cx, winBot / 2 + floorThick, halfD - wallThick / 2]} castShadow>
-                <boxGeometry args={[seg.w, winBot, wallThick]} />
+              <mesh position={[seg.cx, (winBot + floorThick) / 2, halfD - wallThick / 2]} castShadow>
+                <boxGeometry args={[seg.w, winBot + floorThick, wallThick]} />
                 <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
               </mesh>
               {/* Header above window */}
@@ -1737,8 +1747,8 @@ function FlowBWalls({
               </mesh>
               <GlassPane posX={seg.cx} posY={winCY + floorThick} width={seg.w} height={winH} frameColor={frameColor} z={halfD - wallThick / 2} />
               {/* Interior faces */}
-              <mesh position={[seg.cx, winBot / 2 + floorThick, halfD - wallThick - 0.005]}>
-                <boxGeometry args={[seg.w, winBot, 0.01]} />
+              <mesh position={[seg.cx, (winBot + floorThick) / 2, halfD - wallThick - 0.005]}>
+                <boxGeometry args={[seg.w, winBot + floorThick, 0.01]} />
                 <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
               </mesh>
               <mesh position={[seg.cx, winTop + (height - winTop) / 2 + floorThick, halfD - wallThick - 0.005]}>
@@ -1757,6 +1767,11 @@ function FlowBWalls({
               <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
             </mesh>
             <DoorPane posX={seg.cx} posY={floorThick + winTop / 2} width={seg.w} height={winTop} frameColor={frameColor} z={halfD - wallThick / 2} rotate={false} />
+            {/* Wall below door — covers floor slab */}
+            <mesh position={[seg.cx, floorThick / 2, halfD - wallThick / 2]} castShadow>
+              <boxGeometry args={[seg.w, floorThick, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg.w} polygonOffset polygonOffsetFactor={-1} polygonOffsetUnits={-1} />
+            </mesh>
           </group>
         );
       })}
@@ -2050,8 +2065,8 @@ function GenericWalls({
 
         {roomSplit < 100 ? (
           <>
-            <mesh position={[room1CX, winBot / 2 + floorThick, 0]} castShadow>
-              <boxGeometry args={[room1Width, winBot, wallThick]} />
+            <mesh position={[room1CX, (winBot + floorThick) / 2, 0]} castShadow>
+              <boxGeometry args={[room1Width, winBot + floorThick, wallThick]} />
               <CladMaterial {...woodBase} wallWidth={room1Width} />
             </mesh>
             <mesh position={[room1CX, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
@@ -2092,8 +2107,8 @@ function GenericWalls({
           </>
         ) : (
           <>
-            <mesh position={[room1CX, winBot / 2 + floorThick, 0]} castShadow>
-              <boxGeometry args={[flatWidth - PILLAR_W, winBot, wallThick]} />
+            <mesh position={[room1CX, (winBot + floorThick) / 2, 0]} castShadow>
+              <boxGeometry args={[flatWidth - PILLAR_W, winBot + floorThick, wallThick]} />
               <CladMaterial {...woodBase} wallWidth={flatWidth - PILLAR_W} />
             </mesh>
             <mesh position={[room1CX, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
@@ -2154,8 +2169,8 @@ function Room2Facade({
 
   return (
     <>
-      <mesh position={[doorCX, winBot / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[DOOR_W, winBot, wallThick]} />
+      <mesh position={[doorCX, (winBot + floorThick) / 2, 0]} castShadow>
+        <boxGeometry args={[DOOR_W, winBot + floorThick, wallThick]} />
         <CladMaterial {...woodBase} wallWidth={DOOR_W} />
       </mesh>
       <mesh position={[doorCX, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
@@ -2169,8 +2184,8 @@ function Room2Facade({
         <CladMaterial {...woodBase} wallWidth={PILLAR_W} />
       </mesh>
 
-      <mesh position={[win2CX, winBot / 2 + floorThick, 0]} castShadow>
-        <boxGeometry args={[win2W, winBot, wallThick]} />
+      <mesh position={[win2CX, (winBot + floorThick) / 2, 0]} castShadow>
+        <boxGeometry args={[win2W, winBot + floorThick, wallThick]} />
         <CladMaterial {...woodBase} wallWidth={win2W} />
       </mesh>
       <mesh position={[win2CX, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
