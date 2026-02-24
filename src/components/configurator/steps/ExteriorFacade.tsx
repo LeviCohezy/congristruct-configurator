@@ -14,7 +14,9 @@ interface MaterialFamily {
   id: string;
   label: string;
   desc: string;
-  variants: { id: FacadeId; label: string; color: string }[];
+  facadeId: FacadeId;
+  color: string;
+  hasColorPicker?: boolean;
 }
 
 const materials: MaterialFamily[] = [
@@ -22,56 +24,70 @@ const materials: MaterialFamily[] = [
     id: "thermowood-black",
     label: "Thermowood Zwart Den",
     desc: "Zwart gebrand hout",
-    variants: [{ id: "thermowood-black", label: "Zwart", color: "hsl(0,0%,12%)" }],
+    facadeId: "thermowood-black",
+    color: "hsl(0,0%,12%)",
   },
   {
     id: "thermowood-natural",
     label: "Thermowood Ayous",
     desc: "Natuurlijke houtlook",
-    variants: [{ id: "thermowood-natural", label: "Naturel", color: "hsl(32,50%,55%)" }],
+    facadeId: "thermowood-natural",
+    color: "hsl(32,50%,55%)",
   },
   {
-    id: "composite",
-    label: "Composiet gevelplaten",
+    id: "composite-white",
+    label: "Composiet Wit",
     desc: "Vlakke platen 1,22 m · verticale voeg ± 5 mm",
-    variants: [
-      { id: "composite-white", label: "Wit", color: "hsl(0,0%,95%)" },
-      { id: "composite-black", label: "Zwart", color: "hsl(0,0%,8%)" },
-    ],
+    facadeId: "composite-white",
+    color: "hsl(0,0%,95%)",
+  },
+  {
+    id: "composite-black",
+    label: "Composiet Zwart",
+    desc: "Vlakke platen 1,22 m · verticale voeg ± 5 mm",
+    facadeId: "composite-black",
+    color: "hsl(0,0%,8%)",
   },
   {
     id: "aluminium",
     label: "Aluminium gevelbekleding",
-    desc: "Voeglijnen om de ± 1,5 m · alle kleuren mogelijk",
-    variants: [
-      { id: "aluminium-anthracite", label: "Antraciet", color: "hsl(210,5%,30%)" },
-      { id: "aluminium-bronze", label: "Brons", color: "hsl(30,30%,40%)" },
-      { id: "aluminium-white", label: "Wit", color: "hsl(0,0%,92%)" },
-    ],
+    desc: "Geborsteld aluminium planken · alle kleuren mogelijk",
+    facadeId: "aluminium",
+    color: "hsl(210,5%,30%)",
+    hasColorPicker: true,
   },
   {
-    id: "brick",
+    id: "brick-grey",
     label: "Gevelsteen strips",
     desc: "Grijze steenstrips look",
-    variants: [{ id: "brick-grey", label: "Grijs", color: "hsl(0,0%,55%)" }],
+    facadeId: "brick-grey",
+    color: "hsl(0,0%,55%)",
   },
 ];
 
 function getActiveFamily(facade: FacadeId): string {
   for (const m of materials) {
-    if (m.variants.some((v) => v.id === facade)) return m.id;
+    if (m.facadeId === facade) return m.id;
   }
   return materials[0].id;
 }
+
+const presetColors = [
+  { label: "Antraciet", hex: "#383a3b" },
+  { label: "Brons", hex: "#6e4e2e" },
+  { label: "Wit", hex: "#e8e6e2" },
+  { label: "Zwart", hex: "#1a1a1c" },
+  { label: "Groen", hex: "#2d4a3e" },
+  { label: "Blauw", hex: "#2a3d5c" },
+];
 
 export function ExteriorFacade({ config, updateConfig }: Props) {
   const [expandedFamily, setExpandedFamily] = useState(() => getActiveFamily(config.facade));
 
   const selectFamily = (family: MaterialFamily) => {
     setExpandedFamily(family.id);
-    // Auto-select first variant if current facade isn't in this family
-    if (!family.variants.some((v) => v.id === config.facade)) {
-      updateConfig("facade", family.variants[0].id);
+    if (config.facade !== family.facadeId) {
+      updateConfig("facade", family.facadeId);
     }
   };
 
@@ -83,7 +99,6 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
         <div className="grid gap-3">
           {materials.map((family) => {
             const isActive = expandedFamily === family.id;
-            const hasMultiple = family.variants.length > 1;
             return (
               <div key={family.id}>
                 <button
@@ -96,7 +111,7 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                   <div className="flex items-center gap-3">
                     <div
                       className="w-10 h-10 rounded-lg shrink-0 border border-border"
-                      style={{ backgroundColor: family.variants[0].color }}
+                      style={{ backgroundColor: family.id === "aluminium" ? config.aluminiumColor : family.color }}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm">{family.label}</p>
@@ -104,31 +119,44 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     </div>
                   </div>
                 </button>
-                {/* Color sub-swatches */}
-                {isActive && hasMultiple && (
+                {/* Color picker for aluminium */}
+                {isActive && family.hasColorPicker && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="flex gap-2 mt-2 ml-2"
+                    className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
                   >
-                    {family.variants.map((v) => (
-                      <button
-                        key={v.id}
-                        onClick={() => updateConfig("facade", v.id)}
-                        className={cn(
-                          "flex flex-col items-center gap-1 p-2 rounded-lg border transition-colors",
-                          config.facade === v.id
-                            ? "border-accent bg-accent/5"
-                            : "border-border hover:border-muted-foreground/30"
-                        )}
-                      >
-                        <div
-                          className="w-8 h-8 rounded-md border border-border"
-                          style={{ backgroundColor: v.color }}
-                        />
-                        <span className="text-[10px] font-medium">{v.label}</span>
-                      </button>
-                    ))}
+                    <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-2">Kleur kiezen</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {presetColors.map((pc) => (
+                        <button
+                          key={pc.hex}
+                          onClick={() => updateConfig("aluminiumColor", pc.hex)}
+                          className={cn(
+                            "flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-colors",
+                            config.aluminiumColor === pc.hex
+                              ? "border-accent bg-accent/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          )}
+                        >
+                          <div
+                            className="w-7 h-7 rounded-md border border-border"
+                            style={{ backgroundColor: pc.hex }}
+                          />
+                          <span className="text-[9px] font-medium">{pc.label}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <label className="text-xs text-muted-foreground">Custom:</label>
+                      <input
+                        type="color"
+                        value={config.aluminiumColor}
+                        onChange={(e) => updateConfig("aluminiumColor", e.target.value)}
+                        className="w-8 h-8 rounded cursor-pointer border border-border bg-transparent"
+                      />
+                      <span className="text-xs font-mono text-muted-foreground">{config.aluminiumColor}</span>
+                    </div>
                   </motion.div>
                 )}
               </div>
