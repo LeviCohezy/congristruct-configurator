@@ -36,7 +36,7 @@ function getShelfColors(shelfColor: ConfigState["shelfColor"]) {
     case "white":
       return { cabinet: "#e8e6e2", counterTop: "#d5d3cf", doorLine: "#cccac6" };
     case "light-oak":
-      return { cabinet: "#c4a872", counterTop: "#b09560", doorLine: "#a08850" };
+      return { cabinet: "#d4be8a", counterTop: "#c4ae7a", doorLine: "#b8a270" };
     default: // brown
       return { cabinet: "#2a2118", counterTop: "#1a1510", doorLine: "#151010" };
   }
