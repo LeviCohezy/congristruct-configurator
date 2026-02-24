@@ -1212,6 +1212,7 @@ function GlassPane({
       {(
         [
           [0, height / 2 - fw / 2, 0, width, fw, 0.06],
+          [0, -height / 2 + fw / 2, 0, width, fw, 0.06],
           [-width / 2 + fw / 2, 0, 0, fw, height, 0.06],
           [width / 2 - fw / 2, 0, 0, fw, height, 0.06],
           ...(hasDivider ? [[0, 0, 0.004, fw, height - fw * 2, 0.05]] : []),
