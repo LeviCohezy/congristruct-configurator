@@ -173,16 +173,23 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
         {/* Toilet room bottom wall */}
         <rect x={leftPartX} y={toiletBottomY} width={rightPartX + iw - leftPartX} height={iw} fill={wallColor} opacity={0.7} />
 
-        {/* Toilet fixture */}
-        <ellipse cx={hallCx} cy={wt + 25} rx={7} ry={9} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
-        <rect x={hallCx - 6} y={wt + 12} width={12} height={7} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
-        {/* Sink */}
-        <rect x={rightPartX - 10} y={wt + 8} width={8} height={7} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
+        {/* Toilet fixture — attached to right partition wall */}
+        <ellipse cx={rightPartX - 10} cy={wt + 25} rx={7} ry={9} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+        <rect x={rightPartX - 16} y={wt + 12} width={12} height={7} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+        {/* Sink — near left partition */}
+        <rect x={leftPartX + iw + 3} y={wt + 8} width={8} height={7} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
 
-        {/* Toilet door */}
-        <rect x={hallCx - 10} y={toiletBottomY} width={20} height={iw} fill="hsl(var(--background))" />
-        <path d={`M ${hallCx - 10} ${toiletBottomY + iw} A 20 20 0 0 1 ${hallCx + 10} ${toiletBottomY + iw + 20}`}
-          fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+        {/* Toilet door — shifted left of center */}
+        {(() => {
+          const toiletDoorCx = hallCx - 6;
+          return (
+            <>
+              <rect x={toiletDoorCx - 10} y={toiletBottomY} width={20} height={iw} fill="hsl(var(--background))" />
+              <path d={`M ${toiletDoorCx - 10} ${toiletBottomY + iw} A 20 20 0 0 1 ${toiletDoorCx + 10} ${toiletBottomY + iw + 20}`}
+                fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+            </>
+          );
+        })()}
 
         {/* Left room door (84cm, swings into left room) */}
         <rect x={leftPartX} y={toiletBottomY + iw + 15} width={iw} height={doorH} fill="hsl(var(--background))" />

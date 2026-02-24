@@ -1381,8 +1381,11 @@ function FlowBWalls({
   const partSec3D = partSec3End - partSec3Start;
   const partSec3CZ = (partSec3Start + partSec3End) / 2;
 
-  // Toilet room interior positions
-  const toiletCenterX = (leftPartX + partT + rightPartX) / 2;
+  // Toilet room interior positions — offset left (mirroring flips to right)
+  const hallLeft = leftPartX + partT;
+  const hallRight = rightPartX;
+  const hallCenterX = (hallLeft + hallRight) / 2;
+  const toiletCenterX = hallCenterX - 0.15; // toilet shifted left of center
 
   return (
     <group>
@@ -1565,9 +1568,9 @@ function FlowBWalls({
       {(() => {
         const toiletDoorW = 0.84;
         const hallW = rightPartX - leftPartX - partT;
-        const toiletDoorCX = toiletCenterX;
-        const leftSegW = (hallW - toiletDoorW) / 2;
-        const rightSegW = leftSegW;
+        const toiletDoorCX = hallCenterX - 0.12; // door shifted left
+        const leftSegW = toiletDoorCX - toiletDoorW / 2 - (leftPartX + partT);
+        const rightSegW = rightPartX - (toiletDoorCX + toiletDoorW / 2);
         const leftSegCX = leftPartX + partT + leftSegW / 2;
         const rightSegCX = rightPartX - rightSegW / 2;
 
