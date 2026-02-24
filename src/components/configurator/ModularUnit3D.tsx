@@ -1895,6 +1895,11 @@ function FlowAWalls({
                     <boxGeometry args={[rwShelfD, rwUpperH, rwShelfW]} />
                     <meshStandardMaterial {...matProps} />
                   </mesh>
+                  {/* Shelf just under upper cabinet */}
+                  <mesh position={[rwShelfCX, rwUpperBottom - 0.01 + floorThick, rwShelfCZ]}>
+                    <boxGeometry args={[rwShelfD + 0.01, 0.02, rwShelfW + 0.01]} />
+                    <meshStandardMaterial color="#1a1510" roughness={0.4} metalness={0.1} />
+                  </mesh>
                   {/* Open niche back panel */}
                   <mesh position={[rwBackX - 0.005, rwCounterH + (rwUpperBottom - rwCounterH) / 2 + floorThick, rwShelfCZ]}>
                     <boxGeometry args={[0.01, (rwUpperBottom - rwCounterH) - 0.06, rwShelfW - 0.04]} />
@@ -1940,7 +1945,7 @@ function FlowAWalls({
                     <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                   </mesh>
                   {/* ── Coffee machine (left of sink) ── */}
-                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, rwShelfCZ - sinkW / 2 - 0.18]}>
+                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, toiletWallZ + partT / 2 + 0.02 + 0.14]}>
                     {/* Base body */}
                     <mesh position={[0, 0.14, 0]}>
                       <boxGeometry args={[0.18, 0.28, 0.25]} />
