@@ -1939,6 +1939,39 @@ function FlowAWalls({
                     <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
                     <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                   </mesh>
+                  {/* ── Coffee machine (left of sink) ── */}
+                  <group position={[rwShelfCX, rwCounterH + 0.03 + floorThick, rwShelfCZ - sinkW / 2 - 0.18]}>
+                    {/* Base body */}
+                    <mesh position={[0, 0.14, 0]}>
+                      <boxGeometry args={[0.18, 0.28, 0.25]} />
+                      <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                    </mesh>
+                    {/* Water reservoir (back) */}
+                    <mesh position={[0.06, 0.18, 0]}>
+                      <boxGeometry args={[0.06, 0.36, 0.20]} />
+                      <meshStandardMaterial color="#2a2a2a" roughness={0.2} metalness={0.1} />
+                    </mesh>
+                    {/* Drip tray */}
+                    <mesh position={[0, 0.005, 0]}>
+                      <boxGeometry args={[0.16, 0.01, 0.12]} />
+                      <meshStandardMaterial color="#333333" roughness={0.3} metalness={0.5} />
+                    </mesh>
+                    {/* Spout */}
+                    <mesh position={[-0.02, 0.22, 0]}>
+                      <boxGeometry args={[0.04, 0.04, 0.04]} />
+                      <meshStandardMaterial color="#222222" roughness={0.5} metalness={0.4} />
+                    </mesh>
+                    {/* Control panel / buttons */}
+                    <mesh position={[-0.091, 0.20, 0]}>
+                      <boxGeometry args={[0.005, 0.08, 0.10]} />
+                      <meshStandardMaterial color="#444444" roughness={0.3} metalness={0.2} />
+                    </mesh>
+                    {/* Brand accent strip */}
+                    <mesh position={[-0.092, 0.12, 0]}>
+                      <boxGeometry args={[0.004, 0.02, 0.14]} />
+                      <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+                    </mesh>
+                  </group>
                 </group>
               );
             })()}
