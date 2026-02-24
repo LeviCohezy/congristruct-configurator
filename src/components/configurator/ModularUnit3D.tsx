@@ -22,7 +22,7 @@ function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) 
     case "composite-black":
       return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
     case "aluminium":
-      return { color: aluminiumColor || "#383a3b", roughness: 0.25, metalness: 0.85, isWood: false };
+      return { color: aluminiumColor || "#383a3b", roughness: 0.35, metalness: 0.7, isWood: false };
     case "brick-grey":
       return { color: "#7a7a78", roughness: 0.95, metalness: 0.0, isWood: false };
     default:
@@ -177,7 +177,7 @@ function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
   return tex;
 }
 
-// ─── Aluminium panel texture: flat plates every 1.5m with brushed metallic look ─
+// ─── Aluminium panel texture: flat color plates every 1.5m ──────────────────
 function createAluminiumPanelTexture(baseColor: string): THREE.CanvasTexture {
   const canvas = document.createElement("canvas");
   canvas.width = 256;
@@ -191,36 +191,20 @@ function createAluminiumPanelTexture(baseColor: string): THREE.CanvasTexture {
   const gapPx = Math.max(1, Math.round(canvas.width * gapFrac));
   const panelW = canvas.width - gapPx;
 
-  // Panel fill
+  // Panel fill — flat color
   ctx.fillStyle = `#${base.getHexString()}`;
   ctx.fillRect(0, 0, panelW, canvas.height);
-
-  // Brushed metal horizontal micro-streaks across panel
-  for (let y = 0; y < canvas.height; y++) {
-    const alpha = 0.01 + Math.random() * 0.03;
-    ctx.fillStyle = Math.random() > 0.5
-      ? `rgba(255,255,255,${alpha})`
-      : `rgba(0,0,0,${alpha})`;
-    ctx.fillRect(0, y, panelW, 1);
-  }
 
   // Joint line
   ctx.fillStyle = gapCol;
   ctx.fillRect(panelW, 0, gapPx, canvas.height);
 
-  // Edge shadow
+  // Subtle edge shadow
   const grad = ctx.createLinearGradient(panelW - 4, 0, panelW, 0);
   grad.addColorStop(0, "rgba(0,0,0,0)");
   grad.addColorStop(1, "rgba(0,0,0,0.10)");
   ctx.fillStyle = grad;
   ctx.fillRect(panelW - 4, 0, 4, canvas.height);
-
-  // Left highlight
-  const hl = ctx.createLinearGradient(0, 0, 3, 0);
-  hl.addColorStop(0, "rgba(255,255,255,0.04)");
-  hl.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = hl;
-  ctx.fillRect(0, 0, 3, canvas.height);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
