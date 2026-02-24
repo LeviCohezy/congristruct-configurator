@@ -997,29 +997,17 @@ function StartWalls({
         const shelfW = isLeftWall ? depth - 2 * wallThick : cmToUnit(140);
         const shelfD = 0.45;
 
-        // Along-wall center, into-room center, back-panel position
         const shelfCenterAlongWall = isLeftWall ? 0 : -halfW + wallThick + shelfW / 2;
         const shelfCenterIntoRoom = isLeftWall ? -halfW + wallThick + shelfD / 2 : -halfD + wallThick + shelfD / 2;
         const backPanelPos = isLeftWall ? -halfW + wallThick + 0.06 : -halfD + wallThick + 0.06;
 
-        // Positions: [X, Y, Z] differ based on wall orientation
         const pos = (along: number, y: number, into: number): [number, number, number] =>
           isLeftWall ? [into, y, along] : [along, y, into];
-        // Box geometry: [alongWall, height, intoRoom] → need to swap for left wall
         const geo = (along: number, h: number, into: number): [number, number, number] =>
           isLeftWall ? [into, h, along] : [along, h, into];
 
         const sc = getShelfColors(shelfColor);
-        const cabinetColor = sc.cabinet;
-        const counterTopColor = sc.counterTop;
-        const doorLineColor = sc.doorLine;
-        const counterTop = height * 0.3;
-        const nicheH = height * 0.3;
-        const nicheTop = counterTop + nicheH;
-        const upperH = height - nicheTop;
-        const matProps = { color: cabinetColor, roughness: 0.75, metalness: 0.05 };
-        const panelW = shelfW / 6;
-        const openW = shelfW - panelW * 2;
+        const matProps = { color: sc.cabinet, roughness: 0.75, metalness: 0.05 };
 
         // Front face offset (for door lines)
         const frontFace = isLeftWall ? -halfW + wallThick + shelfD + 0.002 : -halfD + wallThick + shelfD + 0.002;
@@ -1036,104 +1024,25 @@ function StartWalls({
               <meshStandardMaterial {...matProps} />
             </mesh>
 
-            {/* Lower cabinet body */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop / 2 + floorThick, shelfCenterIntoRoom)}>
-              <boxGeometry args={geo(shelfW, counterTop, shelfD)} />
-              <meshStandardMaterial {...matProps} />
-            </mesh>
-            {/* Counter surface */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.015 + floorThick, shelfCenterIntoRoom)}>
-              <boxGeometry args={geo(shelfW + 0.02, 0.03, shelfD + 0.02)} />
-              <meshStandardMaterial color={counterTopColor} roughness={0.4} metalness={0.1} />
-            </mesh>
-
-            {/* Upper cabinets */}
-            <mesh position={pos(shelfCenterAlongWall, nicheTop + upperH / 2 + floorThick, shelfCenterIntoRoom)}>
-              <boxGeometry args={geo(shelfW, upperH, shelfD)} />
+            {/* Full-height cabinet body */}
+            <mesh position={pos(shelfCenterAlongWall, height / 2 + floorThick, shelfCenterIntoRoom)}>
+              <boxGeometry args={geo(shelfW, height, shelfD)} />
               <meshStandardMaterial {...matProps} />
             </mesh>
 
-            {/* Niche — left closed panel (1/6th) */}
-            <mesh
-              position={pos(
-                shelfCenterAlongWall - shelfW / 2 + panelW / 2,
-                counterTop + nicheH / 2 + floorThick,
-                shelfCenterIntoRoom,
-              )}
-            >
-              <boxGeometry args={geo(panelW, nicheH, shelfD)} />
-              <meshStandardMaterial {...matProps} />
-            </mesh>
-            {/* Niche — right closed panel (1/6th) */}
-            <mesh
-              position={pos(
-                shelfCenterAlongWall + shelfW / 2 - panelW / 2,
-                counterTop + nicheH / 2 + floorThick,
-                shelfCenterIntoRoom,
-              )}
-            >
-              <boxGeometry args={geo(panelW, nicheH, shelfD)} />
-              <meshStandardMaterial {...matProps} />
-            </mesh>
-
-            {/* Niche — dark back recess */}
-            <mesh
-              position={pos(shelfCenterAlongWall, counterTop + 0.03 + nicheH / 2 + floorThick, backPanelPos + 0.005)}
-            >
-              <boxGeometry args={geo(openW - 0.02, nicheH - 0.06, 0.01)} />
-              <meshStandardMaterial color="#0e0a08" roughness={0.95} />
-            </mesh>
-
-            {/* Niche — middle shelf */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 + floorThick, shelfCenterIntoRoom)}>
-              <boxGeometry args={geo(openW - 0.02, 0.025, shelfD - 0.02)} />
-              <meshStandardMaterial color={counterTopColor} roughness={0.4} metalness={0.1} />
-            </mesh>
-
-            {/* Cabinet door lines (upper) */}
-            {[0.33, 0.5, 0.67].map((frac, i) => (
+            {/* 3 door lines (dividing into 3 equal doors) */}
+            {[1 / 3, 2 / 3].map((frac, i) => (
               <mesh
-                key={`u${i}`}
+                key={`d${i}`}
                 position={doorLinePos(
                   shelfCenterAlongWall - shelfW / 2 + shelfW * frac,
-                  nicheTop + upperH / 2 + floorThick,
+                  height / 2 + floorThick,
                 )}
               >
-                <boxGeometry args={doorLineGeo(upperH - 0.02)} />
-                <meshStandardMaterial color={doorLineColor} roughness={0.5} />
+                <boxGeometry args={doorLineGeo(height - 0.02)} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
               </mesh>
             ))}
-            {/* Cabinet door lines (lower) */}
-            {[0.33, 0.5, 0.67].map((frac, i) => (
-              <mesh
-                key={`l${i}`}
-                position={doorLinePos(shelfCenterAlongWall - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick)}
-              >
-                <boxGeometry args={doorLineGeo(counterTop - 0.02)} />
-                <meshStandardMaterial color={doorLineColor} roughness={0.5} />
-              </mesh>
-            ))}
-
-            {ledStrip && <>
-            {/* LED strip under upper cabinet — front edge */}
-            <mesh position={pos(shelfCenterAlongWall, nicheTop - 0.005 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
-              <boxGeometry args={geo(openW - 0.02, 0.01, 0.015)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
-            </mesh>
-            {/* LED strip under middle shelf — front edge */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + nicheH / 2 - 0.018 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
-              <boxGeometry args={geo(openW - 0.02, 0.01, 0.015)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
-            </mesh>
-            {/* LED strip under countertop — front edge */}
-            <mesh position={pos(shelfCenterAlongWall, counterTop + 0.03 - 0.005 + floorThick, shelfCenterIntoRoom + shelfD / 2 - 0.02)}>
-              <boxGeometry args={geo(shelfW - 0.02, 0.01, 0.015)} />
-              <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
-            </mesh>
-            {/* Point lights for niche glow */}
-            <pointLight position={pos(shelfCenterAlongWall, nicheTop - 0.05 + floorThick, shelfCenterIntoRoom)} intensity={0.5} distance={1.0} color="#fffde8" />
-            <pointLight position={pos(shelfCenterAlongWall, counterTop + nicheH / 4 + floorThick, shelfCenterIntoRoom)} intensity={0.4} distance={0.8} color="#fffde8" />
-            </>}
           </group>
         );
       })()}
