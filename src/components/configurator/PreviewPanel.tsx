@@ -118,7 +118,16 @@ const modelLabels: Record<ConfigState["model"], string> = {
   base: "BLOQ BASE · 50m²",
 };
 
+// Camera distance per model to ensure full visibility
+const cameraDistances: Record<ConfigState["model"], number> = {
+  start: 12,
+  flow: 12,
+  hub: 15,
+  base: 18,
+};
+
 export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
+  const camDist = cameraDistances[config.model];
   const images = getInteriorImages(config);
   const canToggle = images && showInteriorImages !== undefined && onToggleInteriorView;
 
@@ -173,7 +182,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
             <Suspense fallback={<LoadingFallback />}>
               <Canvas
                 shadows
-                camera={{ position: [12, 5, 12], fov: 35 }}
+                camera={{ position: [camDist, 5, camDist], fov: 35 }}
                 gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.9 }}
                 style={{ width: "100%", height: "100%" }}
               >
@@ -181,7 +190,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
                 <OrbitControls
                   enablePan={false}
                   minDistance={5}
-                  maxDistance={18}
+                  maxDistance={camDist + 4}
                   minPolarAngle={0.2}
                   maxPolarAngle={Math.PI / 2.1}
                   autoRotate={false}
