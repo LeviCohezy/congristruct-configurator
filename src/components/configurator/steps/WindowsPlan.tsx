@@ -394,13 +394,13 @@ export function WindowsPlan({ config, updateConfig }: Props) {
           <button
             onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}
             className={cn(
-              "w-12 h-7 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+              "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
               config.tiltTurnWindow ? "bg-accent" : "bg-muted"
             )}
           >
             <span className={cn(
-              "absolute top-0.5 w-6 h-6 rounded-full bg-card shadow transition-transform duration-200",
-              config.tiltTurnWindow ? "translate-x-5" : "translate-x-0.5"
+              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+              config.tiltTurnWindow ? "translate-x-5" : "translate-x-0"
             )} />
           </button>
         </div>
@@ -417,13 +417,13 @@ export function WindowsPlan({ config, updateConfig }: Props) {
           <button
             onClick={() => updateConfig("mirrorPlan", !config.mirrorPlan)}
             className={cn(
-              "w-12 h-7 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+              "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
               config.mirrorPlan ? "bg-accent" : "bg-muted"
             )}
           >
             <span className={cn(
-              "absolute top-0.5 w-6 h-6 rounded-full bg-card shadow transition-transform duration-200",
-              config.mirrorPlan ? "translate-x-5" : "translate-x-0.5"
+              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+              config.mirrorPlan ? "translate-x-5" : "translate-x-0"
             )} />
           </button>
         </div>
