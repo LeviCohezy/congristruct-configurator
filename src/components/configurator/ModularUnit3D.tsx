@@ -2594,7 +2594,7 @@ function FlowBWalls({
               <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
             </mesh>
             <mesh position={[0, 0.72 + floorThick, -0.18]}>
-              <boxGeometry args={[0.05, 0.5, 0.42]} />
+              <boxGeometry args={[0.42, 0.5, 0.05]} />
               <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
             </mesh>
           </group>
