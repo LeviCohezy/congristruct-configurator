@@ -173,7 +173,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
             <Suspense fallback={<LoadingFallback />}>
               <Canvas
                 shadows
-                camera={{ position: [8, 2, 8], fov: 42 }}
+                camera={{ position: [12, 4, 12], fov: 35 }}
                 gl={{ antialias: true, toneMapping: 4, toneMappingExposure: 0.9 }}
                 style={{ width: "100%", height: "100%" }}
               >
@@ -185,7 +185,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
                   minPolarAngle={0.2}
                   maxPolarAngle={Math.PI / 2.1}
                   autoRotate={false}
-                  target={[0, -0.2, 0]}
+                  target={[0, 0.2, 0]}
                 />
               </Canvas>
             </Suspense>
