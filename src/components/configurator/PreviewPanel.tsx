@@ -47,7 +47,7 @@ const interiorImageMap: Record<string, [string, string]> = {
   "fully-finished:light-oak:dark-vinyl": [darkLightoak1, darkLightoak2],
   "fully-finished:white:dark-vinyl": [darkWhite2, darkWhite1],
   // Stone floor
-  "finished:stone-vinyl": [stoneFinished2, stoneFinished1],
+  "finished:stone-vinyl": [stoneFinished1, stoneFinished2],
   "fully-finished:brown:stone-vinyl": [stoneBrown2, stoneBrown1],
   "fully-finished:light-oak:stone-vinyl": [stoneLightoak2, stoneLightoak1],
   "fully-finished:white:stone-vinyl": [stoneWhite2, stoneWhite1],
