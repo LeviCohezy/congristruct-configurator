@@ -30,8 +30,8 @@ const interiorImageMap: Record<string, [string, string]> = {
   // Light floor (default)
   "finished:light-vinyl": [instapklaarImg1, instapklaarImg2],
   "fully-finished:brown:light-vinyl": [brownImg1, brownImg2],
-  "fully-finished:light-oak:light-vinyl": [lightoakImg1, lightoakImg2],
-  "fully-finished:white:light-vinyl": [whiteImg1, whiteImg2],
+  "fully-finished:light-oak:light-vinyl": [lightoakImg2, lightoakImg1],
+  "fully-finished:white:light-vinyl": [whiteImg2, whiteImg1],
   // Dark floor
   "finished:dark-vinyl": [darkFinished2, darkFinished1],
   "fully-finished:brown:dark-vinyl": [darkBrown2, darkBrown1],
