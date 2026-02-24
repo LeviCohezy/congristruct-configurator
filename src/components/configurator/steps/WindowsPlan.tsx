@@ -108,6 +108,18 @@ function FlowPlanSVG({ plan, mirrored, wallColor, winColor }: {
           <rect x={0} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
           <rect x={vw - wt} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
 
+          {/* Left wall window: 200cm wide, centered */}
+          {(() => {
+            const leftWinH = winW; // same 200cm = 100 SVG units
+            const leftWinY = (vh - leftWinH) / 2;
+            return (
+              <>
+                <rect x={0} y={leftWinY} width={wt} height={leftWinH} fill="hsl(var(--background))" />
+                <line x1={wt / 2} y1={leftWinY} x2={wt / 2} y2={leftWinY + leftWinH} stroke={winColor} strokeWidth={2.5} />
+              </>
+            );
+          })()}
+
           {/* Front window: 200cm wide (single pane, no divider) */}
           <rect x={winStart} y={vh - wt} width={winW} height={wt} fill="hsl(var(--background))" />
           <line x1={winStart} y1={vh - wt / 2} x2={winStart + winW} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
