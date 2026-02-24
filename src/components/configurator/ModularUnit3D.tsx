@@ -11,7 +11,7 @@ import darkWoodFloorTextureUrl from "@/assets/dark-wood-floor-texture.png";
 import stoneFloorTextureUrl from "@/assets/stone-floor-texture.png";
 
 // ─── Facade props ─────────────────────────────────────────────────────────────
-function getFacadeProps(facade: ConfigState["facade"]) {
+function getFacadeProps(facade: ConfigState["facade"], aluminiumColor?: string) {
   switch (facade) {
     case "thermowood-black":
       return { color: "#18130e", roughness: 0.93, metalness: 0.0, isWood: true };
@@ -21,12 +21,8 @@ function getFacadeProps(facade: ConfigState["facade"]) {
       return { color: "#ededea", roughness: 0.55, metalness: 0.04, isWood: false };
     case "composite-black":
       return { color: "#1c1c1e", roughness: 0.58, metalness: 0.05, isWood: false };
-    case "aluminium-anthracite":
-      return { color: "#383a3b", roughness: 0.28, metalness: 0.8, isWood: false };
-    case "aluminium-bronze":
-      return { color: "#6e4e2e", roughness: 0.26, metalness: 0.82, isWood: false };
-    case "aluminium-white":
-      return { color: "#e8e6e2", roughness: 0.3, metalness: 0.75, isWood: false };
+    case "aluminium":
+      return { color: aluminiumColor || "#383a3b", roughness: 0.25, metalness: 0.85, isWood: false };
     case "brick-grey":
       return { color: "#7a7a78", roughness: 0.95, metalness: 0.0, isWood: false };
     default:
@@ -44,6 +40,10 @@ const CELL_M = PLANK_WIDTH_M + GAP_WIDTH_M; // one repeating cell
 const COMPOSITE_PANEL_M = 1.22; // 1.22m panel width
 const COMPOSITE_GAP_M = 0.005;  // 5mm joint
 const COMPOSITE_CELL_M = COMPOSITE_PANEL_M + COMPOSITE_GAP_M;
+
+const ALU_PLANK_M = 0.20;   // 200mm aluminium plank
+const ALU_GAP_M = 0.003;    // 3mm joint
+const ALU_CELL_M = ALU_PLANK_M + ALU_GAP_M;
 
 function createPlankTexture(baseColor: string, isWood: boolean, gapColor?: string): THREE.CanvasTexture | null {
   if (!isWood) return null;
@@ -177,6 +177,64 @@ function createCompositePanelTexture(baseColor: string): THREE.CanvasTexture {
   return tex;
 }
 
+// ─── Aluminium plank texture: small planks with brushed metallic look ────────
+function createAluminiumPlankTexture(baseColor: string): THREE.CanvasTexture {
+  const canvas = document.createElement("canvas");
+  canvas.width = 128;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d")!;
+  const base = new THREE.Color(baseColor);
+
+  const gapFrac = ALU_GAP_M / ALU_CELL_M;
+  const gapPx = Math.max(1, Math.round(canvas.width * gapFrac));
+  const plankW = canvas.width - gapPx;
+
+  // Gap (dark line between planks)
+  ctx.fillStyle = "#0a0a0a";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Plank fill
+  ctx.fillStyle = `#${base.getHexString()}`;
+  ctx.fillRect(0, 0, plankW, canvas.height);
+
+  // Brushed metal horizontal streaks
+  for (let y = 0; y < canvas.height; y += 1) {
+    const alpha = 0.01 + Math.random() * 0.04;
+    const bright = Math.random() > 0.5;
+    ctx.fillStyle = bright
+      ? `rgba(255,255,255,${alpha})`
+      : `rgba(0,0,0,${alpha})`;
+    ctx.fillRect(0, y, plankW, 1);
+  }
+
+  // Subtle vertical reflection bands
+  for (let b = 0; b < 3; b++) {
+    const bx = Math.random() * plankW;
+    const bw = 8 + Math.random() * 20;
+    ctx.fillStyle = `rgba(255,255,255,${0.02 + Math.random() * 0.03})`;
+    ctx.fillRect(bx, 0, bw, canvas.height);
+  }
+
+  // Left edge shadow
+  const grad = ctx.createLinearGradient(0, 0, plankW * 0.06, 0);
+  grad.addColorStop(0, "rgba(0,0,0,0.12)");
+  grad.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, plankW * 0.06, canvas.height);
+
+  // Right edge highlight
+  const hl = ctx.createLinearGradient(plankW * 0.94, 0, plankW, 0);
+  hl.addColorStop(0, "rgba(255,255,255,0)");
+  hl.addColorStop(1, "rgba(255,255,255,0.05)");
+  ctx.fillStyle = hl;
+  ctx.fillRect(plankW * 0.94, 0, plankW * 0.06, canvas.height);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  return tex;
+}
+
 // ─── Cladding material with real-world plank repeat ─────────────────────────
 // wallWidthM = how wide the wall face is in meters. The texture repeats so
 // every plank is exactly CELL_M wide, and if it doesn't divide evenly it just
@@ -209,9 +267,10 @@ function makeCladdingMat(
 // ─── CladMaterial: meshStandardMaterial with per-wall plank repeat ──────────
 // photoTex: optional real photo texture (overrides baseTex procedural)
 // photoTexWidthM: real-world width the photo covers (for repeat calc)
-function CladMaterial({ baseTex, compositeTex, photoTex, photoTexWidthM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
+function CladMaterial({ baseTex, compositeTex, aluTex, photoTex, photoTexWidthM, photoTint, wallWidth, wallHeight, fullWallHeight, color, roughness, metalness, isWood, ...rest }: {
   baseTex: THREE.CanvasTexture | null;
   compositeTex?: THREE.CanvasTexture | null;
+  aluTex?: THREE.CanvasTexture | null;
   photoTex?: THREE.Texture | null;
   photoTexWidthM?: number;
   photoTint?: string;
@@ -241,6 +300,15 @@ function CladMaterial({ baseTex, compositeTex, photoTex, photoTexWidthM, photoTi
       b.repeat.set(wallWidth / pw, yRepeat);
       return [t, b];
     }
+    // Aluminium plank texture
+    if (aluTex) {
+      const t = aluTex.clone();
+      t.needsUpdate = true;
+      t.wrapS = THREE.RepeatWrapping;
+      t.wrapT = THREE.RepeatWrapping;
+      t.repeat.set(wallWidth / ALU_CELL_M, 1);
+      return [t, undefined];
+    }
     // Composite panel texture
     if (compositeTex && !isWood) {
       const t = compositeTex.clone();
@@ -262,11 +330,13 @@ function CladMaterial({ baseTex, compositeTex, photoTex, photoTexWidthM, photoTi
     b.wrapT = THREE.RepeatWrapping;
     b.repeat.set(wallWidth / CELL_M, yRepeat);
     return [t, b];
-  }, [baseTex, compositeTex, photoTex, photoTexWidthM, wallWidth, isWood, yRepeat]);
+  }, [baseTex, compositeTex, aluTex, photoTex, photoTexWidthM, wallWidth, isWood, yRepeat]);
+
+  const useWhiteBase = (compositeTex && !isWood) || aluTex;
 
   return (
     <meshStandardMaterial
-      color={photoTex ? (photoTint || "#ffffff") : (compositeTex && !isWood) ? "#ffffff" : color}
+      color={photoTex ? (photoTint || "#ffffff") : useWhiteBase ? "#ffffff" : color}
       roughness={roughness}
       metalness={metalness}
       map={map}
@@ -311,7 +381,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const anyConfig = config as any;
   const woodColorOverride = anyConfig.__woodColor as string | undefined;
   const gapColorOverride = anyConfig.__gapColor as string | undefined;
-  const fp = getFacadeProps(config.facade);
+  const fp = getFacadeProps(config.facade, config.aluminiumColor);
   // Use override color for wood facades
   const effectiveColor = fp.isWood && woodColorOverride ? woodColorOverride : fp.color;
   const roofColor = getRoofColor(config.facade);
@@ -334,6 +404,12 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
     if (!isComposite) return null;
     return createCompositePanelTexture(effectiveColor);
   }, [effectiveColor, isComposite]);
+
+  const isAluminium = config.facade === "aluminium";
+  const aluTex = useMemo(() => {
+    if (!isAluminium) return null;
+    return createAluminiumPlankTexture(effectiveColor);
+  }, [effectiveColor, isAluminium]);
 
   // Dimensions — all 4m depth, variable width
   const { width, height, depth } = useMemo(() => {
@@ -421,6 +497,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const woodBase = {
     baseTex: plankTex,
     compositeTex,
+    aluTex,
     photoTex: activePhotoTex,
     photoTint: isThermowoodBlack ? "#8a8a8a" : undefined, // darken black, no tint on Ayous
     photoTexWidthM: 1,

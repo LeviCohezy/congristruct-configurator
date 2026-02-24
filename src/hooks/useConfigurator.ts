@@ -10,10 +10,9 @@ export interface ConfigState {
     | "thermowood-natural"
     | "composite-white"
     | "composite-black"
-    | "aluminium-anthracite"
-    | "aluminium-bronze"
-    | "aluminium-white"
+    | "aluminium"
     | "brick-grey";
+  aluminiumColor: string; // hex color for aluminium facade
   // Step 3
   floorPlan: "a" | "b";
   tiltTurnWindow: boolean;
@@ -45,6 +44,7 @@ const defaultConfig: ConfigState = {
   model: "flow",
   roundedCorners: false,
   facade: "thermowood-black",
+  aluminiumColor: "#383a3b",
   floorPlan: "a",
   tiltTurnWindow: false,
   mirrorPlan: false,
@@ -90,9 +90,7 @@ const facadePrices: Record<string, number> = {
   "thermowood-natural": 800,
   "composite-white": 1200,
   "composite-black": 1200,
-  "aluminium-anthracite": 2400,
-  "aluminium-bronze": 2800,
-  "aluminium-white": 2400,
+  "aluminium": 2400,
   "brick-grey": 3200,
 };
 
@@ -104,7 +102,7 @@ const finishPrices: Record<string, number> = {
 
 /** Roof is auto-derived: white facades → white roof, else black */
 export function getRoofColor(facade: ConfigState["facade"]) {
-  return facade === "composite-white" || facade === "aluminium-white"
+  return facade === "composite-white"
     ? "#e0deda"
     : "#0e0d0b";
 }
