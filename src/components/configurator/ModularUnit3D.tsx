@@ -1755,8 +1755,8 @@ function FlowAWalls({
               <meshStandardMaterial {...white} />
             </mesh>
 
-            {/* ═══ MONITOR 1 — near left edge of desk 1, facing left chair ═══ */}
-            <group position={[desk1CX - deskD / 2 + 0.20, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
+            {/* ═══ MONITOR 1 — center of desk, near shared edge, facing left chair ═══ */}
+            <group position={[mainRoomCX, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1775,18 +1775,8 @@ function FlowAWalls({
               </mesh>
             </group>
 
-            {/* ═══ KEYBOARD 1 + MOUSE 1 on desk 1 ═══ */}
-            <mesh position={[desk1CX - deskD / 2 + 0.45, deskH + topT / 2 + 0.01 + floorThick, deskCZ]}>
-              <boxGeometry args={[0.02, 0.015, 0.35]} />
-              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
-            </mesh>
-            <mesh position={[desk1CX - deskD / 2 + 0.52, deskH + topT / 2 + 0.008 + floorThick, deskCZ + 0.12]}>
-              <boxGeometry args={[0.04, 0.012, 0.06]} />
-              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
-            </mesh>
-
-            {/* ═══ MONITOR 2 — near right edge of desk 2, facing right chair ═══ */}
-            <group position={[desk2CX + deskD / 2 - 0.20, 0, deskCZ]} rotation={[0, -Math.PI / 2, 0]}>
+            {/* ═══ MONITOR 2 — center of desk, near shared edge, facing right chair ═══ */}
+            <group position={[mainRoomCX, 0, deskCZ]} rotation={[0, Math.PI / 2, 0]}>
               <mesh position={[0, deskH + topT / 2 + 0.008 + floorThick, 0]}>
                 <boxGeometry args={[0.2, 0.008, 0.18]} />
                 <meshStandardMaterial {...silver} />
@@ -1805,14 +1795,24 @@ function FlowAWalls({
               </mesh>
             </group>
 
-            {/* ═══ KEYBOARD 2 + MOUSE 2 on desk 2 ═══ */}
-            <mesh position={[desk2CX + deskD / 2 - 0.45, deskH + topT / 2 + 0.01 + floorThick, deskCZ]}>
-              <boxGeometry args={[0.02, 0.015, 0.35]} />
-              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+            {/* ═══ KEYBOARD 1 + MOUSE 1 on desk 1 (near chair side) ═══ */}
+            <mesh position={[desk1CX - 0.1, deskH + topT / 2 + 0.01 + floorThick, deskCZ + 0.1]}>
+              <boxGeometry args={[0.12, 0.012, 0.35]} />
+              <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
             </mesh>
-            <mesh position={[desk2CX + deskD / 2 - 0.52, deskH + topT / 2 + 0.008 + floorThick, deskCZ + 0.12]}>
+            <mesh position={[desk1CX - 0.1, deskH + topT / 2 + 0.008 + floorThick, deskCZ - 0.15]}>
               <boxGeometry args={[0.04, 0.012, 0.06]} />
-              <meshStandardMaterial color="#333333" roughness={0.6} metalness={0.2} />
+              <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
+            </mesh>
+
+            {/* ═══ KEYBOARD 2 + MOUSE 2 on desk 2 (near chair side) ═══ */}
+            <mesh position={[desk2CX + 0.1, deskH + topT / 2 + 0.01 + floorThick, deskCZ + 0.1]}>
+              <boxGeometry args={[0.12, 0.012, 0.35]} />
+              <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
+            </mesh>
+            <mesh position={[desk2CX + 0.1, deskH + topT / 2 + 0.008 + floorThick, deskCZ - 0.15]}>
+              <boxGeometry args={[0.04, 0.012, 0.06]} />
+              <meshStandardMaterial color="#e0e0e0" roughness={0.3} metalness={0.4} />
             </mesh>
 
             {/* ═══ LEFT OFFICE CHAIR — facing desk 1 (+X) ═══ */}
