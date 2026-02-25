@@ -1813,7 +1813,7 @@ function FlowAWalls({
         const shelfD = 0.40;
         const shelfCX = mainRoomCX;
         const shelfCZ = backInnerZ + shelfD / 2;
-        const backPanelZ = backInnerZ + 0.06;
+        const backPanelZ = backInnerZ + 0.10;
 
         const counterTop = height * 0.25;
         const upperBottom = height * 0.65;
@@ -2664,7 +2664,7 @@ function FlowBWalls({
         // Helper to render a shelf closet across the back wall
         const renderShelf = (cx: number, sw: number) => {
           const shelfCZ = backInnerZ + shelfD / 2;
-          const backPanelZ = backInnerZ + 0.06;
+          const backPanelZ = backInnerZ + 0.10;
           return (
             <>
               {/* Back panel */}
