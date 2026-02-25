@@ -64,17 +64,19 @@ function ImageGrid<T extends string>({
 }) {
   // Desktop: all side-by-side. Mobile: 2-col grid
   return (
-    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+    <div className="flex gap-4 flex-wrap">
       {options.map((o) => (
         <button
           key={o.id}
           onClick={() => onSelect(o.id)}
-          className={cn("option-card text-center p-2", selected === o.id && "option-card-active")}
+          className={cn(
+            "w-20 h-20 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
+            selected === o.id
+              ? "border-accent ring-2 ring-accent/30"
+              : "border-border/60 bg-secondary hover:border-accent/40"
+          )}
         >
-          <div className="aspect-square rounded-lg overflow-hidden mb-2">
-            <img src={o.img} alt={o.label} className="w-full h-full object-cover" />
-          </div>
-          <p className="text-xs font-medium">{o.label}</p>
+          <img src={o.img} alt={o.label} className="w-full h-full object-cover" />
         </button>
       ))}
     </div>
