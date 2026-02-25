@@ -20,7 +20,7 @@ export function UnitSelection({ config, updateConfig }: Props) {
       <div>
         <h3 className="text-xl font-display font-light mb-1">Kies je model</h3>
         <p className="text-sm text-muted-foreground mb-5">Selecteer de unit die bij jouw project past</p>
-        <div className="grid gap-3">
+        <div className="grid gap-4">
           {models.map((m) => (
             <button
               key={m.id}
@@ -44,7 +44,7 @@ export function UnitSelection({ config, updateConfig }: Props) {
 
       <div className="mt-6">
         <p className="config-label mb-3">Hoekafwerking</p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => updateConfig("roundedCorners", false)}
             className={cn("option-card text-center py-5", !config.roundedCorners && "option-card-active")}

@@ -39,7 +39,7 @@ export function ContactForm({ config, updateContact, totalPrice }: Props) {
         <p className="text-xs text-muted-foreground mt-1">excl. VAT · subject to final configuration review</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-4">
         {fields.map((f) => (
           <div key={f.key} className={f.half ? "col-span-1" : "col-span-2"}>
             <label className="text-xs font-medium text-muted-foreground mb-1 block">{f.label}</label>
