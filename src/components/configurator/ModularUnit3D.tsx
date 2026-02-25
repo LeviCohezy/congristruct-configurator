@@ -610,16 +610,29 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       )}
 
       {/* Walkable floor */}
-      <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[width - wallThick * 2, depth - wallThick * 2]} />
-        {isShell ? (
-          <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
-        ) : floorTex ? (
-          <meshStandardMaterial map={floorTex} color={config.floorOption === "stone-vinyl" ? "#9a8a7a" : "#ffe8d6"} roughness={0.85} metalness={0.0} />
-        ) : (
-          <meshStandardMaterial color={floorColor} roughness={0.65} />
-        )}
-      </mesh>
+      {cornerRadius > 0 ? (
+        <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <shapeGeometry args={[roundedRect(width - wallThick * 2, depth - wallThick * 2, Math.max(cornerRadius - wallThick, 0.01))]} />
+          {isShell ? (
+            <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
+          ) : floorTex ? (
+            <meshStandardMaterial map={floorTex} color={config.floorOption === "stone-vinyl" ? "#9a8a7a" : "#ffe8d6"} roughness={0.85} metalness={0.0} />
+          ) : (
+            <meshStandardMaterial color={floorColor} roughness={0.65} />
+          )}
+        </mesh>
+      ) : (
+        <mesh position={[0, floorThick + 0.005, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+          <planeGeometry args={[width - wallThick * 2, depth - wallThick * 2]} />
+          {isShell ? (
+            <InteriorMat osbTex={osbTex} isShell={isShell} color={floorColor} roughness={0.85} />
+          ) : floorTex ? (
+            <meshStandardMaterial map={floorTex} color={config.floorOption === "stone-vinyl" ? "#9a8a7a" : "#ffe8d6"} roughness={0.85} metalness={0.0} />
+          ) : (
+            <meshStandardMaterial color={floorColor} roughness={0.65} />
+          )}
+        </mesh>
+      )}
 
       {/* ── Roof slab — black, covers full unit ── */}
       {slabShape ? (
