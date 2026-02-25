@@ -654,7 +654,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       {cornerShapes &&
         cornerShapes.map(({ shape, posX, posZ }, i) => (
           <mesh key={`ce${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]} castShadow>
-            <extrudeGeometry args={[shape, { depth: height, bevelEnabled: false }]} />
+            <extrudeGeometry args={[shape, { depth: extWallH, bevelEnabled: false }]} />
             <CladMaterial {...woodBase} wallWidth={Math.PI * 0.5 * cornerRadius} />
           </mesh>
         ))}
@@ -677,7 +677,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
             shell.closePath();
             return (
               <mesh key={`ci${i}`} position={[posX, floorThick + height, posZ]} rotation={[Math.PI / 2, 0, 0]}>
-                <extrudeGeometry args={[shell, { depth: height, bevelEnabled: false }]} />
+                <extrudeGeometry args={[shell, { depth: extWallH, bevelEnabled: false }]} />
                 <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
               </mesh>
             );
