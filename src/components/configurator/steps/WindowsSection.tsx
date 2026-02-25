@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
@@ -16,7 +17,7 @@ export function WindowsSection({ config, updateConfig }: Props) {
         <div>
           <p className="text-sm font-medium">Draai-kiepraam</p>
           <p className="text-xs text-muted-foreground">Upgrade naar draai-kiepramen voor betere ventilatie</p>
-          <p className="text-xs font-medium text-accent mt-1">+€450</p>
+          <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-1">+€450</p></BlurredPrice>
         </div>
         <button
           onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}

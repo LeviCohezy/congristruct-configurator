@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Sun, Battery, Umbrella, Landmark } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
@@ -34,7 +35,7 @@ export function ExtraOptions({ config, updateConfig }: Props) {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <p className="font-medium text-sm">{e.label}</p>
-                    <p className="text-sm font-medium">{e.price}</p>
+                    <BlurredPrice revealed={config.priceRevealed}><p className="text-sm font-medium">{e.price}</p></BlurredPrice>
                   </div>
                   <p className="text-xs text-muted-foreground">{e.desc}</p>
                 </div>

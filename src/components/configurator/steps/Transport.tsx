@@ -4,6 +4,7 @@ import { MapPin, Truck, Search } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
@@ -192,7 +193,7 @@ export function Transport({ config, updateConfig }: Props) {
               )}
             </p>
           </div>
-          <p className="text-lg font-display font-bold">€{transportCost.toLocaleString("nl-NL")}</p>
+          <BlurredPrice revealed={config.priceRevealed}><p className="text-lg font-display font-bold">€{transportCost.toLocaleString("nl-NL")}</p></BlurredPrice>
         </div>
       </div>
 
