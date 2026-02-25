@@ -90,7 +90,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       <p className="text-sm text-muted-foreground mb-6">Kies je verlichtingsarmaturen</p>
 
       {/* Spots */}
-      <div className="mb-10">
+      <div className="mb-14">
         <p className="config-label mb-4">Spots</p>
         <ImageGrid
           options={spotOptions}
@@ -100,7 +100,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Rail */}
-      <div className="mb-10">
+      <div className="mb-14">
         <p className="config-label mb-4">Railverlichting</p>
         <ImageGrid
           options={railOptions}
@@ -110,7 +110,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Toiletlamp */}
-      <div className="mb-10">
+      <div className="mb-14">
         <p className="config-label mb-4">Toiletlamp</p>
         <ImageGrid
           options={toiletOptions}
