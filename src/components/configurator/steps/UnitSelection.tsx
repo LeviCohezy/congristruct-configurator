@@ -42,7 +42,7 @@ export function UnitSelection({ config, updateConfig }: Props) {
         </div>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-14">
         <p className="config-label mb-4">Hoekafwerking</p>
         <div className="grid grid-cols-2 gap-4">
           <button
