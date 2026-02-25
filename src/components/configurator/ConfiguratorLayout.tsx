@@ -143,10 +143,11 @@ function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: n
   });
   // Map scroll position to opacity: fade in as section enters center, fade out as it leaves
   const opacity = useTransform(scrollYProgress, [0, 0.15, 0.4, 0.6, 0.85, 1], [0.1, 0.4, 1, 1, 0.4, 0.1]);
-  const y = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [24, 0, 0, -8]);
+  const y = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.8, 1], [40, 16, 0, 0, -8, -20]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.5, 0.7, 1], [0.97, 1, 1, 1, 0.98]);
 
   return (
-    <motion.div ref={ref} style={{ opacity, y }}>
+    <motion.div ref={ref} style={{ opacity, y, scale }}>
       {children}
     </motion.div>
   );
