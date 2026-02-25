@@ -6,6 +6,7 @@ import { UnitSelection } from "./steps/UnitSelection";
 import { FloorPlanSection } from "./steps/FloorPlanSection";
 import { ExteriorFacade } from "./steps/ExteriorFacade";
 import { InteriorFinish } from "./steps/InteriorFinish";
+import { LightingSection } from "./steps/LightingSection";
 import { WindowsSection } from "./steps/WindowsSection";
 import { ExtraOptions } from "./steps/ExtraOptions";
 import { Transport } from "./steps/Transport";
@@ -84,7 +85,12 @@ export function ConfiguratorLayout() {
 
             <Divider />
 
-            {/* 5. Ramen */}
+            {/* 4b. Verlichting */}
+            <Section delay={0.17}>
+              <LightingSection config={config} updateConfig={updateConfig} />
+            </Section>
+
+            <Divider />
             <Section delay={0.2}>
               <WindowsSection config={config} updateConfig={updateConfig} />
             </Section>
