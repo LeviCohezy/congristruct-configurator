@@ -8,6 +8,7 @@ import opbouwSpotWit from "@/assets/lighting-opbouw-spot-wit.avif";
 import railVastWit from "@/assets/lighting-rail-vast-wit.avif";
 import railVastZwart from "@/assets/lighting-rail-vast-zwart.avif";
 import railWitHangend from "@/assets/lighting-rail-wit-hangend.avif";
+import railZwartHangend from "@/assets/lighting-rail-zwart-hangend.avif";
 import wcSpotWit from "@/assets/lighting-wc-spot-wit.avif";
 import wcSpotZwart from "@/assets/lighting-wc-spot-zwart.avif";
 
@@ -27,6 +28,7 @@ const railOptions = [
   { id: "rail-vast-wit" as const, label: "Rail vast wit", img: railVastWit },
   { id: "rail-vast-zwart" as const, label: "Rail vast zwart", img: railVastZwart },
   { id: "rail-wit-hangend" as const, label: "Rail wit hangend", img: railWitHangend },
+  { id: "rail-zwart-hangend" as const, label: "Rail zwart hangend", img: railZwartHangend },
 ];
 
 const toiletOptions = [
@@ -62,10 +64,7 @@ function ImageGrid<T extends string>({
 }) {
   // Desktop: all side-by-side. Mobile: 2-col grid
   return (
-    <div className={cn(
-      "grid gap-3",
-      options.length <= 2 ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-4"
-    )}>
+    <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
       {options.map((o) => (
         <button
           key={o.id}

@@ -24,7 +24,7 @@ export interface ConfigState {
   tiltTurnWindow: boolean;
   // Verlichting
   spotType: "spot-wit" | "spot-zwart" | "opbouw-spot-wit" | "opbouw-spot-zwart";
-  railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend";
+  railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend" | "rail-zwart-hangend";
   toiletLamp: "wc-spot-wit" | "wc-spot-zwart";
   keukenLedStrip: boolean;
   kastLedStrip: boolean;
