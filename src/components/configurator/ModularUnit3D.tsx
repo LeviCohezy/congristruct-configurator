@@ -438,7 +438,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const winCY = winBot + winH / 2;
 
   const slabShape = useMemo(
-    () => (cornerRadius > 0 ? roundedRect(width, depth, cornerRadius) : null),
+    () => (cornerRadius > 0 ? roundedRect(width - 0.02, depth - 0.02, cornerRadius) : null),
     [width, depth, cornerRadius],
   );
 
