@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useConfigurator } from "@/hooks/useConfigurator";
+import { useInteriorImages } from "@/hooks/useInteriorImages";
 import { PreviewPanel } from "./PreviewPanel";
 import { UnitSelection } from "./steps/UnitSelection";
 import { FloorPlanSection } from "./steps/FloorPlanSection";
@@ -13,6 +14,7 @@ import { motion } from "framer-motion";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
+  const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);
   const interiorRef = useRef<HTMLDivElement>(null);
@@ -32,7 +34,7 @@ export function ConfiguratorLayout() {
     return () => observer.disconnect();
   }, []);
 
-  const showImages = !force3D && interiorInView && config.model === "start" && !(config.finishLevel === "shell" && config.floorPlan === "a");
+  const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
@@ -43,6 +45,7 @@ export function ConfiguratorLayout() {
           currentStep={0}
           showInteriorImages={showImages}
           onToggleInteriorView={() => setForce3D((v) => !v)}
+          interiorImages={interiorImages}
         />
       </div>
 
