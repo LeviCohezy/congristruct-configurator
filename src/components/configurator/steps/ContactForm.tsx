@@ -14,13 +14,12 @@ interface Props {
 const fields: { key: keyof ConfigState["contact"]; label: string; type: string }[] = [
   { key: "fullName", label: "Volledige naam", type: "text" },
   { key: "email", label: "E-mailadres", type: "email" },
-  { key: "phone", label: "Telefoonnummer", type: "tel" },
 ];
 
 export function ContactForm({ config, updateContact, totalPrice, onPriceClick }: Props) {
   const handleSubmit = () => {
     const c = config.contact;
-    if (!c.fullName || !c.email || !c.phone) {
+    if (!c.fullName || !c.email) {
       toast.error("Vul alle velden in");
       return;
     }
