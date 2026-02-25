@@ -13,6 +13,7 @@ import { Transport } from "./steps/Transport";
 import { ContactForm } from "./steps/ContactForm";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { BlurredPrice } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
@@ -137,9 +138,9 @@ export function ConfiguratorLayout() {
             onClick={() => !priceRevealed && setShowPriceGate(true)}
             className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 cursor-pointer transition-all hover:shadow-xl"
           >
-            <p className={`text-xl font-display font-bold text-foreground transition-all ${!priceRevealed ? "blur-md select-none" : ""}`}>
-              ± €{totalPrice.toLocaleString("nl-NL")}
-            </p>
+            <BlurredPrice revealed={priceRevealed}>
+              <span className="text-xl font-display font-bold text-foreground">± €{totalPrice.toLocaleString("nl-NL")}</span>
+            </BlurredPrice>
             <p className="text-[11px] text-muted-foreground whitespace-nowrap">
               {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
             </p>

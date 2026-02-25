@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 import {
   Tooltip,
   TooltipContent,
@@ -153,7 +154,7 @@ export function LightingSection({ config, updateConfig }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Keuken LED</p>
-                <p className="text-xs font-medium text-accent mt-0.5">+€350</p>
+                <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-0.5">+€350</p></BlurredPrice>
               </div>
               <Toggle on={config.keukenLedStrip} onToggle={() => updateConfig("keukenLedStrip", !config.keukenLedStrip)} />
             </div>
@@ -170,7 +171,7 @@ export function LightingSection({ config, updateConfig }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Kast LED</p>
-                <p className="text-xs font-medium text-accent mt-0.5">+€300</p>
+                <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-0.5">+€300</p></BlurredPrice>
               </div>
               <Toggle on={config.kastLedStrip} onToggle={() => updateConfig("kastLedStrip", !config.kastLedStrip)} />
             </div>

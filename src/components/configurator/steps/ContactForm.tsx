@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { toast } from "sonner";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
@@ -32,9 +33,9 @@ export function ContactForm({ config, updateContact, totalPrice }: Props) {
 
       <div className="bg-surface rounded-xl p-4 mb-6">
         <p className="config-label">Jouw prijsindicatie</p>
-        <p className={`text-2xl font-display font-bold mt-1 transition-all ${!config.priceRevealed ? "blur-md select-none" : ""}`}>
-          €{totalPrice.toLocaleString("nl-NL")}
-        </p>
+        <BlurredPrice revealed={config.priceRevealed}>
+          <span className="text-2xl font-display font-bold mt-1">€{totalPrice.toLocaleString("nl-NL")}</span>
+        </BlurredPrice>
         <p className="text-xs text-muted-foreground mt-1">excl. BTW · onder voorbehoud van finale configuratie</p>
       </div>
 

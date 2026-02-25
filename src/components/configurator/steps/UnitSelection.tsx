@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
@@ -64,7 +65,7 @@ export function UnitSelection({ config, updateConfig }: Props) {
                   <p className="text-xs text-muted-foreground">
                     {m.size} · {m.people}
                   </p>
-                  <p className="text-sm font-semibold mt-1">{m.price}</p>
+                  <BlurredPrice revealed={config.priceRevealed}><p className="text-sm font-semibold mt-1">{m.price}</p></BlurredPrice>
                 </div>
               </div>
             </button>
