@@ -85,9 +85,9 @@ export function LightingSection({ config, updateConfig }: Props) {
   const isFlow = config.model === "flow";
 
   return (
-    <div className="config-section">
+    <div>
       <h3 className="text-xl font-display font-light mb-1">Verlichting</h3>
-      <p className="text-sm text-muted-foreground mb-6">Kies je verlichtingsarmaturen</p>
+      <p className="text-sm text-muted-foreground mb-8">Kies je verlichtingsarmaturen</p>
 
       {/* Spots */}
       <div className="mb-14">
