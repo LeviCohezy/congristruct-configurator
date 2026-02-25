@@ -20,7 +20,7 @@ export function UnitSelection({ config, updateConfig }: Props) {
       <div>
         <h3 className="text-xl font-display font-light mb-1">Kies je model</h3>
         <p className="text-sm text-muted-foreground mb-5">Selecteer de unit die bij jouw project past</p>
-        <div className="grid gap-4">
+        <div className="grid gap-5">
           {models.map((m) => (
             <button
               key={m.id}
