@@ -2054,7 +2054,7 @@ function FlowAWalls({
               const rwShelfCX = halfW - wallThick - rwShelfD / 2;
               const rwShelfCZ = toiletWallZ + partT / 2 + 0.02 + rwShelfDepth / 2;
               const rwShelfW = rwShelfDepth; // along Z
-              const rwBackX = halfW - wallThick - 0.04;
+              const rwBackX = halfW - wallThick - 0.02; // flush against wall
               const rwCounterH = height * 0.25;
               const rwUpperBottom = height * 0.65;
               const rwUpperH = height - rwUpperBottom;
@@ -2068,7 +2068,7 @@ function FlowAWalls({
                 <group>
                   {/* Back panel on right wall */}
                   <mesh position={[rwBackX, height / 2 + floorThick, rwShelfCZ]}>
-                    <boxGeometry args={[0.02, height, rwShelfW]} />
+                    <boxGeometry args={[0.04, height, rwShelfW]} />
                     <meshStandardMaterial {...matProps} />
                   </mesh>
                   {/* Side panel — toilet wall side */}
