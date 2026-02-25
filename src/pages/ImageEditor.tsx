@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Check, X, ImageIcon } from "lucide-react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Check, X, ImageIcon, Upload, Trash2 } from "lucide-react";
 
 // Import all existing interior images to check availability
 import brownImg1 from "@/assets/start-interior-brown-1.avif";
@@ -66,125 +66,199 @@ const kastColors: { id: Kast; label: string }[] = [
   { id: "white", label: "Wit" },
 ];
 
-// Map of all currently available images
-// Key format: model:plan:finishLevel:floor:kast
-// For casco: model:plan:shell
-// For instapklaar: model:plan:finished:floor
-// For volledig: model:plan:fully-finished:floor:kast
-type ImageEntry = { img1: string | null; img2: string | null };
+function makeKey(model: Model, plan: Plan, finish: string, floor?: Floor, kast?: Kast): string {
+  return [model, plan, finish, floor ?? "", kast ?? ""].join(":");
+}
 
-function getImages(model: Model, plan: Plan, finish: string, floor?: Floor, kast?: Kast): ImageEntry {
-  // Only START has images for now
-  if (model !== "start") return { img1: null, img2: null };
+function getDefaultImage(model: Model, plan: Plan, finish: string, floor?: Floor, kast?: Kast, slot?: 1 | 2): string | null {
+  if (model !== "start") return null;
 
   if (finish === "shell") {
-    if (plan === "a") return { img1: cascoImg1, img2: cascoImg2 };
-    if (plan === "b") return { img1: cascoToiletImg1, img2: cascoToiletImg2 };
+    if (plan === "a") return slot === 1 ? cascoImg1 : cascoImg2;
+    if (plan === "b") return slot === 1 ? cascoToiletImg1 : cascoToiletImg2;
   }
-
   if (finish === "finished") {
     if (plan === "a") {
-      if (floor === "light-vinyl") return { img1: instapklaarImg1, img2: instapklaarImg2 };
-      if (floor === "dark-vinyl") return { img1: darkFinished2, img2: darkFinished1 };
-      if (floor === "stone-vinyl") return { img1: stoneFinished1, img2: stoneFinished2 };
+      if (floor === "light-vinyl") return slot === 1 ? instapklaarImg1 : instapklaarImg2;
+      if (floor === "dark-vinyl") return slot === 1 ? darkFinished2 : darkFinished1;
+      if (floor === "stone-vinyl") return slot === 1 ? stoneFinished1 : stoneFinished2;
     }
     if (plan === "b") {
-      if (floor === "light-vinyl") return { img1: toiletInstapklaar1, img2: toiletInstapklaar2 };
-      // dark & stone toilet finished: not yet uploaded
+      if (floor === "light-vinyl") return slot === 1 ? toiletInstapklaar1 : toiletInstapklaar2;
     }
   }
-
   if (finish === "fully-finished") {
     if (plan === "a") {
       if (floor === "light-vinyl") {
-        if (kast === "brown") return { img1: brownImg1, img2: furnishedShared };
-        if (kast === "light-oak") return { img1: lightoakImg1, img2: furnishedShared };
-        if (kast === "white") return { img1: whiteImg1, img2: furnishedShared };
+        if (kast === "brown") return slot === 1 ? brownImg1 : furnishedShared;
+        if (kast === "light-oak") return slot === 1 ? lightoakImg1 : furnishedShared;
+        if (kast === "white") return slot === 1 ? whiteImg1 : furnishedShared;
       }
       if (floor === "dark-vinyl") {
-        if (kast === "brown") return { img1: darkBrown2, img2: darkBrown1 };
-        if (kast === "light-oak") return { img1: darkLightoak1, img2: darkLightoak2 };
-        if (kast === "white") return { img1: darkWhite2, img2: darkWhite1 };
+        if (kast === "brown") return slot === 1 ? darkBrown2 : darkBrown1;
+        if (kast === "light-oak") return slot === 1 ? darkLightoak1 : darkLightoak2;
+        if (kast === "white") return slot === 1 ? darkWhite2 : darkWhite1;
       }
       if (floor === "stone-vinyl") {
-        if (kast === "brown") return { img1: stoneBrown2, img2: stoneBrown1 };
-        if (kast === "light-oak") return { img1: stoneLightoak2, img2: stoneLightoak1 };
-        if (kast === "white") return { img1: stoneWhite2, img2: stoneWhite1 };
+        if (kast === "brown") return slot === 1 ? stoneBrown2 : stoneBrown1;
+        if (kast === "light-oak") return slot === 1 ? stoneLightoak2 : stoneLightoak1;
+        if (kast === "white") return slot === 1 ? stoneWhite2 : stoneWhite1;
       }
     }
     if (plan === "b") {
       if (floor === "light-vinyl") {
-        if (kast === "brown") return { img1: toiletBrown1, img2: toiletBrown2 };
-        if (kast === "light-oak") return { img1: toiletLightoak1, img2: toiletLightoak2 };
-        if (kast === "white") return { img1: toiletWhite1, img2: toiletWhite2 };
+        if (kast === "brown") return slot === 1 ? toiletBrown1 : toiletBrown2;
+        if (kast === "light-oak") return slot === 1 ? toiletLightoak1 : toiletLightoak2;
+        if (kast === "white") return slot === 1 ? toiletWhite1 : toiletWhite2;
       }
-      // dark & stone toilet fully-finished: not yet uploaded
     }
   }
-
-  return { img1: null, img2: null };
+  return null;
 }
 
-function ImageSlot({ src, label }: { src: string | null; label: string }) {
+// Overrides stored in localStorage
+const STORAGE_KEY = "bloq-image-overrides";
+
+function loadOverrides(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveOverrides(overrides: Record<string, string>) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
+}
+
+function ImageSlot({
+  src,
+  label,
+  slotKey,
+  onReplace,
+  onDelete,
+}: {
+  src: string | null;
+  label: string;
+  slotKey: string;
+  onReplace: (key: string, dataUrl: string) => void;
+  onDelete: (key: string) => void;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        onReplace(slotKey, reader.result);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   return (
-    <div className="relative rounded-lg border border-border overflow-hidden bg-muted aspect-[4/3] flex items-center justify-center">
+    <div className="relative group rounded-lg border border-border overflow-hidden bg-muted aspect-[4/3] flex items-center justify-center">
       {src ? (
-        <img src={src} alt={label} className="w-full h-full object-cover" />
+        <>
+          <img src={src} alt={label} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+            <button
+              onClick={() => fileRef.current?.click()}
+              className="p-2 rounded-full bg-card/90 text-foreground hover:bg-card transition-colors"
+              title="Replace"
+            >
+              <Upload className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onDelete(slotKey)}
+              className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors"
+              title="Delete"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </>
       ) : (
-        <div className="flex flex-col items-center gap-1 text-muted-foreground">
-          <ImageIcon className="w-6 h-6" />
-          <span className="text-[10px]">Missing</span>
-        </div>
+        <button
+          onClick={() => fileRef.current?.click()}
+          className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <Upload className="w-6 h-6" />
+          <span className="text-[10px] font-medium">Upload</span>
+        </button>
       )}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFile}
+      />
     </div>
   );
 }
 
-function StatusBadge({ has }: { has: boolean }) {
-  if (has) {
+function StatusBadge({ count }: { count: number }) {
+  if (count === 2) {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-[10px] font-medium">
         <Check className="w-3 h-3" /> 2/2
       </span>
     );
   }
+  if (count === 1) {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-600 text-[10px] font-medium">
+        1/2
+      </span>
+    );
+  }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-destructive/20 text-destructive text-[10px] font-medium">
-      <X className="w-3 h-3" /> Missing
+      <X className="w-3 h-3" /> 0/2
     </span>
   );
 }
 
-function CombinationRow({ model, plan, finish, floor, kast }: {
+function CombinationRow({
+  model, plan, finish, floor, kast, overrides, onReplace, onDelete,
+}: {
   model: Model; plan: Plan; finish: string; floor?: Floor; kast?: Kast;
+  overrides: Record<string, string>;
+  onReplace: (key: string, dataUrl: string) => void;
+  onDelete: (key: string) => void;
 }) {
-  const { img1, img2 } = getImages(model, plan, finish, floor, kast);
-  const hasAll = !!img1 && !!img2;
+  const key1 = makeKey(model, plan, finish, floor, kast) + ":1";
+  const key2 = makeKey(model, plan, finish, floor, kast) + ":2";
+
+  const img1 = overrides[key1] ?? getDefaultImage(model, plan, finish, floor, kast, 1);
+  const img2 = overrides[key2] ?? getDefaultImage(model, plan, finish, floor, kast, 2);
+
+  // Check for deleted markers
+  const src1 = overrides[key1] === "__deleted__" ? null : img1;
+  const src2 = overrides[key2] === "__deleted__" ? null : img2;
+
+  const count = (src1 ? 1 : 0) + (src2 ? 1 : 0);
 
   const labelParts: string[] = [];
   if (finish === "shell") labelParts.push("Casco");
   if (finish === "finished") labelParts.push("Instapklaar");
   if (finish === "fully-finished") labelParts.push("Volledig ingericht");
-  if (floor) {
-    const floorLabel = floors.find(f => f.id === floor)?.label ?? floor;
-    labelParts.push(floorLabel);
-  }
-  if (kast) {
-    const kastLabel = kastColors.find(k => k.id === kast)?.label ?? kast;
-    labelParts.push(kastLabel);
-  }
+  if (floor) labelParts.push(floors.find(f => f.id === floor)?.label ?? floor);
+  if (kast) labelParts.push(kastColors.find(k => k.id === kast)?.label ?? kast);
 
   return (
-    <div className="flex items-start gap-3 py-3 border-b border-border/50 last:border-0">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-2">
-          <p className="text-xs font-medium text-foreground truncate">{labelParts.join(" · ")}</p>
-          <StatusBadge has={hasAll} />
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <ImageSlot src={img1} label="Image 1" />
-          <ImageSlot src={img2} label="Image 2" />
-        </div>
+    <div className="py-3 border-b border-border/50 last:border-0">
+      <div className="flex items-center gap-2 mb-2">
+        <p className="text-xs font-medium text-foreground truncate">{labelParts.join(" · ")}</p>
+        <StatusBadge count={count} />
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <ImageSlot src={src1} label="Image 1" slotKey={key1} onReplace={onReplace} onDelete={onDelete} />
+        <ImageSlot src={src2} label="Image 2" slotKey={key2} onReplace={onReplace} onDelete={onDelete} />
       </div>
     </div>
   );
@@ -193,48 +267,45 @@ function CombinationRow({ model, plan, finish, floor, kast }: {
 export default function ImageEditor() {
   const [selectedModel, setSelectedModel] = useState<Model>("start");
   const [selectedPlan, setSelectedPlan] = useState<Plan>("a");
+  const [overrides, setOverrides] = useState<Record<string, string>>(loadOverrides);
 
-  // Build the combinations list
-  const combinations: React.ReactNode[] = [];
+  useEffect(() => {
+    saveOverrides(overrides);
+  }, [overrides]);
 
-  // 1. Casco — 1 combo, no floor/kast
-  combinations.push(
-    <CombinationRow key="shell" model={selectedModel} plan={selectedPlan} finish="shell" />
-  );
+  const handleReplace = useCallback((key: string, dataUrl: string) => {
+    setOverrides(prev => ({ ...prev, [key]: dataUrl }));
+  }, []);
 
-  // 2. Instapklaar — 3 combos (per floor)
-  for (const floor of floors) {
-    combinations.push(
-      <CombinationRow key={`finished-${floor.id}`} model={selectedModel} plan={selectedPlan} finish="finished" floor={floor.id} />
-    );
-  }
+  const handleDelete = useCallback((key: string) => {
+    setOverrides(prev => ({ ...prev, [key]: "__deleted__" }));
+  }, []);
 
-  // 3. Volledig ingericht — 9 combos (3 floors × 3 kast colors)
-  for (const floor of floors) {
-    for (const kast of kastColors) {
-      combinations.push(
-        <CombinationRow key={`full-${floor.id}-${kast.id}`} model={selectedModel} plan={selectedPlan} finish="fully-finished" floor={floor.id} kast={kast.id} />
-      );
+  // Count filled slots
+  function countFilled() {
+    let filled = 0;
+    const total = (1 + 3 + 9) * 2;
+    const combos = getCombos();
+    for (const c of combos) {
+      const k1 = makeKey(selectedModel, selectedPlan, c.finish, c.floor, c.kast) + ":1";
+      const k2 = makeKey(selectedModel, selectedPlan, c.finish, c.floor, c.kast) + ":2";
+      const s1 = overrides[k1] === "__deleted__" ? null : (overrides[k1] ?? getDefaultImage(selectedModel, selectedPlan, c.finish, c.floor, c.kast, 1));
+      const s2 = overrides[k2] === "__deleted__" ? null : (overrides[k2] ?? getDefaultImage(selectedModel, selectedPlan, c.finish, c.floor, c.kast, 2));
+      if (s1) filled++;
+      if (s2) filled++;
     }
+    return { filled, total };
   }
 
-  // Count totals
-  const totalSlots = (1 + 3 + 9) * 2; // 13 combos × 2 images
-  let filledSlots = 0;
-  // Casco
-  const cascoImgs = getImages(selectedModel, selectedPlan, "shell");
-  if (cascoImgs.img1) filledSlots++;
-  if (cascoImgs.img2) filledSlots++;
-  for (const floor of floors) {
-    const fi = getImages(selectedModel, selectedPlan, "finished", floor.id);
-    if (fi.img1) filledSlots++;
-    if (fi.img2) filledSlots++;
-    for (const kast of kastColors) {
-      const fu = getImages(selectedModel, selectedPlan, "fully-finished", floor.id, kast.id);
-      if (fu.img1) filledSlots++;
-      if (fu.img2) filledSlots++;
-    }
+  function getCombos() {
+    const combos: { finish: string; floor?: Floor; kast?: Kast }[] = [];
+    combos.push({ finish: "shell" });
+    for (const f of floors) combos.push({ finish: "finished", floor: f.id });
+    for (const f of floors) for (const k of kastColors) combos.push({ finish: "fully-finished", floor: f.id, kast: k.id });
+    return combos;
   }
+
+  const { filled, total } = countFilled();
 
   return (
     <div className="min-h-screen bg-background">
@@ -242,7 +313,7 @@ export default function ImageEditor() {
         <div className="mb-8">
           <h1 className="text-2xl font-display font-bold text-foreground">Interior Image Editor</h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Overview of all interior image combinations per BLOQ model
+            Manage all interior image combinations per BLOQ model. Hover images to replace or delete.
           </p>
         </div>
 
@@ -290,12 +361,12 @@ export default function ImageEditor() {
         <div className="mb-6 p-4 rounded-xl bg-surface border border-border">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-medium text-foreground">Coverage</p>
-            <p className="text-sm font-bold text-foreground">{filledSlots}/{totalSlots} images</p>
+            <p className="text-sm font-bold text-foreground">{filled}/{total} images</p>
           </div>
           <div className="h-2 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full rounded-full bg-accent transition-all"
-              style={{ width: `${(filledSlots / totalSlots) * 100}%` }}
+              style={{ width: `${(filled / total) * 100}%` }}
             />
           </div>
         </div>
@@ -303,12 +374,12 @@ export default function ImageEditor() {
         {/* Sections */}
         <div className="space-y-6">
           <Section title="Casco" count="1 combinatie">
-            <CombinationRow model={selectedModel} plan={selectedPlan} finish="shell" />
+            <CombinationRow model={selectedModel} plan={selectedPlan} finish="shell" overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
           </Section>
 
           <Section title="Instapklaar" count="3 combinaties (per vloer)">
             {floors.map((floor) => (
-              <CombinationRow key={floor.id} model={selectedModel} plan={selectedPlan} finish="finished" floor={floor.id} />
+              <CombinationRow key={floor.id} model={selectedModel} plan={selectedPlan} finish="finished" floor={floor.id} overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
             ))}
           </Section>
 
@@ -316,10 +387,10 @@ export default function ImageEditor() {
             {floors.map((floor) => (
               <div key={floor.id}>
                 <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
-                  {floors.find(f => f.id === floor.id)?.label}
+                  {floor.label}
                 </p>
                 {kastColors.map((kast) => (
-                  <CombinationRow key={`${floor.id}-${kast.id}`} model={selectedModel} plan={selectedPlan} finish="fully-finished" floor={floor.id} kast={kast.id} />
+                  <CombinationRow key={`${floor.id}-${kast.id}`} model={selectedModel} plan={selectedPlan} finish="fully-finished" floor={floor.id} kast={kast.id} overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
                 ))}
               </div>
             ))}
