@@ -35,7 +35,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
       <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
       {/* Finish levels */}
-      <div className="grid gap-4">
+      <div className="grid gap-6">
         {finishLevels.map((f) => (
           <button
             key={f.id}
@@ -65,7 +65,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
           >
             <div className="mt-10">
               <p className="config-label mb-4">Vloerkeuze (Clickvinyl)</p>
-               <div className="grid grid-cols-3 gap-4">
+               <div className="grid grid-cols-3 gap-6">
                 {floorOptions.map((f) => (
                   <button
                     key={f.id}
@@ -96,7 +96,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
               {/* Shelf color */}
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-6">
                   {shelfColors.map((c) => (
                     <button
                       key={c.id}
