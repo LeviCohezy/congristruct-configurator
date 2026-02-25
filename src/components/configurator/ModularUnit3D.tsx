@@ -1813,7 +1813,7 @@ function FlowAWalls({
         const shelfD = 0.40;
         const shelfCX = mainRoomCX;
         const shelfCZ = backInnerZ + shelfD / 2;
-        const backPanelZ = backInnerZ + 0.10;
+        const backPanelZ = backInnerZ + 0.02; // flush against wall
 
         const counterTop = height * 0.25;
         const upperBottom = height * 0.65;
@@ -1852,7 +1852,7 @@ function FlowAWalls({
           <group>
             {/* ═══ BACK WALL SHELF/CABINET ═══ */}
             <mesh position={[shelfCX, height / 2 + floorThick, backPanelZ]}>
-              <boxGeometry args={[shelfW, height, 0.02]} />
+              <boxGeometry args={[shelfW, height, 0.04]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             <mesh position={[shelfCX, counterTop / 2 + floorThick, shelfCZ]}>
@@ -2664,12 +2664,12 @@ function FlowBWalls({
         // Helper to render a shelf closet across the back wall
         const renderShelf = (cx: number, sw: number) => {
           const shelfCZ = backInnerZ + shelfD / 2;
-          const backPanelZ = backInnerZ + 0.10;
+          const backPanelZ = backInnerZ + 0.02; // flush against wall
           return (
             <>
               {/* Back panel */}
               <mesh position={[cx, height / 2 + floorThick, backPanelZ]}>
-                <boxGeometry args={[sw, height, 0.02]} />
+                <boxGeometry args={[sw, height, 0.04]} />
                 <meshStandardMaterial {...matProps} />
               </mesh>
               {/* Lower cabinet */}
