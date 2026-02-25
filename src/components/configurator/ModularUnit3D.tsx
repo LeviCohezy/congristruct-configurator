@@ -715,7 +715,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           claddingProps={claddingProps} woodBase={woodBase} frameColor={frameColor}
           cmToUnit={cmToUnit} cmToDepth={cmToDepth}
           floorPlan={config.floorPlan} finishLevel={config.finishLevel}
-          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
+          shelfColor={config.shelfColor} ledStrip={config.kastLedStrip}
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           lightOakTex={lightOakTex}
@@ -730,7 +730,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
-          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
+          shelfColor={config.shelfColor} ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
         />
       ) : isFlowB ? (
@@ -743,7 +743,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           finishLevel={config.finishLevel}
-          shelfColor={config.shelfColor} ledStrip={config.ledStrip}
+          shelfColor={config.shelfColor} ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
         />
       ) : (

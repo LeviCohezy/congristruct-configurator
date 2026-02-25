@@ -19,10 +19,16 @@ export interface ConfigState {
   // Interieur
   finishLevel: "shell" | "finished" | "fully-finished";
   floorOption: "light-vinyl" | "dark-vinyl" | "stone-vinyl";
-  ledStrip: boolean;
   shelfColor: "brown" | "light-oak" | "white";
   // Ramen
   tiltTurnWindow: boolean;
+  // Verlichting
+  spotType: "spot-wit" | "spot-zwart" | "opbouw-spot-wit" | "opbouw-spot-zwart";
+  railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend";
+  toiletLamp: "wc-spot-wit" | "wc-spot-zwart";
+  keukenLedStrip: boolean;
+  kastLedStrip: boolean;
+  lightingPackage: "base" | "full";
   // Extra's
   awning: boolean;
   solarPanels: boolean;
@@ -30,8 +36,6 @@ export interface ConfigState {
   foundation: boolean;
   // Transport
   transportDistance: number;
-  // Verlichting
-  lightingPackage: "base" | "full";
   // Contact
   contact: {
     firstName: string;
@@ -52,9 +56,13 @@ const defaultConfig: ConfigState = {
   aluminiumColor: "#383a3b",
   finishLevel: "shell",
   floorOption: "light-vinyl",
-  ledStrip: false,
   shelfColor: "brown",
   tiltTurnWindow: false,
+  spotType: "spot-zwart",
+  railType: "rail-vast-zwart",
+  toiletLamp: "wc-spot-zwart",
+  keukenLedStrip: false,
+  kastLedStrip: false,
   lightingPackage: "base",
   awning: false,
   solarPanels: false,
@@ -122,7 +130,8 @@ export function useConfigurator() {
     if (config.roundedCorners) price += 1500;
     if (config.tiltTurnWindow) price += 450;
     if (config.lightingPackage === "full") price += 1800;
-    if (config.ledStrip) price += 650;
+    if (config.keukenLedStrip) price += 350;
+    if (config.kastLedStrip) price += 300;
     if (config.awning) price += 2400;
     if (config.solarPanels) price += 4800;
     if (config.batterySystem) price += 3200;
