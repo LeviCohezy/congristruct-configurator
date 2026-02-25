@@ -12,7 +12,7 @@ import { ExtraOptions } from "./steps/ExtraOptions";
 import { Transport } from "./steps/Transport";
 import { ContactForm } from "./steps/ContactForm";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, MousePointerClick } from "lucide-react";
 import { BlurredPrice } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
@@ -136,7 +136,7 @@ export function ConfiguratorLayout() {
         <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
           <button
             onClick={() => !priceRevealed && setShowPriceGate(true)}
-            className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 cursor-pointer transition-all hover:shadow-xl"
+            className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:shadow-xl"
           >
             <BlurredPrice
               text={totalPrice.toLocaleString("nl-NL")}
@@ -148,6 +148,9 @@ export function ConfiguratorLayout() {
             <p className="text-[11px] text-muted-foreground whitespace-nowrap">
               {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
             </p>
+            {!priceRevealed && (
+              <MousePointerClick className="w-5 h-5 text-accent animate-bounce" />
+            )}
           </button>
         </div>
 
