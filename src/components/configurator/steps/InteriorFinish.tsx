@@ -70,7 +70,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
           >
             <div className="mt-10">
               <p className="config-label mb-4">Vloerkeuze (Clickvinyl)</p>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {floorOptions.map((f) => (
                   <button
                     key={f.id}
@@ -100,7 +100,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
             <div className="mt-10 space-y-6">
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
-                <div className="grid grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   {shelfColors.map((c) => (
                     <button
                       key={c.id}
