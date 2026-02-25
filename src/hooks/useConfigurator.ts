@@ -38,13 +38,12 @@ export interface ConfigState {
   transportDistance: number;
   // Contact
   contact: {
-    firstName: string;
-    lastName: string;
+    fullName: string;
     email: string;
     phone: string;
-    company: string;
-    address: string;
   };
+  // Price gate
+  priceRevealed: boolean;
 }
 
 const defaultConfig: ConfigState = {
@@ -70,13 +69,11 @@ const defaultConfig: ConfigState = {
   foundation: false,
   transportDistance: 50,
   contact: {
-    firstName: "",
-    lastName: "",
+    fullName: "",
     email: "",
     phone: "",
-    company: "",
-    address: "",
   },
+  priceRevealed: false,
 };
 
 // Pricing
