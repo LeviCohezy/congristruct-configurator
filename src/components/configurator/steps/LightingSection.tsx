@@ -1,5 +1,11 @@
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import spotWit from "@/assets/lighting-spot-wit.avif";
 import spotZwart from "@/assets/lighting-spot-zwart.avif";
@@ -11,6 +17,8 @@ import railWitHangend from "@/assets/lighting-rail-wit-hangend.avif";
 import railZwartHangend from "@/assets/lighting-rail-zwart-hangend.avif";
 import wcSpotWit from "@/assets/lighting-wc-spot-wit.avif";
 import wcSpotZwart from "@/assets/lighting-wc-spot-zwart.avif";
+import keukenLedImg from "@/assets/lighting-keuken-led.avif";
+import kastLedImg from "@/assets/lighting-kast-led.avif";
 
 interface Props {
   config: ConfigState;
@@ -18,22 +26,22 @@ interface Props {
 }
 
 const spotOptions = [
-  { id: "spot-wit" as const, label: "Spot wit", img: spotWit },
-  { id: "spot-zwart" as const, label: "Spot zwart", img: spotZwart },
-  { id: "opbouw-spot-wit" as const, label: "Opbouw spot wit", img: opbouwSpotWit },
-  { id: "opbouw-spot-zwart" as const, label: "Opbouw spot zwart", img: opbouwSpotZwart },
+  { id: "spot-wit" as const, tooltip: "Inbouwspot", img: spotWit },
+  { id: "spot-zwart" as const, tooltip: "Inbouwspot", img: spotZwart },
+  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot", img: opbouwSpotWit },
+  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot", img: opbouwSpotZwart },
 ];
 
 const railOptions = [
-  { id: "rail-vast-wit" as const, label: "Rail vast wit", img: railVastWit },
-  { id: "rail-vast-zwart" as const, label: "Rail vast zwart", img: railVastZwart },
-  { id: "rail-wit-hangend" as const, label: "Rail wit hangend", img: railWitHangend },
-  { id: "rail-zwart-hangend" as const, label: "Rail zwart hangend", img: railZwartHangend },
+  { id: "rail-vast-wit" as const, tooltip: "Vaste rail", img: railVastWit },
+  { id: "rail-vast-zwart" as const, tooltip: "Vaste rail", img: railVastZwart },
+  { id: "rail-wit-hangend" as const, tooltip: "Hangende rail", img: railWitHangend },
+  { id: "rail-zwart-hangend" as const, tooltip: "Hangende rail", img: railZwartHangend },
 ];
 
 const toiletOptions = [
-  { id: "wc-spot-wit" as const, label: "WC spot wit", img: wcSpotWit },
-  { id: "wc-spot-zwart" as const, label: "WC spot zwart", img: wcSpotZwart },
+  { id: "wc-spot-wit" as const, tooltip: "WC spot wit", img: wcSpotWit },
+  { id: "wc-spot-zwart" as const, tooltip: "WC spot zwart", img: wcSpotZwart },
 ];
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
@@ -41,7 +49,7 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
     <button
       onClick={onToggle}
       className={cn(
-        "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+        "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0",
         on ? "bg-accent" : "bg-muted"
       )}
     >
@@ -53,33 +61,40 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   );
 }
 
-function ImageGrid<T extends string>({
+function CircleGrid<T extends string>({
   options,
   selected,
   onSelect,
 }: {
-  options: { id: T; label: string; img: string }[];
+  options: { id: T; tooltip: string; img: string }[];
   selected: T;
   onSelect: (id: T) => void;
 }) {
-  // Desktop: all side-by-side. Mobile: 2-col grid
   return (
-    <div className="flex gap-4 flex-wrap">
-      {options.map((o) => (
-        <button
-          key={o.id}
-          onClick={() => onSelect(o.id)}
-          className={cn(
-            "w-20 h-20 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
-            selected === o.id
-              ? "border-accent ring-2 ring-accent/30"
-              : "border-border/60 bg-secondary hover:border-accent/40"
-          )}
-        >
-          <img src={o.img} alt={o.label} className="w-full h-full object-cover" />
-        </button>
-      ))}
-    </div>
+    <TooltipProvider delayDuration={200}>
+      <div className="flex gap-4 flex-wrap">
+        {options.map((o) => (
+          <Tooltip key={o.id}>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => onSelect(o.id)}
+                className={cn(
+                  "w-20 h-20 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
+                  selected === o.id
+                    ? "border-accent ring-2 ring-accent/30"
+                    : "border-border/60 bg-secondary hover:border-accent/40"
+                )}
+              >
+                <img src={o.img} alt={o.tooltip} className="w-full h-full object-cover" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" className="text-xs">
+              {o.tooltip}
+            </TooltipContent>
+          </Tooltip>
+        ))}
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -94,7 +109,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       {/* Spots */}
       <div className="mb-14">
         <p className="config-label mb-4">Spots</p>
-        <ImageGrid
+        <CircleGrid
           options={spotOptions}
           selected={config.spotType}
           onSelect={(id) => updateConfig("spotType", id)}
@@ -104,7 +119,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       {/* Rail */}
       <div className="mb-14">
         <p className="config-label mb-4">Railverlichting</p>
-        <ImageGrid
+        <CircleGrid
           options={railOptions}
           selected={config.railType}
           onSelect={(id) => updateConfig("railType", id)}
@@ -114,7 +129,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       {/* Toiletlamp */}
       <div className="mb-14">
         <p className="config-label mb-4">Toiletlamp</p>
-        <ImageGrid
+        <CircleGrid
           options={toiletOptions}
           selected={config.toiletLamp}
           onSelect={(id) => updateConfig("toiletLamp", id)}
@@ -123,25 +138,42 @@ export function LightingSection({ config, updateConfig }: Props) {
 
       {/* LED strips — only for FLOW */}
       {isFlow && (
-        <div className="space-y-4">
+        <div>
           <p className="config-label mb-4">LED-strips</p>
-
-          <div className="option-card flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Keuken LED-strip</p>
-              <p className="text-xs text-muted-foreground">LED-strip onder keukenkastjes</p>
-              <p className="text-xs font-medium text-accent mt-1">+€350</p>
+          <div className="space-y-5">
+            {/* Keuken LED */}
+            <div className={cn(
+              "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
+              config.keukenLedStrip
+                ? "border-accent bg-card ring-1 ring-accent/30"
+                : "border-transparent bg-secondary"
+            )}>
+              <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
+                <img src={keukenLedImg} alt="Keuken LED" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Keuken LED</p>
+                <p className="text-xs font-medium text-accent mt-0.5">+€350</p>
+              </div>
+              <Toggle on={config.keukenLedStrip} onToggle={() => updateConfig("keukenLedStrip", !config.keukenLedStrip)} />
             </div>
-            <Toggle on={config.keukenLedStrip} onToggle={() => updateConfig("keukenLedStrip", !config.keukenLedStrip)} />
-          </div>
 
-          <div className="option-card flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">Kast LED-strip</p>
-              <p className="text-xs text-muted-foreground">LED-strips achter kastplanken</p>
-              <p className="text-xs font-medium text-accent mt-1">+€300</p>
+            {/* Kast LED */}
+            <div className={cn(
+              "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
+              config.kastLedStrip
+                ? "border-accent bg-card ring-1 ring-accent/30"
+                : "border-transparent bg-secondary"
+            )}>
+              <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
+                <img src={kastLedImg} alt="Kast LED" className="w-full h-full object-cover" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">Kast LED</p>
+                <p className="text-xs font-medium text-accent mt-0.5">+€300</p>
+              </div>
+              <Toggle on={config.kastLedStrip} onToggle={() => updateConfig("kastLedStrip", !config.kastLedStrip)} />
             </div>
-            <Toggle on={config.kastLedStrip} onToggle={() => updateConfig("kastLedStrip", !config.kastLedStrip)} />
           </div>
         </div>
       )}
