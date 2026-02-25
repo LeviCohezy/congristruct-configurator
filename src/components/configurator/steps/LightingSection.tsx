@@ -81,7 +81,7 @@ function CircleGrid<T extends string>({
               <button
                 onClick={() => onSelect(o.id)}
                 className={cn(
-                  "w-20 h-20 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
+                  "w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
                   selected === o.id
                     ? "border-accent ring-2 ring-accent/30"
                     : "border-border/60 bg-secondary hover:border-accent/40"
@@ -142,7 +142,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
       {isFlow && (
         <div>
           <p className="config-label mb-4">LED-strips</p>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             {/* Keuken LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
