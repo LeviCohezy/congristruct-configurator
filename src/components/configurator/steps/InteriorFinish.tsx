@@ -1,16 +1,18 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
 const finishLevels = [
-  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
-  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€16.500" },
+  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen", priceNum: "" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500", priceNum: "8.500" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€16.500", priceNum: "16.500" },
 ];
 
 const floorOptions = [
@@ -28,13 +30,12 @@ const shelfColors = [
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
 const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-finished";
 
-export function InteriorFinish({ config, updateConfig }: Props) {
+export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Interieur & afwerking</h3>
       <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
-      {/* Finish levels */}
       <div className="grid gap-6">
         {finishLevels.map((f) => (
           <button
@@ -47,13 +48,17 @@ export function InteriorFinish({ config, updateConfig }: Props) {
                 <p className="font-medium">{f.label}</p>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </div>
-              <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+              {f.priceNum ? (
+                <BlurredPrice text={f.priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
+              ) : (
+                <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+              )}
             </div>
           </button>
         ))}
       </div>
 
-      {/* Floor option — only if finished or fully-finished */}
+      {/* Floor option */}
       <AnimatePresence>
         {showFloor(config.finishLevel) && (
           <motion.div
@@ -65,7 +70,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
           >
             <div className="mt-10">
               <p className="config-label mb-4">Vloerkeuze (Clickvinyl)</p>
-               <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-3 gap-6">
                 {floorOptions.map((f) => (
                   <button
                     key={f.id}
@@ -82,7 +87,7 @@ export function InteriorFinish({ config, updateConfig }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Furnished options — only if fully-finished */}
+      {/* Furnished options */}
       <AnimatePresence>
         {showFurnished(config.finishLevel) && (
           <motion.div
@@ -93,7 +98,6 @@ export function InteriorFinish({ config, updateConfig }: Props) {
             className="overflow-hidden"
           >
             <div className="mt-10 space-y-6">
-              {/* Shelf color */}
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
                 <div className="grid grid-cols-3 gap-6">

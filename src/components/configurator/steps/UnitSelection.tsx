@@ -6,44 +6,17 @@ import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
 const models = [
-  {
-    id: "start" as const,
-    label: "BLOQ START",
-    size: "14 m²",
-    people: "1 pers.",
-    desc: "Geschikt als thuiskantoor of kleine vergaderruimte",
-    price: "€29.500",
-  },
-  {
-    id: "flow" as const,
-    label: "BLOQ FLOW",
-    size: "21–28 m²",
-    people: "1–2 pers.",
-    desc: "Ideaal als praktijkruimte of refter voor meerdere personen",
-    price: "€42.000",
-  },
-  {
-    id: "hub" as const,
-    label: "BLOQ HUB",
-    size: "35 m²",
-    people: "4–6 pers.",
-    desc: "Voor kleine teams of gedeelde kantoren. Functioneel en goed ingedeeld.",
-    price: "€58.500",
-  },
-  {
-    id: "base" as const,
-    label: "BLOQ BASE",
-    size: "50 m²",
-    people: "6 pers.",
-    desc: "Onze grootste unit. Stevig, uitbreidbaar en klaar voor intensief gebruik.",
-    price: "€79.000",
-  },
+  { id: "start" as const, label: "BLOQ START", size: "14 m²", people: "1 pers.", desc: "Geschikt als thuiskantoor of kleine vergaderruimte", price: "29.500" },
+  { id: "flow" as const, label: "BLOQ FLOW", size: "21–28 m²", people: "1–2 pers.", desc: "Ideaal als praktijkruimte of refter voor meerdere personen", price: "42.000" },
+  { id: "hub" as const, label: "BLOQ HUB", size: "35 m²", people: "4–6 pers.", desc: "Voor kleine teams of gedeelde kantoren. Functioneel en goed ingedeeld.", price: "58.500" },
+  { id: "base" as const, label: "BLOQ BASE", size: "50 m²", people: "6 pers.", desc: "Onze grootste unit. Stevig, uitbreidbaar en klaar voor intensief gebruik.", price: "79.000" },
 ];
 
-export function UnitSelection({ config, updateConfig }: Props) {
+export function UnitSelection({ config, updateConfig, onPriceClick }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <div className="mb-20">
@@ -62,10 +35,8 @@ export function UnitSelection({ config, updateConfig }: Props) {
                   <p className="text-sm text-muted-foreground">{m.desc}</p>
                 </div>
                 <div className="text-right shrink-0 ml-3">
-                  <p className="text-xs text-muted-foreground">
-                    {m.size} · {m.people}
-                  </p>
-                  <BlurredPrice revealed={config.priceRevealed}><p className="text-sm font-semibold mt-1">{m.price}</p></BlurredPrice>
+                  <p className="text-xs text-muted-foreground">{m.size} · {m.people}</p>
+                  <BlurredPrice text={m.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-semibold mt-1" />
                 </div>
               </div>
             </button>

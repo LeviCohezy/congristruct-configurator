@@ -8,6 +8,7 @@ interface Props {
   config: ConfigState;
   updateContact: (field: keyof ConfigState["contact"], value: string) => void;
   totalPrice: number;
+  onPriceClick?: () => void;
 }
 
 const fields: { key: keyof ConfigState["contact"]; label: string; type: string }[] = [
@@ -16,7 +17,7 @@ const fields: { key: keyof ConfigState["contact"]; label: string; type: string }
   { key: "phone", label: "Telefoonnummer", type: "tel" },
 ];
 
-export function ContactForm({ config, updateContact, totalPrice }: Props) {
+export function ContactForm({ config, updateContact, totalPrice, onPriceClick }: Props) {
   const handleSubmit = () => {
     const c = config.contact;
     if (!c.fullName || !c.email || !c.phone) {
@@ -33,9 +34,12 @@ export function ContactForm({ config, updateContact, totalPrice }: Props) {
 
       <div className="bg-surface rounded-xl p-4 mb-6">
         <p className="config-label">Jouw prijsindicatie</p>
-        <BlurredPrice revealed={config.priceRevealed}>
-          <span className="text-2xl font-display font-bold mt-1">€{totalPrice.toLocaleString("nl-NL")}</span>
-        </BlurredPrice>
+        <BlurredPrice
+          text={totalPrice.toLocaleString("nl-NL")}
+          revealed={config.priceRevealed}
+          onClick={onPriceClick}
+          className="text-2xl font-display font-bold mt-1"
+        />
         <p className="text-xs text-muted-foreground mt-1">excl. BTW · onder voorbehoud van finale configuratie</p>
       </div>
 

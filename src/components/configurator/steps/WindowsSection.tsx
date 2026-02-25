@@ -5,9 +5,10 @@ import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
-export function WindowsSection({ config, updateConfig }: Props) {
+export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Ramen</h3>
@@ -17,7 +18,7 @@ export function WindowsSection({ config, updateConfig }: Props) {
         <div>
           <p className="text-sm font-medium">Draai-kiepraam</p>
           <p className="text-xs text-muted-foreground">Upgrade naar draai-kiepramen voor betere ventilatie</p>
-          <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-1">+€450</p></BlurredPrice>
+          <BlurredPrice text="450" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
         </div>
         <button
           onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}

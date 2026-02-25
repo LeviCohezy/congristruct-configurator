@@ -1,20 +1,29 @@
-import { EyeOff } from "lucide-react";
+import { Eye } from "lucide-react";
 
 interface Props {
-  children: React.ReactNode;
+  text: string;
   revealed: boolean;
+  onClick?: () => void;
   className?: string;
+  prefix?: string;
 }
 
-export function BlurredPrice({ children, revealed, className = "" }: Props) {
+export function BlurredPrice({ text, revealed, onClick, className = "", prefix = "€" }: Props) {
+  if (revealed) {
+    return <span className={className}>{prefix}{text}</span>;
+  }
+
   return (
-    <span className={`relative inline-flex items-center gap-1 ${className}`}>
-      <span className={`transition-all duration-300 ${!revealed ? "blur-md select-none" : ""}`}>
-        {children}
+    <button
+      type="button"
+      onClick={onClick}
+      className={`relative inline-flex items-center gap-0.5 cursor-pointer group ${className}`}
+    >
+      <span>{prefix}</span>
+      <span className="relative">
+        <span className="blur-md select-none">{text}</span>
+        <Eye className="absolute inset-0 m-auto w-3.5 h-3.5 text-muted-foreground/70 group-hover:text-foreground transition-colors" />
       </span>
-      {!revealed && (
-        <EyeOff className="w-3.5 h-3.5 text-muted-foreground/60 shrink-0" />
-      )}
-    </span>
+    </button>
   );
 }

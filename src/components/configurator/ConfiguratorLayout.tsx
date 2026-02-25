@@ -68,7 +68,7 @@ export function ConfiguratorLayout() {
           <div className="px-5 sm:px-8 py-12 space-y-16">
             {/* 1. Unit */}
             <Section delay={0}>
-              <UnitSelection config={config} updateConfig={updateConfig} />
+              <UnitSelection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             <Divider />
@@ -90,7 +90,7 @@ export function ConfiguratorLayout() {
             {/* 4. Interieur */}
             <div ref={interiorRef}>
               <Section delay={0.15}>
-                <InteriorFinish config={config} updateConfig={updateConfig} />
+                <InteriorFinish config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
               </Section>
             </div>
 
@@ -98,33 +98,33 @@ export function ConfiguratorLayout() {
 
             {/* 4b. Verlichting */}
             <Section delay={0.17}>
-              <LightingSection config={config} updateConfig={updateConfig} />
+              <LightingSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             <Divider />
             <Section delay={0.2}>
-              <WindowsSection config={config} updateConfig={updateConfig} />
+              <WindowsSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             <Divider />
 
             {/* 6. Extra's */}
             <Section delay={0.25}>
-              <ExtraOptions config={config} updateConfig={updateConfig} />
+              <ExtraOptions config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             <Divider />
 
             {/* 7. Transport */}
             <Section delay={0.3}>
-              <Transport config={config} updateConfig={updateConfig} />
+              <Transport config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             <Divider />
 
             {/* 8. Contact */}
             <Section delay={0.35}>
-              <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} />
+              <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={() => setShowPriceGate(true)} />
             </Section>
 
             {/* Bottom spacer for sticky price bar */}
@@ -138,9 +138,13 @@ export function ConfiguratorLayout() {
             onClick={() => !priceRevealed && setShowPriceGate(true)}
             className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 cursor-pointer transition-all hover:shadow-xl"
           >
-            <BlurredPrice revealed={priceRevealed}>
-              <span className="text-xl font-display font-bold text-foreground">± €{totalPrice.toLocaleString("nl-NL")}</span>
-            </BlurredPrice>
+            <BlurredPrice
+              text={totalPrice.toLocaleString("nl-NL")}
+              revealed={priceRevealed}
+              onClick={() => setShowPriceGate(true)}
+              className="text-xl font-display font-bold text-foreground"
+              prefix="± €"
+            />
             <p className="text-[11px] text-muted-foreground whitespace-nowrap">
               {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
             </p>
