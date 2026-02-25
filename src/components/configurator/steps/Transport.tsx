@@ -165,7 +165,7 @@ export function Transport({ config, updateConfig, onPriceClick }: Props) {
           placeholder="Vul je leveringsadres in…"
           value={address}
           onChange={(e) => handleAddressChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-card text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+          className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-card text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-muted-foreground/30 border-t-accent rounded-full animate-spin" />
@@ -173,7 +173,7 @@ export function Transport({ config, updateConfig, onPriceClick }: Props) {
       </div>
 
       {/* Map */}
-      <div className="rounded-xl overflow-hidden border border-border mb-5">
+      <div className="rounded-xl overflow-hidden border border-border mb-5 relative z-0">
         <div ref={mapRef} className="w-full h-[280px] sm:h-[340px]" />
       </div>
 

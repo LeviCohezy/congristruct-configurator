@@ -3,6 +3,13 @@ import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
+import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
+import darkWoodFloorTexture from "@/assets/dark-wood-floor-texture.png";
+import stoneFloorTexture from "@/assets/stone-floor-texture.png";
+import thermowoodNaturalTexture from "@/assets/thermowood-natural-texture.png";
+import lightOakTexture from "@/assets/light-oak-texture.png";
+import brickStripsTexture from "@/assets/brick-strips-texture.png";
+
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
@@ -16,15 +23,15 @@ const finishLevels = [
 ];
 
 const floorOptions = [
-  { id: "light-vinyl" as const, label: "Licht hout", color: "hsl(40,20%,85%)" },
-  { id: "dark-vinyl" as const, label: "Donker hout", color: "hsl(25,15%,35%)" },
-  { id: "stone-vinyl" as const, label: "Steenlook", color: "hsl(30,5%,65%)" },
+  { id: "light-vinyl" as const, label: "Licht hout", texture: lightWoodFloorTexture },
+  { id: "dark-vinyl" as const, label: "Donker hout", texture: darkWoodFloorTexture },
+  { id: "stone-vinyl" as const, label: "Steenlook", texture: stoneFloorTexture },
 ];
 
 const shelfColors = [
-  { id: "brown" as const, label: "Walnoot bruin", color: "hsl(25,30%,35%)" },
-  { id: "light-oak" as const, label: "Licht eiken", color: "hsl(40,30%,72%)" },
-  { id: "white" as const, label: "Wit", color: "hsl(0,0%,95%)" },
+  { id: "brown" as const, label: "Walnoot bruin", texture: thermowoodNaturalTexture },
+  { id: "light-oak" as const, label: "Licht eiken", texture: lightOakTexture },
+  { id: "white" as const, label: "Wit", texture: brickStripsTexture },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
@@ -77,7 +84,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                     onClick={() => updateConfig("floorOption", f.id)}
                     className={cn("option-card text-center", config.floorOption === f.id && "option-card-active")}
                   >
-                    <div className="w-full h-10 rounded-lg mb-2" style={{ backgroundColor: f.color }} />
+                    <div className="w-full h-10 rounded-lg mb-2 bg-cover bg-center" style={{ backgroundImage: `url(${f.texture})` }} />
                     <p className="text-xs font-medium">{f.label}</p>
                   </button>
                 ))}
@@ -107,7 +114,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                       onClick={() => updateConfig("shelfColor", c.id)}
                       className={cn("option-card text-center", config.shelfColor === c.id && "option-card-active")}
                     >
-                      <div className="w-full h-10 rounded-lg mb-2 border border-border" style={{ backgroundColor: c.color }} />
+                      <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
                       <p className="text-xs font-medium">{c.label}</p>
                     </button>
                   ))}
