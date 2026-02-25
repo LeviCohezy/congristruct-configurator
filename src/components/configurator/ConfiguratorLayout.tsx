@@ -133,10 +133,7 @@ export function ConfiguratorLayout() {
         </div>
 
         {/* Sticky price bar */}
-        <div className="sticky bottom-0 z-30 flex flex-col items-center pb-3 pointer-events-none">
-          {!priceRevealed && (
-            <p className="text-[11px] text-muted-foreground mb-1 pointer-events-none">Klik om prijs te zien</p>
-          )}
+        <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
           <div className="relative pointer-events-auto">
             <button
               onClick={() => !priceRevealed && setShowPriceGate(true)}
@@ -149,9 +146,9 @@ export function ConfiguratorLayout() {
                 className="text-xl font-display font-bold text-foreground cursor-pointer"
                 prefix="± €"
               />
-              {priceRevealed && (
-                <p className="text-[11px] text-muted-foreground whitespace-nowrap">excl. BTW</p>
-              )}
+              <p className="text-[11px] text-muted-foreground whitespace-nowrap">
+                {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
+              </p>
             </button>
             {!priceRevealed && (
               <MousePointerClick className="absolute right-[7.5rem] -bottom-3 w-8 h-8 text-accent animate-bounce pointer-events-none drop-shadow-md" />
