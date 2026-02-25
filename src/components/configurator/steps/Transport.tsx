@@ -124,18 +124,14 @@ export function Transport({ config, updateConfig }: Props) {
 
           if (routeLayerRef.current) routeLayerRef.current.remove();
           routeLayerRef.current = L.polyline(coords, {
-            color: "hsl(142, 70%, 45%)",
+            color: "#98aba1",
             weight: 3.5,
             opacity: 0.9,
           }).addTo(map);
 
-          // Fit to route but keep zoomed out enough
-          const bounds = L.latLngBounds([
-            [ORIGIN.lat, ORIGIN.lng],
-            [destLat, destLng],
-          ]);
-          map.fitBounds(bounds.pad(0.4), { maxZoom: 9 });
-
+          // Fit bounds with generous padding so both points are ~1cm from edge
+          const routeBounds = L.latLngBounds(coords);
+          map.fitBounds(routeBounds, { padding: [50, 50], maxZoom: 13 });
           setRouteDistance(distKm);
           updateConfig("transportDistance", distKm);
         }
