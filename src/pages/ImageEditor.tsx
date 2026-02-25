@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Check, X, ImageIcon, Upload, Trash2 } from "lucide-react";
 
 // Import all existing interior images to check availability
@@ -116,20 +116,7 @@ function getDefaultImage(model: Model, plan: Plan, finish: string, floor?: Floor
   return null;
 }
 
-// Overrides stored in localStorage
-const STORAGE_KEY = "bloq-image-overrides";
-
-function loadOverrides(): Record<string, string> {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
-  } catch {
-    return {};
-  }
-}
-
-function saveOverrides(overrides: Record<string, string>) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(overrides));
-}
+// Overrides are session-only (blob URLs)
 
 function ImageSlot({
   src,
@@ -149,13 +136,7 @@ function ImageSlot({
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") {
-        onReplace(slotKey, reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    onReplace(slotKey, URL.createObjectURL(file));
     e.target.value = "";
   };
 
@@ -267,11 +248,7 @@ function CombinationRow({
 export default function ImageEditor() {
   const [selectedModel, setSelectedModel] = useState<Model>("start");
   const [selectedPlan, setSelectedPlan] = useState<Plan>("a");
-  const [overrides, setOverrides] = useState<Record<string, string>>(loadOverrides);
-
-  useEffect(() => {
-    saveOverrides(overrides);
-  }, [overrides]);
+  const [overrides, setOverrides] = useState<Record<string, string>>({});
 
   const handleReplace = useCallback((key: string, dataUrl: string) => {
     setOverrides(prev => ({ ...prev, [key]: dataUrl }));
