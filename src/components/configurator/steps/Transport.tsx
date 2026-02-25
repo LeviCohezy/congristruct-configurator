@@ -42,8 +42,8 @@ export function Transport({ config, updateConfig }: Props) {
       scrollWheelZoom: false,
     }).fitBounds(MAP_BOUNDS);
 
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-      maxZoom: 18,
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19,
     }).addTo(map);
 
     // Origin marker
@@ -124,10 +124,9 @@ export function Transport({ config, updateConfig }: Props) {
 
           if (routeLayerRef.current) routeLayerRef.current.remove();
           routeLayerRef.current = L.polyline(coords, {
-            color: "hsl(220, 15%, 25%)",
-            weight: 3,
-            opacity: 0.7,
-            dashArray: "8 6",
+            color: "hsl(142, 70%, 45%)",
+            weight: 3.5,
+            opacity: 0.9,
           }).addTo(map);
 
           // Fit to route but keep zoomed out enough
