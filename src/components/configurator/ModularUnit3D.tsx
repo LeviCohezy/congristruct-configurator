@@ -1498,10 +1498,13 @@ function FlowAWalls({
   const partT = 0.10; // 10cm internal partition walls
 
   // Front wall segments (m): 75+200+100+100+125 = 600cm
+  // When corners are rounded, trim only the outermost segments so the facade follows the curved profile.
   const segs = [0.75, 2.0, 1.0, 1.0, 1.25];
   const segTypes = ["wall", "window", "wall", "door", "wall"] as const;
-  let xCursor = -halfW;
-  const frontParts = segs.map((w, i) => {
+  const frontEdgeInset = Math.max(0, cornerRadius);
+  const frontSegs = segs.map((w, i) => (i === 0 || i === segs.length - 1 ? Math.max(0.05, w - frontEdgeInset) : w));
+  let xCursor = -halfW + frontEdgeInset;
+  const frontParts = frontSegs.map((w, i) => {
     const cx = xCursor + w / 2;
     xCursor += w;
     return { w, cx, type: segTypes[i] };
@@ -2268,10 +2271,13 @@ function FlowBWalls({
   const toiletWallZ = -halfD + wallThick + toiletD;
 
   // Front wall segments (in meters): 73+200+77+100+77+200+73 = 800cm
+  // When corners are rounded, trim only the outermost segments so the facade follows the curved profile.
   const segs = [0.73, 2.0, 0.77, 1.0, 0.77, 2.0, 0.73];
   const segTypes = ["wall", "window", "wall", "door", "wall", "window", "wall"] as const;
-  let xCursor = -halfW;
-  const frontParts = segs.map((w, i) => {
+  const frontEdgeInset = Math.max(0, cornerRadius);
+  const frontSegs = segs.map((w, i) => (i === 0 || i === segs.length - 1 ? Math.max(0.05, w - frontEdgeInset) : w));
+  let xCursor = -halfW + frontEdgeInset;
+  const frontParts = frontSegs.map((w, i) => {
     const cx = xCursor + w / 2;
     xCursor += w;
     return { w, cx, type: segTypes[i] };
