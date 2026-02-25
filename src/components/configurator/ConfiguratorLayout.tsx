@@ -229,14 +229,15 @@ export function ConfiguratorLayout() {
 
 function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const ref = useRef<HTMLDivElement>(null);
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 1024;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
-  // Map scroll position to opacity: fade in as section enters center, fade out as it leaves
-  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.4, 0.6, 0.85, 1], [0.1, 0.4, 1, 1, 0.4, 0.1]);
-  const y = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.8, 1], [40, 16, 0, 0, -8, -20]);
-  const scale = useTransform(scrollYProgress, [0, 0.3, 0.5, 0.7, 1], [0.97, 1, 1, 1, 0.98]);
+
+  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.4, 0.6, 0.85, 1], isMobile ? [1, 1, 1, 1, 1, 1] : [0.1, 0.4, 1, 1, 0.4, 0.1]);
+  const y = useTransform(scrollYProgress, [0, 0.2, 0.4, 0.6, 0.8, 1], isMobile ? [0, 0, 0, 0, 0, 0] : [40, 16, 0, 0, -8, -20]);
+  const scale = useTransform(scrollYProgress, [0, 0.3, 0.5, 0.7, 1], isMobile ? [1, 1, 1, 1, 1] : [0.97, 1, 1, 1, 0.98]);
 
   return (
     <motion.div ref={ref} style={{ opacity, y, scale }}>
