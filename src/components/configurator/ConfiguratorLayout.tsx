@@ -137,7 +137,7 @@ export function ConfiguratorLayout() {
           <div className="relative pointer-events-auto">
             <button
               onClick={() => !priceRevealed && setShowPriceGate(true)}
-              className="px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-center gap-1.5 cursor-pointer transition-all hover:shadow-xl"
+              className="px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-center gap-1.5 cursor-pointer transition-all hover:shadow-xl flicker-border"
             >
               <BlurredPrice
                 text={totalPrice.toLocaleString("nl-NL")}
