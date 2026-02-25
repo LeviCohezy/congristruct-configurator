@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { cn } from "@/lib/utils";
 import { useConfigurator } from "@/hooks/useConfigurator";
 import { useInteriorImages } from "@/hooks/useInteriorImages";
 import { PreviewPanel } from "./PreviewPanel";
@@ -136,7 +137,10 @@ export function ConfiguratorLayout() {
         <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
           <button
             onClick={() => !priceRevealed && setShowPriceGate(true)}
-            className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 cursor-pointer transition-all hover:shadow-xl"
+            className={cn(
+              "pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 transition-all hover:shadow-xl",
+              !priceRevealed && "cursor-pointer animate-pulse hover:animate-none hover:scale-105 border-accent/40"
+            )}
           >
             <BlurredPrice
               text={totalPrice.toLocaleString("nl-NL")}
@@ -146,7 +150,7 @@ export function ConfiguratorLayout() {
               prefix="± €"
             />
             <p className="text-[11px] text-muted-foreground whitespace-nowrap">
-              {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
+              {priceRevealed ? "excl. BTW" : "👁 Klik om prijs te zien"}
             </p>
           </button>
         </div>
