@@ -24,6 +24,7 @@ import kastLedImg from "@/assets/lighting-kast-led.avif";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
 const spotOptions = [
@@ -99,7 +100,7 @@ function CircleGrid<T extends string>({
   );
 }
 
-export function LightingSection({ config, updateConfig }: Props) {
+export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
 
   return (
@@ -154,7 +155,7 @@ export function LightingSection({ config, updateConfig }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Keuken LED</p>
-                <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-0.5">+€350</p></BlurredPrice>
+                <BlurredPrice text="350" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
               <Toggle on={config.keukenLedStrip} onToggle={() => updateConfig("keukenLedStrip", !config.keukenLedStrip)} />
             </div>
@@ -171,7 +172,7 @@ export function LightingSection({ config, updateConfig }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Kast LED</p>
-                <BlurredPrice revealed={config.priceRevealed}><p className="text-xs font-medium text-accent mt-0.5">+€300</p></BlurredPrice>
+                <BlurredPrice text="300" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
               <Toggle on={config.kastLedStrip} onToggle={() => updateConfig("kastLedStrip", !config.kastLedStrip)} />
             </div>

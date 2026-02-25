@@ -9,6 +9,7 @@ import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
 const ORIGIN = { lat: 50.9365, lng: 3.1262 };
@@ -20,7 +21,7 @@ const MAP_BOUNDS: L.LatLngBoundsExpression = [
   [53.0, 7.5],
 ];
 
-export function Transport({ config, updateConfig }: Props) {
+export function Transport({ config, updateConfig, onPriceClick }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const routeLayerRef = useRef<L.Polyline | null>(null);
@@ -193,7 +194,7 @@ export function Transport({ config, updateConfig }: Props) {
               )}
             </p>
           </div>
-          <BlurredPrice revealed={config.priceRevealed}><p className="text-lg font-display font-bold">€{transportCost.toLocaleString("nl-NL")}</p></BlurredPrice>
+          <BlurredPrice text={transportCost.toLocaleString("nl-NL")} revealed={config.priceRevealed} onClick={onPriceClick} className="text-lg font-display font-bold" />
         </div>
       </div>
 

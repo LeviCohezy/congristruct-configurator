@@ -7,16 +7,17 @@ import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  onPriceClick?: () => void;
 }
 
 const extras = [
-  { key: "awning" as const, label: "Awning / canopy", icon: Umbrella, price: "€2.400", desc: "Outdoor shading" },
-  { key: "solarPanels" as const, label: "Solar panels", icon: Sun, price: "€4.800", desc: "On-roof solar system" },
-  { key: "batterySystem" as const, label: "Battery system", icon: Battery, price: "€3.200", desc: "Energy storage" },
-  { key: "foundation" as const, label: "Foundation", icon: Landmark, price: "€3.500", desc: "Concrete screw piles" },
+  { key: "awning" as const, label: "Awning / canopy", icon: Umbrella, price: "2.400", desc: "Outdoor shading" },
+  { key: "solarPanels" as const, label: "Solar panels", icon: Sun, price: "4.800", desc: "On-roof solar system" },
+  { key: "batterySystem" as const, label: "Battery system", icon: Battery, price: "3.200", desc: "Energy storage" },
+  { key: "foundation" as const, label: "Foundation", icon: Landmark, price: "3.500", desc: "Concrete screw piles" },
 ];
 
-export function ExtraOptions({ config, updateConfig }: Props) {
+export function ExtraOptions({ config, updateConfig, onPriceClick }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Extra opties</h3>
@@ -35,7 +36,7 @@ export function ExtraOptions({ config, updateConfig }: Props) {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <p className="font-medium text-sm">{e.label}</p>
-                    <BlurredPrice revealed={config.priceRevealed}><p className="text-sm font-medium">{e.price}</p></BlurredPrice>
+                    <BlurredPrice text={e.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium" />
                   </div>
                   <p className="text-xs text-muted-foreground">{e.desc}</p>
                 </div>
