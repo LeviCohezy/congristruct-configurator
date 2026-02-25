@@ -64,7 +64,7 @@ function ImageGrid<T extends string>({
 }) {
   // Desktop: all side-by-side. Mobile: 2-col grid
   return (
-    <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
       {options.map((o) => (
         <button
           key={o.id}
@@ -90,7 +90,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       <p className="text-sm text-muted-foreground mb-6">Kies je verlichtingsarmaturen</p>
 
       {/* Spots */}
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="config-label mb-3">Spots</p>
         <ImageGrid
           options={spotOptions}
@@ -100,7 +100,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Rail */}
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="config-label mb-3">Railverlichting</p>
         <ImageGrid
           options={railOptions}
@@ -110,7 +110,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Toiletlamp */}
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="config-label mb-3">Toiletlamp</p>
         <ImageGrid
           options={toiletOptions}
@@ -121,7 +121,7 @@ export function LightingSection({ config, updateConfig }: Props) {
 
       {/* LED strips — only for FLOW */}
       {isFlow && (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <p className="config-label mb-1">LED-strips</p>
 
           <div className="option-card flex items-center justify-between">

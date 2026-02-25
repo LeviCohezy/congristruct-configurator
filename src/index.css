@@ -18,7 +18,7 @@
     --primary: 220 12% 16%;
     --primary-foreground: 40 20% 97%;
 
-    --secondary: 40 8% 94%;
+    --secondary: 40 8% 91%;
     --secondary-foreground: 220 12% 16%;
 
     --muted: 40 6% 93%;
@@ -123,7 +123,7 @@
     @apply border-accent bg-card ring-1 ring-accent/40;
   }
   .config-section {
-    @apply space-y-4;
+    @apply space-y-5;
   }
   .config-label {
     @apply text-xs font-medium text-muted-foreground uppercase tracking-widest;

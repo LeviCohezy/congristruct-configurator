@@ -20,7 +20,7 @@ export function ExtraOptions({ config, updateConfig }: Props) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Extra opties</h3>
       <p className="text-sm text-muted-foreground mb-5">Voeg optionele features toe</p>
-      <div className="grid gap-3">
+      <div className="grid gap-4">
         {extras.map((e) => {
           const active = config[e.key];
           return (
