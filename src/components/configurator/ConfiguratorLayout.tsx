@@ -11,7 +11,7 @@ import { WindowsSection } from "./steps/WindowsSection";
 import { ExtraOptions } from "./steps/ExtraOptions";
 import { Transport } from "./steps/Transport";
 import { ContactForm } from "./steps/ContactForm";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
@@ -136,13 +136,17 @@ export function ConfiguratorLayout() {
 }
 
 function Section({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  // Map scroll position to opacity: fade in as section enters center, fade out as it leaves
+  const opacity = useTransform(scrollYProgress, [0, 0.25, 0.45, 0.55, 0.75, 1], [0, 1, 1, 1, 1, 0.3]);
+  const y = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [24, 0, 0, -8]);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.4, delay }}
-    >
+    <motion.div ref={ref} style={{ opacity, y }}>
       {children}
     </motion.div>
   );
