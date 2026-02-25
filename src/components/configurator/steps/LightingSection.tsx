@@ -140,7 +140,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       {isFlow && (
         <div>
           <p className="config-label mb-4">LED-strips</p>
-          <div className="space-y-5">
+          <div className="grid grid-cols-2 gap-4">
             {/* Keuken LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
