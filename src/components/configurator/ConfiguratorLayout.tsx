@@ -123,9 +123,11 @@ export function ConfiguratorLayout() {
             <Divider />
 
             {/* 8. Contact */}
-            <Section delay={0.35}>
-              <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={() => setShowPriceGate(true)} />
-            </Section>
+            <div id="contact-section">
+              <Section delay={0.35}>
+                <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={() => setShowPriceGate(true)} />
+              </Section>
+            </div>
 
             {/* Bottom spacer for sticky price bar */}
             <div className="h-24" />
@@ -177,40 +179,44 @@ export function ConfiguratorLayout() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-lg font-display font-semibold">Ontdek je prijs</h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">Vul je gegevens in om de live prijsindicatie te zien</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {priceRevealed ? "Je prijs is zichtbaar. Vraag direct een offerte aan!" : "Vul je gegevens in om de live prijsindicatie te zien"}
+                    </p>
                   </div>
                   <button onClick={() => setShowPriceGate(false)} className="text-muted-foreground hover:text-foreground transition-colors">
                     <X className="w-5 h-5" />
                   </button>
                 </div>
-                <div className="space-y-3 mb-5">
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Volledige naam</label>
-                    <input
-                      type="text"
-                      value={config.contact.fullName}
-                      onChange={(e) => updateContact("fullName", e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
-                      placeholder="Jan Janssens"
-                    />
+                {!priceRevealed && (
+                  <div className="space-y-3 mb-5">
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Volledige naam</label>
+                      <input
+                        type="text"
+                        value={config.contact.fullName}
+                        onChange={(e) => updateContact("fullName", e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                        placeholder="Jan Janssens"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">E-mailadres</label>
+                      <input
+                        type="email"
+                        value={config.contact.email}
+                        onChange={(e) => updateContact("email", e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                        placeholder="jan@voorbeeld.be"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1 block">E-mailadres</label>
-                    <input
-                      type="email"
-                      value={config.contact.email}
-                      onChange={(e) => updateContact("email", e.target.value)}
-                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
-                      placeholder="jan@voorbeeld.be"
-                    />
-                  </div>
-                </div>
+                )}
                 <button
-                  onClick={handleRevealPrice}
-                  disabled={!config.contact.fullName.trim() || !config.contact.email.trim()}
+                  onClick={priceRevealed ? () => { setShowPriceGate(false); document.getElementById("contact-section")?.scrollIntoView({ behavior: "smooth" }); } : handleRevealPrice}
+                  disabled={!priceRevealed && (!config.contact.fullName.trim() || !config.contact.email.trim())}
                   className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Toon mijn prijsindicatie
+                  {priceRevealed ? "Offerte aanvragen" : "Toon mijn prijsindicatie"}
                 </button>
               </motion.div>
             </motion.div>
