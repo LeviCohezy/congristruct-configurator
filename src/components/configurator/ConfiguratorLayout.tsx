@@ -54,7 +54,7 @@ export function ConfiguratorLayout() {
       <div className="lg:w-[45%] flex flex-col bg-background min-h-0">
         {/* Scrollable content — all sections */}
         <div className="flex-1 overflow-y-auto">
-          <div className="px-5 sm:px-8 py-8 space-y-10">
+          <div className="px-5 sm:px-8 py-10 space-y-14">
             {/* 1. Unit */}
             <Section delay={0}>
               <UnitSelection config={config} updateConfig={updateConfig} />

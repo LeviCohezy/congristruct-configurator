@@ -117,10 +117,10 @@
     @apply border-accent ring-2 ring-accent/30 scale-110;
   }
   .option-card {
-    @apply relative p-4 rounded-lg border border-border/80 bg-card cursor-pointer transition-all duration-150 hover:border-accent/60;
+    @apply relative p-4 rounded-xl border border-transparent bg-secondary cursor-pointer transition-all duration-150 hover:border-accent/40;
   }
   .option-card-active {
-    @apply border-accent ring-1 ring-accent/40;
+    @apply border-accent bg-card ring-1 ring-accent/40;
   }
   .config-section {
     @apply space-y-4;

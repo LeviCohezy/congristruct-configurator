@@ -86,7 +86,7 @@ export function LightingSection({ config, updateConfig }: Props) {
 
   return (
     <div className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Verlichting</h3>
+      <h3 className="text-xl font-display font-light mb-1">Verlichting</h3>
       <p className="text-sm text-muted-foreground mb-6">Kies je verlichtingsarmaturen</p>
 
       {/* Spots */}

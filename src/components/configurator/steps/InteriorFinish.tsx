@@ -31,8 +31,8 @@ const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-fi
 export function InteriorFinish({ config, updateConfig }: Props) {
   return (
     <div className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Interieur & afwerking</h3>
-      <p className="text-sm text-muted-foreground mb-4">Kies je afwerkingsniveau</p>
+      <h3 className="text-xl font-display font-light mb-1">Interieur & afwerking</h3>
+      <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
       {/* Finish levels */}
       <div className="grid gap-3">

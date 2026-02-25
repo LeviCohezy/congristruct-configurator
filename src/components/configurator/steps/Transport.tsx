@@ -12,8 +12,8 @@ export function Transport({ config, updateConfig }: Props) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Transport</h3>
-      <p className="text-sm text-muted-foreground mb-6">Estimated delivery cost based on distance</p>
+      <h3 className="text-xl font-display font-light mb-1">Transport</h3>
+      <p className="text-sm text-muted-foreground mb-6">Geschatte leveringskosten op basis van afstand</p>
 
       <div className="bg-surface rounded-xl p-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
