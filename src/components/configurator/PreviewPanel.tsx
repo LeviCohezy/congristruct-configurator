@@ -14,9 +14,17 @@ import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
 import furnishedShared from "@/assets/start-interior-furnished-shared.avif";
 import cascoImg1 from "@/assets/start-interior-casco-1.avif";
 import cascoImg2 from "@/assets/start-interior-casco-2.avif";
-// Plan B (with toilet) — light floor
 import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
 import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
+// Plan B (with toilet) — light floor finished & fully-finished
+import toiletBrown1 from "@/assets/start-interior-toilet-brown-1.avif";
+import toiletBrown2 from "@/assets/start-interior-toilet-brown-2.avif";
+import toiletLightoak1 from "@/assets/start-interior-toilet-lightoak-1.avif";
+import toiletLightoak2 from "@/assets/start-interior-toilet-lightoak-2.avif";
+import toiletWhite1 from "@/assets/start-interior-toilet-white-1.avif";
+import toiletWhite2 from "@/assets/start-interior-toilet-white-2.avif";
+import toiletInstapklaar1 from "@/assets/start-interior-toilet-instapklaar-1.avif";
+import toiletInstapklaar2 from "@/assets/start-interior-toilet-instapklaar-2.avif";
 // Interior images — dark floor
 import darkFinished1 from "@/assets/start-interior-darkfloor-finished-1.png";
 import darkFinished2 from "@/assets/start-interior-darkfloor-finished-2.png";
@@ -52,19 +60,27 @@ const interiorImageMap: Record<string, [string, string]> = {
   "fully-finished:brown:stone-vinyl": [stoneBrown2, stoneBrown1],
   "fully-finished:light-oak:stone-vinyl": [stoneLightoak2, stoneLightoak1],
   "fully-finished:white:stone-vinyl": [stoneWhite2, stoneWhite1],
-  // Shell (casco) — Plan A (open plan)
+  // Shell (casco)
   "shell:a": [cascoImg1, cascoImg2],
-  // Shell (casco) — Plan B (with toilet)
   "shell:b": [cascoToiletImg1, cascoToiletImg2],
+  // Plan B (toilet) — light floor
+  "finished:light-vinyl:b": [toiletInstapklaar1, toiletInstapklaar2],
+  "fully-finished:brown:light-vinyl:b": [toiletBrown1, toiletBrown2],
+  "fully-finished:light-oak:light-vinyl:b": [toiletLightoak1, toiletLightoak2],
+  "fully-finished:white:light-vinyl:b": [toiletWhite1, toiletWhite2],
 };
 
 function getInteriorImages(config: ConfigState): [string, string] | null {
   if (config.finishLevel === "shell") return interiorImageMap[`shell:${config.floorPlan}`] ?? interiorImageMap["shell:a"];
+  const plan = config.floorPlan;
   const floor = config.floorOption;
   if (config.finishLevel === "finished") {
-    return interiorImageMap[`finished:${floor}`] ?? interiorImageMap["finished:light-vinyl"];
+    return interiorImageMap[`finished:${floor}:${plan}`]
+      ?? interiorImageMap[`finished:${floor}`]
+      ?? interiorImageMap["finished:light-vinyl"];
   }
-  return interiorImageMap[`fully-finished:${config.shelfColor}:${floor}`]
+  return interiorImageMap[`fully-finished:${config.shelfColor}:${floor}:${plan}`]
+    ?? interiorImageMap[`fully-finished:${config.shelfColor}:${floor}`]
     ?? interiorImageMap[`fully-finished:${config.shelfColor}:light-vinyl`]
     ?? interiorImageMap["fully-finished:brown:light-vinyl"];
 }
