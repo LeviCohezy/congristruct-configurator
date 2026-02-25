@@ -5,92 +5,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { ModularUnit3D } from "./ModularUnit3D";
 import type { ConfigState } from "@/hooks/useConfigurator";
 
-// Interior images for BLOQ START — light floor (default)
-import brownImg1 from "@/assets/start-interior-brown-1.avif";
-import lightoakImg1 from "@/assets/start-interior-lightoak-1.avif";
-import whiteImg1 from "@/assets/start-interior-white-1.avif";
-import instapklaarImg1 from "@/assets/start-interior-instapklaar-1.avif";
-import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
-import furnishedShared from "@/assets/start-interior-furnished-shared.avif";
-import cascoImg1 from "@/assets/start-interior-casco-1.avif";
-import cascoImg2 from "@/assets/start-interior-casco-2.avif";
-import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
-import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
-// Plan B (with toilet) — light floor finished & fully-finished
-import toiletBrown1 from "@/assets/start-interior-toilet-brown-1.avif";
-import toiletBrown2 from "@/assets/start-interior-toilet-brown-2.avif";
-import toiletLightoak1 from "@/assets/start-interior-toilet-lightoak-1.avif";
-import toiletLightoak2 from "@/assets/start-interior-toilet-lightoak-2.avif";
-import toiletWhite1 from "@/assets/start-interior-toilet-white-1.avif";
-import toiletWhite2 from "@/assets/start-interior-toilet-white-2.avif";
-import toiletInstapklaar1 from "@/assets/start-interior-toilet-instapklaar-1.avif";
-import toiletInstapklaar2 from "@/assets/start-interior-toilet-instapklaar-2.avif";
-// Interior images — dark floor
-import darkFinished1 from "@/assets/start-interior-darkfloor-finished-1.png";
-import darkFinished2 from "@/assets/start-interior-darkfloor-finished-2.png";
-import darkBrown1 from "@/assets/start-interior-darkfloor-brown-1.png";
-import darkBrown2 from "@/assets/start-interior-darkfloor-brown-2.png";
-import darkLightoak1 from "@/assets/start-interior-darkfloor-lightoak-1.png";
-import darkLightoak2 from "@/assets/start-interior-darkfloor-lightoak-2.png";
-import darkWhite1 from "@/assets/start-interior-darkfloor-white-1.png";
-import darkWhite2 from "@/assets/start-interior-darkfloor-white-2.png";
-// Interior images — stone floor
-import stoneFinished1 from "@/assets/start-interior-stonefloor-finished-1.png";
-import stoneFinished2 from "@/assets/start-interior-stonefloor-finished-2.png";
-import stoneBrown1 from "@/assets/start-interior-stonefloor-brown-1.png";
-import stoneBrown2 from "@/assets/start-interior-stonefloor-brown-2.png";
-import stoneLightoak1 from "@/assets/start-interior-stonefloor-lightoak-1.png";
-import stoneLightoak2 from "@/assets/start-interior-stonefloor-lightoak-2.png";
-import stoneWhite1 from "@/assets/start-interior-stonefloor-white-1.png";
-import stoneWhite2 from "@/assets/start-interior-stonefloor-white-2.png";
-
-const interiorImageMap: Record<string, [string, string]> = {
-  // Light floor (default)
-  "finished:light-vinyl": [instapklaarImg1, instapklaarImg2],
-  "fully-finished:brown:light-vinyl": [brownImg1, furnishedShared],
-  "fully-finished:light-oak:light-vinyl": [lightoakImg1, furnishedShared],
-  "fully-finished:white:light-vinyl": [whiteImg1, furnishedShared],
-  // Dark floor
-  "finished:dark-vinyl": [darkFinished2, darkFinished1],
-  "fully-finished:brown:dark-vinyl": [darkBrown2, darkBrown1],
-  "fully-finished:light-oak:dark-vinyl": [darkLightoak1, darkLightoak2],
-  "fully-finished:white:dark-vinyl": [darkWhite2, darkWhite1],
-  // Stone floor
-  "finished:stone-vinyl": [stoneFinished1, stoneFinished2],
-  "fully-finished:brown:stone-vinyl": [stoneBrown2, stoneBrown1],
-  "fully-finished:light-oak:stone-vinyl": [stoneLightoak2, stoneLightoak1],
-  "fully-finished:white:stone-vinyl": [stoneWhite2, stoneWhite1],
-  // Shell (casco)
-  "shell:a": [cascoImg1, cascoImg2],
-  "shell:b": [cascoToiletImg1, cascoToiletImg2],
-  // Plan B (toilet) — light floor
-  "finished:light-vinyl:b": [toiletInstapklaar1, toiletInstapklaar2],
-  "fully-finished:brown:light-vinyl:b": [toiletBrown1, toiletBrown2],
-  "fully-finished:light-oak:light-vinyl:b": [toiletLightoak1, toiletLightoak2],
-  "fully-finished:white:light-vinyl:b": [toiletWhite1, toiletWhite2],
-};
-
-function getInteriorImages(config: ConfigState): [string, string] | null {
-  if (config.finishLevel === "shell") return interiorImageMap[`shell:${config.floorPlan}`] ?? interiorImageMap["shell:a"];
-  const plan = config.floorPlan;
-  const floor = config.floorOption;
-  if (config.finishLevel === "finished") {
-    return interiorImageMap[`finished:${floor}:${plan}`]
-      ?? interiorImageMap[`finished:${floor}`]
-      ?? interiorImageMap["finished:light-vinyl"];
-  }
-  return interiorImageMap[`fully-finished:${config.shelfColor}:${floor}:${plan}`]
-    ?? interiorImageMap[`fully-finished:${config.shelfColor}:${floor}`]
-    ?? interiorImageMap[`fully-finished:${config.shelfColor}:light-vinyl`]
-    ?? interiorImageMap["fully-finished:brown:light-vinyl"];
-}
-
 interface PreviewPanelProps {
   config: ConfigState;
   currentStep: number;
   onOverrideWoodColor?: (color: string | null) => void;
   showInteriorImages?: boolean;
   onToggleInteriorView?: () => void;
+  interiorImages?: [string, string] | null;
 }
 
 function SceneContent({ config }: { config: ConfigState }) {
@@ -139,7 +60,6 @@ const modelLabels: Record<ConfigState["model"], string> = {
   base: "BLOQ BASE · 50m²",
 };
 
-// Camera distance per model to ensure full visibility
 const cameraDistances: Record<ConfigState["model"], number> = {
   start: 12,
   flow: 17,
@@ -147,9 +67,9 @@ const cameraDistances: Record<ConfigState["model"], number> = {
   base: 26,
 };
 
-export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView }: PreviewPanelProps) {
+export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView, interiorImages }: PreviewPanelProps) {
   const camDist = cameraDistances[config.model];
-  const images = getInteriorImages(config);
+  const images = interiorImages;
   const canToggle = images && showInteriorImages !== undefined && onToggleInteriorView;
 
   return (
@@ -225,7 +145,7 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView 
 
       {/* Interior images overlay for BLOQ START */}
       <AnimatePresence>
-        {showInteriorImages && (
+        {showInteriorImages && images && (
           <motion.div
             key="interior-images"
             initial={{ opacity: 0 }}
