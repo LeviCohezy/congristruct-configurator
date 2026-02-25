@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useConfigurator } from "@/hooks/useConfigurator";
 import { useInteriorImages } from "@/hooks/useInteriorImages";
 import { PreviewPanel } from "./PreviewPanel";
@@ -11,13 +11,15 @@ import { WindowsSection } from "./steps/WindowsSection";
 import { ExtraOptions } from "./steps/ExtraOptions";
 import { Transport } from "./steps/Transport";
 import { ContactForm } from "./steps/ContactForm";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
   const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);
+  const [showPriceGate, setShowPriceGate] = useState(false);
   const interiorRef = useRef<HTMLDivElement>(null);
 
   // Reset force3D when interior leaves view
@@ -36,6 +38,14 @@ export function ConfiguratorLayout() {
   }, []);
 
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
+  const priceRevealed = config.priceRevealed;
+
+  const handleRevealPrice = useCallback(() => {
+    const c = config.contact;
+    if (!c.fullName.trim() || !c.email.trim()) return;
+    updateConfig("priceRevealed", true);
+    setShowPriceGate(false);
+  }, [config.contact, updateConfig]);
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-background">
@@ -123,13 +133,79 @@ export function ConfiguratorLayout() {
 
         {/* Sticky price bar */}
         <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
-          <div className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5">
-            <p className="text-xl font-display font-bold text-foreground">
+          <button
+            onClick={() => !priceRevealed && setShowPriceGate(true)}
+            className="pointer-events-auto px-5 py-2.5 rounded-full bg-card/60 backdrop-blur-xl border border-border/50 shadow-lg flex items-baseline gap-1.5 cursor-pointer transition-all hover:shadow-xl"
+          >
+            <p className={`text-xl font-display font-bold text-foreground transition-all ${!priceRevealed ? "blur-md select-none" : ""}`}>
               ± €{totalPrice.toLocaleString("nl-NL")}
             </p>
-            <p className="text-[11px] text-muted-foreground whitespace-nowrap">excl. BTW</p>
-          </div>
+            <p className="text-[11px] text-muted-foreground whitespace-nowrap">
+              {priceRevealed ? "excl. BTW" : "Klik om prijs te zien"}
+            </p>
+          </button>
         </div>
+
+        {/* Price gate modal */}
+        <AnimatePresence>
+          {showPriceGate && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+              onClick={() => setShowPriceGate(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 16 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 16 }}
+                transition={{ duration: 0.2 }}
+                className="bg-card rounded-2xl border border-border shadow-2xl p-6 w-full max-w-sm"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-lg font-display font-semibold">Ontdek je prijs</h3>
+                    <p className="text-sm text-muted-foreground mt-0.5">Vul je gegevens in om de live prijsindicatie te zien</p>
+                  </div>
+                  <button onClick={() => setShowPriceGate(false)} className="text-muted-foreground hover:text-foreground transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="space-y-3 mb-5">
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">Volledige naam</label>
+                    <input
+                      type="text"
+                      value={config.contact.fullName}
+                      onChange={(e) => updateContact("fullName", e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                      placeholder="Jan Janssens"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1 block">E-mailadres</label>
+                    <input
+                      type="email"
+                      value={config.contact.email}
+                      onChange={(e) => updateContact("email", e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                      placeholder="jan@voorbeeld.be"
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={handleRevealPrice}
+                  disabled={!config.contact.fullName.trim() || !config.contact.email.trim()}
+                  className="w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Toon mijn prijsindicatie
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
