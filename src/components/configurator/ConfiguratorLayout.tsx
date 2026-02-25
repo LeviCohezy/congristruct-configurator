@@ -151,7 +151,7 @@ export function ConfiguratorLayout() {
               </p>
             </button>
             {!priceRevealed && (
-              <MousePointerClick className="absolute right-[7.5rem] -bottom-2.5 w-6 h-6 text-accent animate-bounce pointer-events-none drop-shadow-md" />
+              <MousePointerClick className="absolute right-[7.5rem] -bottom-3 w-8 h-8 text-accent animate-bounce pointer-events-none drop-shadow-md" />
             )}
           </div>
         </div>
