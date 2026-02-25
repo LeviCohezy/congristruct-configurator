@@ -142,7 +142,7 @@ export function ConfiguratorLayout() {
               text={totalPrice.toLocaleString("nl-NL")}
               revealed={priceRevealed}
               onClick={() => setShowPriceGate(true)}
-              className="text-xl font-display font-bold text-foreground"
+              className="text-xl font-display font-bold text-foreground cursor-pointer"
               prefix="± €"
             />
             <p className="text-[11px] text-muted-foreground whitespace-nowrap">
