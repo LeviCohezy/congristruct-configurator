@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ConfigState } from "./useConfigurator";
 
 export function useInteriorImages(config: ConfigState): [string, string] | null {
   const [images, setImages] = useState<[string, string] | null>(null);
+  const prevImagesRef = useRef<[string, string] | null>(null);
 
   useEffect(() => {
     if (config.model !== "start") {
@@ -34,11 +35,14 @@ export function useInteriorImages(config: ConfigState): [string, string] | null 
         return;
       }
 
-      setImages([data.image1_url, data.image2_url]);
+      const newImages: [string, string] = [data.image1_url, data.image2_url];
+      prevImagesRef.current = newImages;
+      setImages(newImages);
     };
 
     fetchImages();
   }, [config.model, config.floorPlan, config.finishLevel, config.floorOption, config.shelfColor]);
 
-  return images;
+  // Return previous images while loading to avoid flash to 3D
+  return images ?? prevImagesRef.current;
 }

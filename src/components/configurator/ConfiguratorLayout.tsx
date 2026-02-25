@@ -38,6 +38,7 @@ export function ConfiguratorLayout() {
     return () => observer.disconnect();
   }, []);
 
+  // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
 
@@ -130,7 +131,7 @@ export function ConfiguratorLayout() {
             </div>
 
             {/* Bottom spacer for sticky price bar */}
-            <div className="h-24" />
+            <div className="h-32" />
           </div>
         </div>
 
@@ -195,7 +196,7 @@ export function ConfiguratorLayout() {
                         type="text"
                         value={config.contact.fullName}
                         onChange={(e) => updateContact("fullName", e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all text-base sm:text-sm"
                         placeholder="Jan Janssens"
                       />
                     </div>
@@ -205,7 +206,7 @@ export function ConfiguratorLayout() {
                         type="email"
                         value={config.contact.email}
                         onChange={(e) => updateContact("email", e.target.value)}
-                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all text-base sm:text-sm"
                         placeholder="jan@voorbeeld.be"
                       />
                     </div>
