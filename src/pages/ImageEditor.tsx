@@ -1,41 +1,7 @@
-import { useState, useRef, useCallback } from "react";
-import { Check, X, ImageIcon, Upload, Trash2 } from "lucide-react";
-
-// Import all existing interior images to check availability
-import brownImg1 from "@/assets/start-interior-brown-1.avif";
-import lightoakImg1 from "@/assets/start-interior-lightoak-1.avif";
-import whiteImg1 from "@/assets/start-interior-white-1.avif";
-import instapklaarImg1 from "@/assets/start-interior-instapklaar-1.avif";
-import instapklaarImg2 from "@/assets/start-interior-instapklaar-2.avif";
-import furnishedShared from "@/assets/start-interior-furnished-shared.avif";
-import cascoImg1 from "@/assets/start-interior-casco-1.avif";
-import cascoImg2 from "@/assets/start-interior-casco-2.avif";
-import cascoToiletImg1 from "@/assets/start-interior-casco-toilet-1.avif";
-import cascoToiletImg2 from "@/assets/start-interior-casco-toilet-2.avif";
-import toiletBrown1 from "@/assets/start-interior-toilet-brown-1.avif";
-import toiletBrown2 from "@/assets/start-interior-toilet-brown-2.avif";
-import toiletLightoak1 from "@/assets/start-interior-toilet-lightoak-1.avif";
-import toiletLightoak2 from "@/assets/start-interior-toilet-lightoak-2.avif";
-import toiletWhite1 from "@/assets/start-interior-toilet-white-1.avif";
-import toiletWhite2 from "@/assets/start-interior-toilet-white-2.avif";
-import toiletInstapklaar1 from "@/assets/start-interior-toilet-instapklaar-1.avif";
-import toiletInstapklaar2 from "@/assets/start-interior-toilet-instapklaar-2.avif";
-import darkFinished1 from "@/assets/start-interior-darkfloor-finished-1.png";
-import darkFinished2 from "@/assets/start-interior-darkfloor-finished-2.png";
-import darkBrown1 from "@/assets/start-interior-darkfloor-brown-1.png";
-import darkBrown2 from "@/assets/start-interior-darkfloor-brown-2.png";
-import darkLightoak1 from "@/assets/start-interior-darkfloor-lightoak-1.png";
-import darkLightoak2 from "@/assets/start-interior-darkfloor-lightoak-2.png";
-import darkWhite1 from "@/assets/start-interior-darkfloor-white-1.png";
-import darkWhite2 from "@/assets/start-interior-darkfloor-white-2.png";
-import stoneFinished1 from "@/assets/start-interior-stonefloor-finished-1.png";
-import stoneFinished2 from "@/assets/start-interior-stonefloor-finished-2.png";
-import stoneBrown1 from "@/assets/start-interior-stonefloor-brown-1.png";
-import stoneBrown2 from "@/assets/start-interior-stonefloor-brown-2.png";
-import stoneLightoak1 from "@/assets/start-interior-stonefloor-lightoak-1.png";
-import stoneLightoak2 from "@/assets/start-interior-stonefloor-lightoak-2.png";
-import stoneWhite1 from "@/assets/start-interior-stonefloor-white-1.png";
-import stoneWhite2 from "@/assets/start-interior-stonefloor-white-2.png";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { Check, X, ImageIcon, Upload, Trash2, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Model = "start" | "flow" | "hub" | "base";
 type Plan = "a" | "b";
@@ -66,82 +32,50 @@ const kastColors: { id: Kast; label: string }[] = [
   { id: "white", label: "Wit" },
 ];
 
-function makeKey(model: Model, plan: Plan, finish: string, floor?: Floor, kast?: Kast): string {
+interface ImageRecord {
+  id: string;
+  model: string;
+  plan: string;
+  finish_level: string;
+  floor_option: string | null;
+  kast_color: string | null;
+  image1_url: string | null;
+  image2_url: string | null;
+}
+
+function makeKey(model: string, plan: string, finish: string, floor?: string, kast?: string): string {
   return [model, plan, finish, floor ?? "", kast ?? ""].join(":");
 }
-
-function getDefaultImage(model: Model, plan: Plan, finish: string, floor?: Floor, kast?: Kast, slot?: 1 | 2): string | null {
-  if (model !== "start") return null;
-
-  if (finish === "shell") {
-    if (plan === "a") return slot === 1 ? cascoImg1 : cascoImg2;
-    if (plan === "b") return slot === 1 ? cascoToiletImg1 : cascoToiletImg2;
-  }
-  if (finish === "finished") {
-    if (plan === "a") {
-      if (floor === "light-vinyl") return slot === 1 ? instapklaarImg1 : instapklaarImg2;
-      if (floor === "dark-vinyl") return slot === 1 ? darkFinished2 : darkFinished1;
-      if (floor === "stone-vinyl") return slot === 1 ? stoneFinished1 : stoneFinished2;
-    }
-    if (plan === "b") {
-      if (floor === "light-vinyl") return slot === 1 ? toiletInstapklaar1 : toiletInstapklaar2;
-    }
-  }
-  if (finish === "fully-finished") {
-    if (plan === "a") {
-      if (floor === "light-vinyl") {
-        if (kast === "brown") return slot === 1 ? brownImg1 : furnishedShared;
-        if (kast === "light-oak") return slot === 1 ? lightoakImg1 : furnishedShared;
-        if (kast === "white") return slot === 1 ? whiteImg1 : furnishedShared;
-      }
-      if (floor === "dark-vinyl") {
-        if (kast === "brown") return slot === 1 ? darkBrown2 : darkBrown1;
-        if (kast === "light-oak") return slot === 1 ? darkLightoak1 : darkLightoak2;
-        if (kast === "white") return slot === 1 ? darkWhite2 : darkWhite1;
-      }
-      if (floor === "stone-vinyl") {
-        if (kast === "brown") return slot === 1 ? stoneBrown2 : stoneBrown1;
-        if (kast === "light-oak") return slot === 1 ? stoneLightoak2 : stoneLightoak1;
-        if (kast === "white") return slot === 1 ? stoneWhite2 : stoneWhite1;
-      }
-    }
-    if (plan === "b") {
-      if (floor === "light-vinyl") {
-        if (kast === "brown") return slot === 1 ? toiletBrown1 : toiletBrown2;
-        if (kast === "light-oak") return slot === 1 ? toiletLightoak1 : toiletLightoak2;
-        if (kast === "white") return slot === 1 ? toiletWhite1 : toiletWhite2;
-      }
-    }
-  }
-  return null;
-}
-
-// Overrides are session-only (blob URLs)
 
 function ImageSlot({
   src,
   label,
-  slotKey,
   onReplace,
   onDelete,
+  uploading,
 }: {
   src: string | null;
   label: string;
-  slotKey: string;
-  onReplace: (key: string, dataUrl: string) => void;
-  onDelete: (key: string) => void;
+  onReplace: (file: File) => void;
+  onDelete: () => void;
+  uploading?: boolean;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    onReplace(slotKey, URL.createObjectURL(file));
+    onReplace(file);
     e.target.value = "";
   };
 
   return (
     <div className="relative group rounded-lg border border-border overflow-hidden bg-muted aspect-[4/3] flex items-center justify-center">
+      {uploading && (
+        <div className="absolute inset-0 z-20 bg-background/80 flex items-center justify-center">
+          <RefreshCw className="w-5 h-5 animate-spin text-muted-foreground" />
+        </div>
+      )}
       {src ? (
         <>
           <img src={src} alt={label} className="w-full h-full object-cover" />
@@ -154,7 +88,7 @@ function ImageSlot({
               <Upload className="w-4 h-4" />
             </button>
             <button
-              onClick={() => onDelete(slotKey)}
+              onClick={onDelete}
               className="p-2 rounded-full bg-destructive/90 text-destructive-foreground hover:bg-destructive transition-colors"
               title="Delete"
             >
@@ -171,13 +105,7 @@ function ImageSlot({
           <span className="text-[10px] font-medium">Upload</span>
         </button>
       )}
-      <input
-        ref={fileRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFile}
-      />
+      <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
     </div>
   );
 }
@@ -192,7 +120,7 @@ function StatusBadge({ count }: { count: number }) {
   }
   if (count === 1) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-600 text-[10px] font-medium">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 text-[10px] font-medium">
         1/2
       </span>
     );
@@ -205,23 +133,15 @@ function StatusBadge({ count }: { count: number }) {
 }
 
 function CombinationRow({
-  model, plan, finish, floor, kast, overrides, onReplace, onDelete,
+  model, plan, finish, floor, kast, record, onUpload, onDeleteImage,
 }: {
   model: Model; plan: Plan; finish: string; floor?: Floor; kast?: Kast;
-  overrides: Record<string, string>;
-  onReplace: (key: string, dataUrl: string) => void;
-  onDelete: (key: string) => void;
+  record: ImageRecord | undefined;
+  onUpload: (model: string, plan: string, finish: string, floor: string | null, kast: string | null, slot: 1 | 2, file: File) => void;
+  onDeleteImage: (model: string, plan: string, finish: string, floor: string | null, kast: string | null, slot: 1 | 2) => void;
 }) {
-  const key1 = makeKey(model, plan, finish, floor, kast) + ":1";
-  const key2 = makeKey(model, plan, finish, floor, kast) + ":2";
-
-  const img1 = overrides[key1] ?? getDefaultImage(model, plan, finish, floor, kast, 1);
-  const img2 = overrides[key2] ?? getDefaultImage(model, plan, finish, floor, kast, 2);
-
-  // Check for deleted markers
-  const src1 = overrides[key1] === "__deleted__" ? null : img1;
-  const src2 = overrides[key2] === "__deleted__" ? null : img2;
-
+  const src1 = record?.image1_url ?? null;
+  const src2 = record?.image2_url ?? null;
   const count = (src1 ? 1 : 0) + (src2 ? 1 : 0);
 
   const labelParts: string[] = [];
@@ -238,8 +158,18 @@ function CombinationRow({
         <StatusBadge count={count} />
       </div>
       <div className="grid grid-cols-2 gap-2">
-        <ImageSlot src={src1} label="Image 1" slotKey={key1} onReplace={onReplace} onDelete={onDelete} />
-        <ImageSlot src={src2} label="Image 2" slotKey={key2} onReplace={onReplace} onDelete={onDelete} />
+        <ImageSlot
+          src={src1}
+          label="Image 1"
+          onReplace={(file) => onUpload(model, plan, finish, floor ?? null, kast ?? null, 1, file)}
+          onDelete={() => onDeleteImage(model, plan, finish, floor ?? null, kast ?? null, 1)}
+        />
+        <ImageSlot
+          src={src2}
+          label="Image 2"
+          onReplace={(file) => onUpload(model, plan, finish, floor ?? null, kast ?? null, 2, file)}
+          onDelete={() => onDeleteImage(model, plan, finish, floor ?? null, kast ?? null, 2)}
+        />
       </div>
     </div>
   );
@@ -248,41 +178,106 @@ function CombinationRow({
 export default function ImageEditor() {
   const [selectedModel, setSelectedModel] = useState<Model>("start");
   const [selectedPlan, setSelectedPlan] = useState<Plan>("a");
-  const [overrides, setOverrides] = useState<Record<string, string>>({});
+  const [records, setRecords] = useState<ImageRecord[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleReplace = useCallback((key: string, dataUrl: string) => {
-    setOverrides(prev => ({ ...prev, [key]: dataUrl }));
-  }, []);
-
-  const handleDelete = useCallback((key: string) => {
-    setOverrides(prev => ({ ...prev, [key]: "__deleted__" }));
-  }, []);
-
-  // Count filled slots
-  function countFilled() {
-    let filled = 0;
-    const total = (1 + 3 + 9) * 2;
-    const combos = getCombos();
-    for (const c of combos) {
-      const k1 = makeKey(selectedModel, selectedPlan, c.finish, c.floor, c.kast) + ":1";
-      const k2 = makeKey(selectedModel, selectedPlan, c.finish, c.floor, c.kast) + ":2";
-      const s1 = overrides[k1] === "__deleted__" ? null : (overrides[k1] ?? getDefaultImage(selectedModel, selectedPlan, c.finish, c.floor, c.kast, 1));
-      const s2 = overrides[k2] === "__deleted__" ? null : (overrides[k2] ?? getDefaultImage(selectedModel, selectedPlan, c.finish, c.floor, c.kast, 2));
-      if (s1) filled++;
-      if (s2) filled++;
+  const fetchRecords = useCallback(async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("interior_images")
+      .select("*")
+      .eq("model", selectedModel)
+      .eq("plan", selectedPlan);
+    if (error) {
+      toast.error("Failed to load images");
+      console.error(error);
+    } else {
+      setRecords((data as ImageRecord[]) ?? []);
     }
-    return { filled, total };
-  }
+    setLoading(false);
+  }, [selectedModel, selectedPlan]);
 
-  function getCombos() {
-    const combos: { finish: string; floor?: Floor; kast?: Kast }[] = [];
-    combos.push({ finish: "shell" });
-    for (const f of floors) combos.push({ finish: "finished", floor: f.id });
-    for (const f of floors) for (const k of kastColors) combos.push({ finish: "fully-finished", floor: f.id, kast: k.id });
-    return combos;
-  }
+  useEffect(() => { fetchRecords(); }, [fetchRecords]);
 
-  const { filled, total } = countFilled();
+  const getRecord = (finish: string, floor?: Floor, kast?: Kast) => {
+    return records.find(r =>
+      r.finish_level === finish &&
+      (r.floor_option ?? "") === (floor ?? "") &&
+      (r.kast_color ?? "") === (kast ?? "")
+    );
+  };
+
+  const handleUpload = useCallback(async (
+    model: string, plan: string, finish: string,
+    floor: string | null, kast: string | null,
+    slot: 1 | 2, file: File,
+  ) => {
+    const ext = file.name.split(".").pop() ?? "avif";
+    const path = `${model}/${plan}-${finish}-${floor ?? "none"}-${kast ?? "none"}-${slot}-${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("interior-images")
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      toast.error("Upload failed");
+      console.error(uploadError);
+      return;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from("interior-images")
+      .getPublicUrl(path);
+
+    const publicUrl = urlData.publicUrl;
+    const field = slot === 1 ? "image1_url" : "image2_url";
+
+    // Check if record exists
+    const existing = getRecord(finish, floor as Floor | undefined, kast as Kast | undefined);
+
+    if (existing) {
+      await supabase
+        .from("interior_images")
+        .update({ [field]: publicUrl, updated_at: new Date().toISOString() })
+        .eq("id", existing.id);
+    } else {
+      await supabase
+        .from("interior_images")
+        .insert({
+          model, plan, finish_level: finish,
+          floor_option: floor, kast_color: kast,
+          [field]: publicUrl,
+        });
+    }
+
+    toast.success("Image uploaded!");
+    fetchRecords();
+  }, [records, fetchRecords]);
+
+  const handleDeleteImage = useCallback(async (
+    model: string, plan: string, finish: string,
+    floor: string | null, kast: string | null, slot: 1 | 2,
+  ) => {
+    const existing = getRecord(finish, floor as Floor | undefined, kast as Kast | undefined);
+    if (!existing) return;
+
+    const field = slot === 1 ? "image1_url" : "image2_url";
+    await supabase
+      .from("interior_images")
+      .update({ [field]: null, updated_at: new Date().toISOString() })
+      .eq("id", existing.id);
+
+    toast.success("Image removed");
+    fetchRecords();
+  }, [records, fetchRecords]);
+
+  // Count filled
+  let filled = 0;
+  const total = (1 + 3 + 9) * 2;
+  for (const r of records) {
+    if (r.image1_url) filled++;
+    if (r.image2_url) filled++;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -348,31 +343,37 @@ export default function ImageEditor() {
           </div>
         </div>
 
-        {/* Sections */}
-        <div className="space-y-6">
-          <Section title="Casco" count="1 combinatie">
-            <CombinationRow model={selectedModel} plan={selectedPlan} finish="shell" overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
-          </Section>
+        {loading ? (
+          <div className="flex items-center justify-center py-12 text-muted-foreground">
+            <RefreshCw className="w-5 h-5 animate-spin mr-2" />
+            Loading...
+          </div>
+        ) : (
+          <div className="space-y-6">
+            <Section title="Casco" count="1 combinatie">
+              <CombinationRow model={selectedModel} plan={selectedPlan} finish="shell" record={getRecord("shell")} onUpload={handleUpload} onDeleteImage={handleDeleteImage} />
+            </Section>
 
-          <Section title="Instapklaar" count="3 combinaties (per vloer)">
-            {floors.map((floor) => (
-              <CombinationRow key={floor.id} model={selectedModel} plan={selectedPlan} finish="finished" floor={floor.id} overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
-            ))}
-          </Section>
+            <Section title="Instapklaar" count="3 combinaties (per vloer)">
+              {floors.map((floor) => (
+                <CombinationRow key={floor.id} model={selectedModel} plan={selectedPlan} finish="finished" floor={floor.id} record={getRecord("finished", floor.id)} onUpload={handleUpload} onDeleteImage={handleDeleteImage} />
+              ))}
+            </Section>
 
-          <Section title="Volledig ingericht" count="9 combinaties (3 vloeren × 3 kastkleuren)">
-            {floors.map((floor) => (
-              <div key={floor.id}>
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
-                  {floor.label}
-                </p>
-                {kastColors.map((kast) => (
-                  <CombinationRow key={`${floor.id}-${kast.id}`} model={selectedModel} plan={selectedPlan} finish="fully-finished" floor={floor.id} kast={kast.id} overrides={overrides} onReplace={handleReplace} onDelete={handleDelete} />
-                ))}
-              </div>
-            ))}
-          </Section>
-        </div>
+            <Section title="Volledig ingericht" count="9 combinaties (3 vloeren × 3 kastkleuren)">
+              {floors.map((floor) => (
+                <div key={floor.id}>
+                  <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mt-3 mb-1">
+                    {floor.label}
+                  </p>
+                  {kastColors.map((kast) => (
+                    <CombinationRow key={`${floor.id}-${kast.id}`} model={selectedModel} plan={selectedPlan} finish="fully-finished" floor={floor.id} kast={kast.id} record={getRecord("fully-finished", floor.id, kast.id)} onUpload={handleUpload} onDeleteImage={handleDeleteImage} />
+                  ))}
+                </div>
+              ))}
+            </Section>
+          </div>
+        )}
       </div>
     </div>
   );
