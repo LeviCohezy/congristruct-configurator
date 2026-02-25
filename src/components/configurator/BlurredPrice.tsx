@@ -21,7 +21,7 @@ export function BlurredPrice({ text, revealed, onClick, className = "", prefix =
     >
       <span>{prefix}</span>
       <span className="relative">
-        <span className="blur-md select-none">{text}</span>
+        <span className="blur-md select-none" style={{ color: "#98aba1" }}>{text}</span>
         <Eye className="absolute inset-0 m-auto w-3.5 h-3.5 text-muted-foreground/70 group-hover:text-foreground transition-colors" />
       </span>
     </button>
