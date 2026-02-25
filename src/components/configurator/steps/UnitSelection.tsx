@@ -18,8 +18,8 @@ export function UnitSelection({ config, updateConfig }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <div>
-        <h3 className="text-lg font-display font-semibold mb-1">Kies je model</h3>
-        <p className="text-sm text-muted-foreground mb-4">Selecteer de unit die bij jouw project past</p>
+        <h3 className="text-xl font-display font-light mb-1">Kies je model</h3>
+        <p className="text-sm text-muted-foreground mb-5">Selecteer de unit die bij jouw project past</p>
         <div className="grid gap-3">
           {models.map((m) => (
             <button

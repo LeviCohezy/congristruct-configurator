@@ -96,8 +96,8 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <div>
-        <h3 className="text-lg font-display font-semibold mb-1">Gevelmateriaal</h3>
-        <p className="text-sm text-muted-foreground mb-4">Kies je buitenbekleding</p>
+        <h3 className="text-xl font-display font-light mb-1">Gevelmateriaal</h3>
+        <p className="text-sm text-muted-foreground mb-5">Kies je buitenbekleding</p>
         <div className="grid grid-cols-2 gap-3">
           {materials.map((family) => {
             const isActive = expandedFamily === family.id;

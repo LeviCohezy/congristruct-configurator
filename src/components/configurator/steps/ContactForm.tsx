@@ -30,8 +30,8 @@ export function ContactForm({ config, updateContact, totalPrice }: Props) {
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Contact & price indication</h3>
-      <p className="text-sm text-muted-foreground mb-6">Complete your details to receive a detailed quotation</p>
+      <h3 className="text-xl font-display font-light mb-1">Contact & prijsindicatie</h3>
+      <p className="text-sm text-muted-foreground mb-6">Vul je gegevens in voor een gedetailleerde offerte</p>
 
       <div className="bg-surface rounded-xl p-4 mb-6">
         <p className="config-label">Your price indication</p>

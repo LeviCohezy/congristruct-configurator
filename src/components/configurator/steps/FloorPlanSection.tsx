@@ -30,8 +30,8 @@ export function FloorPlanSection({ config, updateConfig }: Props) {
 
   return (
     <div className="config-section">
-      <h3 className="text-lg font-display font-semibold mb-1">Indeling</h3>
-      <p className="text-sm text-muted-foreground mb-4">Kies je grondplan</p>
+      <h3 className="text-xl font-display font-light mb-1">Indeling</h3>
+      <p className="text-sm text-muted-foreground mb-5">Kies je grondplan</p>
 
       <div className="grid grid-cols-2 gap-3 mb-6">
         {(["a", "b"] as const).map((plan) => (
