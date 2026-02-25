@@ -1,13 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
 
 export interface ConfigState {
-  // Unit
   model: "start" | "flow" | "hub" | "base";
   roundedCorners: boolean;
-  // Indeling
   floorPlan: "a" | "b";
   mirrorPlan: boolean;
-  // Exterieur
   facade:
     | "thermowood-black"
     | "thermowood-natural"
@@ -16,35 +13,54 @@ export interface ConfigState {
     | "aluminium"
     | "brick-grey";
   aluminiumColor: string;
-  // Interieur
   finishLevel: "shell" | "finished" | "fully-finished";
   floorOption: "light-vinyl" | "dark-vinyl" | "stone-vinyl";
   shelfColor: "brown" | "light-oak" | "white";
-  // Ramen
   tiltTurnWindow: boolean;
-  // Verlichting
   spotType: "spot-wit" | "spot-zwart" | "opbouw-spot-wit" | "opbouw-spot-zwart";
   railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend" | "rail-zwart-hangend";
   toiletLamp: "wc-spot-wit" | "wc-spot-zwart";
   keukenLedStrip: boolean;
   kastLedStrip: boolean;
   lightingPackage: "base" | "full";
-  // Extra's
   awning: boolean;
   solarPanels: boolean;
   batterySystem: boolean;
   foundation: boolean;
-  // Transport
   transportDistance: number;
-  // Contact
   contact: {
     fullName: string;
     email: string;
     phone: string;
   };
-  // Price gate
   priceRevealed: boolean;
 }
+
+const CONTACT_STORAGE_KEY = "configurator-contact";
+
+function loadContactFromStorage(): ConfigState["contact"] {
+  try {
+    const stored = localStorage.getItem(CONTACT_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        fullName: parsed.fullName || "",
+        email: parsed.email || "",
+        phone: parsed.phone || "",
+      };
+    }
+  } catch {}
+  return { fullName: "", email: "", phone: "" };
+}
+
+function saveContactToStorage(contact: ConfigState["contact"]) {
+  try {
+    localStorage.setItem(CONTACT_STORAGE_KEY, JSON.stringify(contact));
+  } catch {}
+}
+
+const savedContact = loadContactFromStorage();
+const hasStoredContact = !!(savedContact.fullName && savedContact.email);
 
 const defaultConfig: ConfigState = {
   model: "flow",
@@ -68,12 +84,8 @@ const defaultConfig: ConfigState = {
   batterySystem: false,
   foundation: false,
   transportDistance: 50,
-  contact: {
-    fullName: "",
-    email: "",
-    phone: "",
-  },
-  priceRevealed: false,
+  contact: savedContact,
+  priceRevealed: hasStoredContact,
 };
 
 // Pricing
@@ -114,10 +126,11 @@ export function useConfigurator() {
   }, []);
 
   const updateContact = useCallback((field: keyof ConfigState["contact"], value: string) => {
-    setConfig((prev) => ({
-      ...prev,
-      contact: { ...prev.contact, [field]: value },
-    }));
+    setConfig((prev) => {
+      const newContact = { ...prev.contact, [field]: value };
+      saveContactToStorage(newContact);
+      return { ...prev, contact: newContact };
+    });
   }, []);
 
   const totalPrice = useMemo(() => {
