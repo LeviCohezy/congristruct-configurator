@@ -63,8 +63,8 @@ export function InteriorFinish({ config, updateConfig }: Props) {
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="mt-6">
-              <p className="config-label mb-3">Vloerkeuze (Clickvinyl)</p>
+            <div className="mt-10">
+              <p className="config-label mb-4">Vloerkeuze (Clickvinyl)</p>
                <div className="grid grid-cols-3 gap-4">
                 {floorOptions.map((f) => (
                   <button
@@ -92,10 +92,10 @@ export function InteriorFinish({ config, updateConfig }: Props) {
             transition={{ duration: 0.3, delay: 0.1 }}
             className="overflow-hidden"
           >
-            <div className="mt-6 space-y-4">
+            <div className="mt-10 space-y-6">
               {/* Shelf color */}
               <div>
-                <p className="config-label mb-3">Kleur kasten & legplanken</p>
+                <p className="config-label mb-4">Kleur kasten & legplanken</p>
                 <div className="grid grid-cols-3 gap-4">
                   {shelfColors.map((c) => (
                     <button

@@ -90,8 +90,8 @@ export function LightingSection({ config, updateConfig }: Props) {
       <p className="text-sm text-muted-foreground mb-6">Kies je verlichtingsarmaturen</p>
 
       {/* Spots */}
-      <div className="mb-8">
-        <p className="config-label mb-3">Spots</p>
+      <div className="mb-10">
+        <p className="config-label mb-4">Spots</p>
         <ImageGrid
           options={spotOptions}
           selected={config.spotType}
@@ -100,8 +100,8 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Rail */}
-      <div className="mb-8">
-        <p className="config-label mb-3">Railverlichting</p>
+      <div className="mb-10">
+        <p className="config-label mb-4">Railverlichting</p>
         <ImageGrid
           options={railOptions}
           selected={config.railType}
@@ -110,8 +110,8 @@ export function LightingSection({ config, updateConfig }: Props) {
       </div>
 
       {/* Toiletlamp */}
-      <div className="mb-8">
-        <p className="config-label mb-3">Toiletlamp</p>
+      <div className="mb-10">
+        <p className="config-label mb-4">Toiletlamp</p>
         <ImageGrid
           options={toiletOptions}
           selected={config.toiletLamp}
@@ -122,7 +122,7 @@ export function LightingSection({ config, updateConfig }: Props) {
       {/* LED strips — only for FLOW */}
       {isFlow && (
         <div className="space-y-4">
-          <p className="config-label mb-1">LED-strips</p>
+          <p className="config-label mb-4">LED-strips</p>
 
           <div className="option-card flex items-center justify-between">
             <div>
