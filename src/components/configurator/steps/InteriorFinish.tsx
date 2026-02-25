@@ -7,6 +7,8 @@ interface Props {
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
 }
 
+const showLedOption = (model: ConfigState["model"]) => model !== "start";
+
 const finishLevels = [
   { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
   { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500" },
@@ -93,26 +95,28 @@ export function InteriorFinish({ config, updateConfig }: Props) {
             className="overflow-hidden"
           >
             <div className="mt-6 space-y-4">
-              {/* LED strip toggle */}
-              <div className="option-card flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">LED-strip verlichting</p>
-                  <p className="text-xs text-muted-foreground">LED-strips in kasten en minikeuken</p>
-                  <p className="text-xs font-medium text-accent mt-1">+€650</p>
+              {/* LED strip toggle — not available for START */}
+              {showLedOption(config.model) && (
+                <div className="option-card flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium">LED-strip verlichting</p>
+                    <p className="text-xs text-muted-foreground">LED-strips in kasten en minikeuken</p>
+                    <p className="text-xs font-medium text-accent mt-1">+€650</p>
+                  </div>
+                  <button
+                    onClick={() => updateConfig("ledStrip", !config.ledStrip)}
+                    className={cn(
+                      "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+                      config.ledStrip ? "bg-accent" : "bg-muted"
+                    )}
+                  >
+                    <span className={cn(
+                      "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+                      config.ledStrip ? "translate-x-5" : "translate-x-0"
+                    )} />
+                  </button>
                 </div>
-                <button
-                  onClick={() => updateConfig("ledStrip", !config.ledStrip)}
-                  className={cn(
-                    "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
-                    config.ledStrip ? "bg-accent" : "bg-muted"
-                  )}
-                >
-                  <span className={cn(
-                    "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
-                    config.ledStrip ? "translate-x-5" : "translate-x-0"
-                  )} />
-                </button>
-              </div>
+              )}
 
               {/* Shelf color */}
               <div>
