@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
@@ -46,13 +47,14 @@ const toiletOptions = [
   { id: "wc-spot-zwart" as const, tooltip: "WC spot zwart", img: wcSpotZwart },
 ];
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function Toggle({ on, onToggle, pulse }: { on: boolean; onToggle: () => void; pulse?: boolean }) {
   return (
     <button
       onClick={onToggle}
       className={cn(
         "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0",
-        on ? "bg-accent" : "bg-muted"
+        on ? "bg-accent" : "bg-muted",
+        pulse && !on && "animate-pulse ring-2 ring-accent/50"
       )}
     >
       <span className={cn(
@@ -67,22 +69,33 @@ function CircleGrid<T extends string>({
   options,
   selected,
   onSelect,
+  disabled,
+  onDisabledClick,
 }: {
   options: { id: T; tooltip: string; img: string }[];
   selected: T;
   onSelect: (id: T) => void;
+  disabled?: boolean;
+  onDisabledClick?: () => void;
 }) {
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="flex gap-4 flex-wrap">
+      <div className={cn("flex gap-4 flex-wrap", disabled && "opacity-40 pointer-events-auto")}>
         {options.map((o) => (
           <Tooltip key={o.id}>
             <TooltipTrigger asChild>
               <button
-                onClick={() => onSelect(o.id)}
+                onClick={() => {
+                  if (disabled) {
+                    onDisabledClick?.();
+                  } else {
+                    onSelect(o.id);
+                  }
+                }}
                 className={cn(
-                  "w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150 cursor-pointer",
-                  selected === o.id
+                  "w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150",
+                  disabled ? "cursor-not-allowed" : "cursor-pointer",
+                  !disabled && selected === o.id
                     ? "border-accent ring-2 ring-accent/30"
                     : "border-border/60 bg-secondary hover:border-accent/40"
                 )}
@@ -91,7 +104,7 @@ function CircleGrid<T extends string>({
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="text-xs">
-              {o.tooltip}
+              {disabled ? "Activeer eerst het verlichtingspakket" : o.tooltip}
             </TooltipContent>
           </Tooltip>
         ))}
@@ -102,6 +115,13 @@ function CircleGrid<T extends string>({
 
 export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
+  const packageOn = config.lightingPackage === "full";
+  const [pulseToggle, setPulseToggle] = useState(false);
+
+  const handleDisabledClick = () => {
+    setPulseToggle(true);
+    setTimeout(() => setPulseToggle(false), 1500);
+  };
 
   return (
     <div>
@@ -120,7 +140,11 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
           <p className="text-sm font-medium">Verlichtingspakket</p>
           <p className="text-xs text-muted-foreground">Inclusief alle armaturen & installatie</p>
         </div>
-        <Toggle on={config.lightingPackage === "full"} onToggle={() => updateConfig("lightingPackage", config.lightingPackage === "full" ? "base" : "full")} />
+        <Toggle
+          on={packageOn}
+          onToggle={() => updateConfig("lightingPackage", packageOn ? "base" : "full")}
+          pulse={pulseToggle}
+        />
       </div>
 
       {/* Spots */}
@@ -130,6 +154,8 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
           options={spotOptions}
           selected={config.spotType}
           onSelect={(id) => updateConfig("spotType", id)}
+          disabled={!packageOn}
+          onDisabledClick={handleDisabledClick}
         />
       </div>
 
@@ -140,6 +166,8 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
           options={railOptions}
           selected={config.railType}
           onSelect={(id) => updateConfig("railType", id)}
+          disabled={!packageOn}
+          onDisabledClick={handleDisabledClick}
         />
       </div>
 
@@ -150,6 +178,8 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
           options={toiletOptions}
           selected={config.toiletLamp}
           onSelect={(id) => updateConfig("toiletLamp", id)}
+          disabled={!packageOn}
+          onDisabledClick={handleDisabledClick}
         />
       </div>
 
@@ -161,10 +191,13 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
             {/* Keuken LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
+              !packageOn && "opacity-40",
               config.keukenLedStrip
                 ? "border-accent bg-card ring-1 ring-accent/30"
                 : "border-transparent bg-secondary"
-            )}>
+            )}
+              onClick={() => !packageOn && handleDisabledClick()}
+            >
               <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
                 <img src={keukenLedImg} alt="Keuken LED" className="w-full h-full object-cover" />
               </div>
@@ -172,16 +205,23 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
                 <p className="text-sm font-medium">Keuken LED</p>
                 <BlurredPrice text="350" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
-              <Toggle on={config.keukenLedStrip} onToggle={() => updateConfig("keukenLedStrip", !config.keukenLedStrip)} />
+              <Toggle
+                on={config.keukenLedStrip}
+                onToggle={() => packageOn && updateConfig("keukenLedStrip", !config.keukenLedStrip)}
+                pulse={!packageOn && pulseToggle}
+              />
             </div>
 
             {/* Kast LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
+              !packageOn && "opacity-40",
               config.kastLedStrip
                 ? "border-accent bg-card ring-1 ring-accent/30"
                 : "border-transparent bg-secondary"
-            )}>
+            )}
+              onClick={() => !packageOn && handleDisabledClick()}
+            >
               <div className="w-16 h-16 rounded-full overflow-hidden shrink-0">
                 <img src={kastLedImg} alt="Kast LED" className="w-full h-full object-cover" />
               </div>
@@ -189,7 +229,11 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
                 <p className="text-sm font-medium">Kast LED</p>
                 <BlurredPrice text="300" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
-              <Toggle on={config.kastLedStrip} onToggle={() => updateConfig("kastLedStrip", !config.kastLedStrip)} />
+              <Toggle
+                on={config.kastLedStrip}
+                onToggle={() => packageOn && updateConfig("kastLedStrip", !config.kastLedStrip)}
+                pulse={!packageOn && pulseToggle}
+              />
             </div>
           </div>
         </div>
