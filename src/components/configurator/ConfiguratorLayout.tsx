@@ -158,16 +158,16 @@ export function ConfiguratorLayout() {
             )}
             {/* Floating euro signs on price increase */}
             <AnimatePresence>
-              {priceRevealed && priceJustIncreased && (
+              {priceJustIncreased && (
                 <>
                   {[0, 1, 2].map((i) => (
                     <motion.span
                       key={`euro-${i}-${totalPrice}`}
-                      initial={{ opacity: 1, y: 0, x: -10 + i * 20 }}
-                      animate={{ opacity: 0, y: -40 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1, delay: i * 0.15, ease: "easeOut" }}
-                      className="absolute -top-2 left-1/2 text-accent font-bold text-sm pointer-events-none"
+                      initial={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{ opacity: 0, y: -60, scale: 1.3 }}
+                      transition={{ duration: 1.2, delay: i * 0.18, ease: "easeOut" }}
+                      className="absolute -top-3 pointer-events-none text-accent font-bold text-lg drop-shadow-md"
+                      style={{ left: `calc(50% + ${(i - 1) * 22}px)` }}
                     >
                       €
                     </motion.span>
