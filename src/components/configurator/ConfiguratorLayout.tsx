@@ -16,7 +16,7 @@ import { X, MousePointerClick } from "lucide-react";
 import { BlurredPrice } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
-  const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
+  const { config, updateConfig, updateContact, totalPrice, priceJustIncreased } = useConfigurator();
   const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);
