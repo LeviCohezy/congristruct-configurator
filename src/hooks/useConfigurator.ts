@@ -155,9 +155,17 @@ export function useConfigurator() {
     if (config.tiltTurnWindow) price += 180;
 
     // Lighting
-    if (config.lightingPackage === "full") price += 1500;
-    // Opbouw spots cost €5 extra
-    if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") price += 5;
+    if (config.lightingPackage === "full") {
+      price += 1500;
+      // Spots & rail: +€5 each, opbouw spots: +€10
+      if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") {
+        price += 10;
+      } else {
+        price += 5;
+      }
+      // Rail: +€5
+      price += 5;
+    }
     if (config.keukenLedStrip) price += 350;
     if (config.kastLedStrip) price += 300;
 
