@@ -26,20 +26,20 @@ interface MaterialFamily {
 
 const materials: MaterialFamily[] = [
   {
-    id: "thermowood-black",
-    label: "Thermowood Zwart Den",
-    desc: "Zwart gebrand hout",
-    facadeId: "thermowood-black",
-    color: "hsl(0,0%,12%)",
-    image: thermowoodBlackImg,
-  },
-  {
     id: "thermowood-natural",
     label: "Thermowood Ayous",
     desc: "Natuurlijke houtlook",
     facadeId: "thermowood-natural",
     color: "hsl(32,50%,55%)",
     image: thermowoodNaturalImg,
+  },
+  {
+    id: "thermowood-black",
+    label: "Thermowood Zwart Den",
+    desc: "Zwart gebrand hout",
+    facadeId: "thermowood-black",
+    color: "hsl(0,0%,12%)",
+    image: thermowoodBlackImg,
   },
   {
     id: "composite-white",

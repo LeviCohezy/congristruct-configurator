@@ -66,7 +66,7 @@ const defaultConfig: ConfigState = {
   roundedCorners: false,
   floorPlan: "a",
   mirrorPlan: false,
-  facade: "thermowood-black",
+  facade: "thermowood-natural",
   aluminiumColor: "#383a3b",
   finishLevel: "shell",
   floorOption: "light-vinyl",
