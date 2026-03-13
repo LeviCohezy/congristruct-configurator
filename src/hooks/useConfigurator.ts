@@ -81,7 +81,7 @@ const defaultConfig: ConfigState = {
   heatPump: false,
   solarBattery: false,
   insulation: false,
-  transportDistance: 50,
+  transportDistance: 0,
   contact: savedContact,
   priceRevealed: hasStoredContact,
 };
@@ -93,12 +93,12 @@ const startBasePrices: Record<string, number> = {
 };
 
 const facadePrices: Record<string, number> = {
-  "thermowood-black": 265,
-  "thermowood-natural": 400,
-  "composite-white": 600,
-  "composite-black": 600,
-  "aluminium": 1200,
-  "brick-grey": 1600,
+  "thermowood-black": 0,
+  "thermowood-natural": 135,
+  "composite-white": 335,
+  "composite-black": 335,
+  "aluminium": 935,
+  "brick-grey": 1335,
 };
 
 const finishPrices: Record<string, number> = {
