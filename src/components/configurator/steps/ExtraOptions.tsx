@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Sun, Battery, Umbrella, Landmark } from "lucide-react";
+import { Flame, Battery, Layers } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
@@ -11,10 +11,9 @@ interface Props {
 }
 
 const extras = [
-  { key: "awning" as const, label: "Awning / canopy", icon: Umbrella, price: "2.400", desc: "Outdoor shading" },
-  { key: "solarPanels" as const, label: "Solar panels", icon: Sun, price: "4.800", desc: "On-roof solar system" },
-  { key: "batterySystem" as const, label: "Battery system", icon: Battery, price: "3.200", desc: "Energy storage" },
-  { key: "foundation" as const, label: "Foundation", icon: Landmark, price: "3.500", desc: "Concrete screw piles" },
+  { key: "heatPump" as const, label: "Luchtwarmtepomp", icon: Flame, price: "2.500", desc: "Efficiënte verwarming & koeling" },
+  { key: "solarBattery" as const, label: "Solar batterij", icon: Battery, price: "4.500", desc: "Energieopslag" },
+  { key: "insulation" as const, label: "Houtvezelplaat isolatie", icon: Layers, price: "900", desc: "Extra isolatie met houtvezelplaat" },
 ];
 
 export function ExtraOptions({ config, updateConfig, onPriceClick }: Props) {
@@ -36,7 +35,7 @@ export function ExtraOptions({ config, updateConfig, onPriceClick }: Props) {
                 <div className="flex-1">
                   <div className="flex justify-between">
                     <p className="font-medium text-sm">{e.label}</p>
-                    <BlurredPrice text={e.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium" />
+                    <BlurredPrice text={e.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium" prefix="+€" />
                   </div>
                   <p className="text-xs text-muted-foreground">{e.desc}</p>
                 </div>

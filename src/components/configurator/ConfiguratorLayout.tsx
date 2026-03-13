@@ -16,7 +16,7 @@ import { X, MousePointerClick } from "lucide-react";
 import { BlurredPrice } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
-  const { config, updateConfig, updateContact, totalPrice } = useConfigurator();
+  const { config, updateConfig, updateContact, totalPrice, priceJustIncreased } = useConfigurator();
   const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);
@@ -156,6 +156,25 @@ export function ConfiguratorLayout() {
             {!priceRevealed && (
               <MousePointerClick className="absolute right-[7.5rem] -bottom-3 w-8 h-8 text-accent animate-bounce pointer-events-none drop-shadow-md" />
             )}
+            {/* Floating euro signs on price increase */}
+            <AnimatePresence>
+              {priceRevealed && priceJustIncreased && (
+                <>
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={`euro-${i}-${totalPrice}`}
+                      initial={{ opacity: 1, y: 0, x: -10 + i * 20 }}
+                      animate={{ opacity: 0, y: -40 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1, delay: i * 0.15, ease: "easeOut" }}
+                      className="absolute -top-2 left-1/2 text-accent font-bold text-sm pointer-events-none"
+                    >
+                      €
+                    </motion.span>
+                  ))}
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 

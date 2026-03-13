@@ -18,8 +18,8 @@ interface Props {
 
 const finishLevels = [
   { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen", priceNum: "" },
-  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€8.500", priceNum: "8.500" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€16.500", priceNum: "16.500" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€3.780", priceNum: "3.780" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€7.500", priceNum: "7.500" },
 ];
 
 const floorOptions = [
@@ -29,9 +29,9 @@ const floorOptions = [
 ];
 
 const shelfColors = [
-  { id: "brown" as const, label: "Walnoot bruin", texture: thermowoodNaturalTexture },
-  { id: "light-oak" as const, label: "Licht eiken", texture: lightOakTexture },
-  { id: "white" as const, label: "Wit", texture: brickStripsTexture },
+  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture, price: "160" },
+  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture, price: "141" },
+  { id: "white" as const, label: "Wit", texture: brickStripsTexture, price: "" },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
@@ -116,6 +116,11 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                     >
                       <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
                       <p className="text-xs font-medium">{c.label}</p>
+                      {c.price ? (
+                        <BlurredPrice text={c.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
+                      ) : (
+                        <p className="text-[10px] font-medium text-muted-foreground mt-0.5">inbegrepen</p>
+                      )}
                     </button>
                   ))}
                 </div>
