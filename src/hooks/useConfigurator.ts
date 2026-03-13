@@ -93,8 +93,8 @@ const startBasePrices: Record<string, number> = {
 };
 
 const facadePrices: Record<string, number> = {
-  "thermowood-black": 0,
-  "thermowood-natural": 135,
+  "thermowood-natural": 0,
+  "thermowood-black": 265,
   "composite-white": 335,
   "composite-black": 335,
   "aluminium": 935,
