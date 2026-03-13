@@ -29,17 +29,17 @@ interface Props {
 }
 
 const spotOptions = [
-  { id: "spot-wit" as const, tooltip: "Inbouwspot", img: spotWit },
-  { id: "spot-zwart" as const, tooltip: "Inbouwspot", img: spotZwart },
-  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot (+€5)", img: opbouwSpotWit },
-  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot (+€5)", img: opbouwSpotZwart },
+  { id: "spot-wit" as const, tooltip: "Inbouwspot (+€5)", img: spotWit },
+  { id: "spot-zwart" as const, tooltip: "Inbouwspot (+€5)", img: spotZwart },
+  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot (+€10)", img: opbouwSpotWit },
+  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot (+€10)", img: opbouwSpotZwart },
 ];
 
 const railOptions = [
-  { id: "rail-vast-wit" as const, tooltip: "Vaste rail", img: railVastWit },
-  { id: "rail-vast-zwart" as const, tooltip: "Vaste rail", img: railVastZwart },
-  { id: "rail-wit-hangend" as const, tooltip: "Hangende rail", img: railWitHangend },
-  { id: "rail-zwart-hangend" as const, tooltip: "Hangende rail", img: railZwartHangend },
+  { id: "rail-vast-wit" as const, tooltip: "Vaste rail (+€5)", img: railVastWit },
+  { id: "rail-vast-zwart" as const, tooltip: "Vaste rail (+€5)", img: railVastZwart },
+  { id: "rail-wit-hangend" as const, tooltip: "Hangende rail (+€5)", img: railWitHangend },
+  { id: "rail-zwart-hangend" as const, tooltip: "Hangende rail (+€5)", img: railZwartHangend },
 ];
 
 const toiletOptions = [
@@ -47,14 +47,13 @@ const toiletOptions = [
   { id: "wc-spot-zwart" as const, tooltip: "WC spot zwart", img: wcSpotZwart },
 ];
 
-function Toggle({ on, onToggle, pulse }: { on: boolean; onToggle: () => void; pulse?: boolean }) {
+function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
     <button
       onClick={onToggle}
       className={cn(
         "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0",
-        on ? "bg-accent" : "bg-muted",
-        pulse && !on && "animate-pulse ring-2 ring-accent/50"
+        on ? "bg-accent" : "bg-muted"
       )}
     >
       <span className={cn(
@@ -80,7 +79,7 @@ function CircleGrid<T extends string>({
 }) {
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={cn("flex gap-4 flex-wrap", disabled && "opacity-40 pointer-events-auto")}>
+      <div className={cn("flex gap-4 flex-wrap", disabled && "opacity-40")}>
         {options.map((o) => (
           <Tooltip key={o.id}>
             <TooltipTrigger asChild>
@@ -116,11 +115,12 @@ function CircleGrid<T extends string>({
 export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
   const packageOn = config.lightingPackage === "full";
-  const [pulseToggle, setPulseToggle] = useState(false);
+  const hasToilet = config.floorPlan === "b";
+  const [flickerCard, setFlickerCard] = useState(false);
 
   const handleDisabledClick = () => {
-    setPulseToggle(true);
-    setTimeout(() => setPulseToggle(false), 1500);
+    setFlickerCard(true);
+    setTimeout(() => setFlickerCard(false), 1500);
   };
 
   return (
@@ -135,7 +135,10 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
       </p>
 
       {/* Lighting package toggle */}
-      <div className="option-card flex items-center justify-between mb-8">
+      <div className={cn(
+        "option-card flex items-center justify-between mb-8 transition-all duration-300",
+        flickerCard && "flicker-border-green"
+      )}>
         <div>
           <p className="text-sm font-medium">Verlichtingspakket</p>
           <p className="text-xs text-muted-foreground">Inclusief alle armaturen & installatie</p>
@@ -143,7 +146,6 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
         <Toggle
           on={packageOn}
           onToggle={() => updateConfig("lightingPackage", packageOn ? "base" : "full")}
-          pulse={pulseToggle}
         />
       </div>
 
@@ -171,24 +173,25 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
         />
       </div>
 
-      {/* Toiletlamp */}
-      <div className="mb-14">
-        <p className="config-label mb-4">Toiletlamp</p>
-        <CircleGrid
-          options={toiletOptions}
-          selected={config.toiletLamp}
-          onSelect={(id) => updateConfig("toiletLamp", id)}
-          disabled={!packageOn}
-          onDisabledClick={handleDisabledClick}
-        />
-      </div>
+      {/* Toiletlamp — only when plan B (with toilet) */}
+      {hasToilet && (
+        <div className="mb-14">
+          <p className="config-label mb-4">Toiletlamp</p>
+          <CircleGrid
+            options={toiletOptions}
+            selected={config.toiletLamp}
+            onSelect={(id) => updateConfig("toiletLamp", id)}
+            disabled={!packageOn}
+            onDisabledClick={handleDisabledClick}
+          />
+        </div>
+      )}
 
       {/* LED strips — only for FLOW */}
       {isFlow && (
         <div>
           <p className="config-label mb-4">LED-strips</p>
           <div className="grid grid-cols-1 gap-4">
-            {/* Keuken LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
               !packageOn && "opacity-40",
@@ -208,11 +211,9 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
               <Toggle
                 on={config.keukenLedStrip}
                 onToggle={() => packageOn && updateConfig("keukenLedStrip", !config.keukenLedStrip)}
-                pulse={!packageOn && pulseToggle}
               />
             </div>
 
-            {/* Kast LED */}
             <div className={cn(
               "flex items-center gap-4 p-3 rounded-xl border-2 transition-all duration-150",
               !packageOn && "opacity-40",
@@ -232,7 +233,6 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
               <Toggle
                 on={config.kastLedStrip}
                 onToggle={() => packageOn && updateConfig("kastLedStrip", !config.kastLedStrip)}
-                pulse={!packageOn && pulseToggle}
               />
             </div>
           </div>
