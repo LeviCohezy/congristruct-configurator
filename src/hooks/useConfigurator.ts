@@ -81,7 +81,7 @@ const defaultConfig: ConfigState = {
   heatPump: false,
   solarBattery: false,
   insulation: false,
-  transportDistance: 50,
+  transportDistance: 0,
   contact: savedContact,
   priceRevealed: hasStoredContact,
 };
