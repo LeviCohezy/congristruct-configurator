@@ -166,8 +166,10 @@ export function useConfigurator() {
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += 900;
 
-    // Transport
-    price += config.transportDistance * 8;
+    // Transport — only count when user has entered a distance > 0
+    if (config.transportDistance > 0) {
+      price += config.transportDistance * 8;
+    }
     return price;
   }, [config]);
 
