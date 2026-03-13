@@ -66,7 +66,7 @@ const defaultConfig: ConfigState = {
   roundedCorners: false,
   floorPlan: "a",
   mirrorPlan: false,
-  facade: "thermowood-black",
+  facade: "thermowood-natural",
   aluminiumColor: "#383a3b",
   finishLevel: "shell",
   floorOption: "light-vinyl",
@@ -93,8 +93,8 @@ const startBasePrices: Record<string, number> = {
 };
 
 const facadePrices: Record<string, number> = {
-  "thermowood-black": 0,
-  "thermowood-natural": 135,
+  "thermowood-natural": 0,
+  "thermowood-black": 265,
   "composite-white": 335,
   "composite-black": 335,
   "aluminium": 935,
@@ -166,8 +166,10 @@ export function useConfigurator() {
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += 900;
 
-    // Transport
-    price += config.transportDistance * 8;
+    // Transport — only count when user has entered a distance > 0
+    if (config.transportDistance > 0) {
+      price += config.transportDistance * 8;
+    }
     return price;
   }, [config]);
 
