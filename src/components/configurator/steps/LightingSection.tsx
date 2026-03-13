@@ -30,8 +30,8 @@ interface Props {
 const spotOptions = [
   { id: "spot-wit" as const, tooltip: "Inbouwspot", img: spotWit },
   { id: "spot-zwart" as const, tooltip: "Inbouwspot", img: spotZwart },
-  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot", img: opbouwSpotWit },
-  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot", img: opbouwSpotZwart },
+  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot (+€5)", img: opbouwSpotWit },
+  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot (+€5)", img: opbouwSpotZwart },
 ];
 
 const railOptions = [
@@ -106,7 +106,22 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   return (
     <div>
       <h3 className="text-xl font-display font-light mb-1">Verlichting</h3>
-      <p className="text-sm text-muted-foreground mb-8">Kies je verlichtingsarmaturen</p>
+      <p className="text-sm text-muted-foreground mb-2">
+        <span className="flex items-center gap-2">
+          Verlichtingspunten inbegrepen
+          <span className="text-xs text-muted-foreground/70">|</span>
+          <BlurredPrice text="1.500" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium" prefix="Verlichtingspakket +€" />
+        </span>
+      </p>
+
+      {/* Lighting package toggle */}
+      <div className="option-card flex items-center justify-between mb-8">
+        <div>
+          <p className="text-sm font-medium">Verlichtingspakket</p>
+          <p className="text-xs text-muted-foreground">Inclusief alle armaturen & installatie</p>
+        </div>
+        <Toggle on={config.lightingPackage === "full"} onToggle={() => updateConfig("lightingPackage", config.lightingPackage === "full" ? "base" : "full")} />
+      </div>
 
       {/* Spots */}
       <div className="mb-14">

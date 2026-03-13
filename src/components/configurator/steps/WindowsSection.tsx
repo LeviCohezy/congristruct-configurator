@@ -16,9 +16,9 @@ export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
 
       <div className="option-card flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium">Draai-kiepraam</p>
-          <p className="text-xs text-muted-foreground">Upgrade naar draai-kiepramen voor betere ventilatie</p>
-          <BlurredPrice text="450" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
+          <p className="text-sm font-medium">Kiepraam</p>
+          <p className="text-xs text-muted-foreground">Upgrade naar kiepramen voor betere ventilatie</p>
+          <BlurredPrice text="180" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
         </div>
         <button
           onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}
