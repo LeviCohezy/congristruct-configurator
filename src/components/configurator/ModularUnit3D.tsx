@@ -3020,11 +3020,13 @@ function HubWalls({
         </mesh>
       </group>
 
-      {/* Interior front wall face */}
-      <mesh position={[0, height / 2 + floorThick, halfD - wallThick - 0.01]}>
-        <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
-        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
-      </mesh>
+      {/* Interior front wall faces — only behind solid segments (not windows) */}
+      {[0, 2, 4, 6].map((i) => (
+        <mesh key={`ifw${i}`} position={[cumX[i] + seg[i] / 2, height / 2 + floorThick, halfD - wallThick - 0.01]}>
+          <boxGeometry args={[seg[i], height, 0.01]} />
+          <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+        </mesh>
+      ))}
 
       {/* ── WC partition (Plan A only) ── */}
       {hasWC && (
