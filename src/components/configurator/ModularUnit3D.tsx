@@ -416,7 +416,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       case "flow":
         return { width: config.floorPlan === "b" ? 8.0 : 6.0, height: 3.0, depth: 4.0 };
       case "hub":
-        return { width: 8.75, height: 3.0, depth: 4.0 };
+        return { width: 10.0, height: 3.0, depth: 3.5 };
       case "base":
         return { width: 12.5, height: 3.0, depth: 4.0 };
     }
