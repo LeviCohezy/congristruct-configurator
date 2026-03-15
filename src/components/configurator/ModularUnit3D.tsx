@@ -2914,10 +2914,11 @@ function HubWalls({
   const DOOR_W = 1.0;
   const doorCenterZ = halfD - 1.0 - DOOR_W / 2; // ~0.25m from front interior
 
-  // WC partition: vertical wall from front wall inward, 1.75m from right edge
-  const wcPartX = cumX[6]; // x = 3.25
-  const wcDepth = depth - wallThick * 2; // full depth partition
-  const wcDoorW = 0.84;
+  // WC partition: 205cm long (front-to-back), 60cm wide room, against right+back wall
+  const wcWidth = 0.60; // 60cm wide WC room
+  const wcLength = 2.05; // 205cm long
+  const wcPartX = halfW - wallThick - wcWidth; // partition X position
+  const wcDoorW = 0.64;
 
   return (
     <group>
@@ -3031,32 +3032,38 @@ function HubWalls({
       {/* ── WC partition (Plan A only) ── */}
       {hasWC && (
         <group>
-          {/* Vertical partition wall running front-to-back at x=3.25 */}
-          <mesh position={[wcPartX, height / 2 + floorThick, 0]}>
-            <boxGeometry args={[partT, height, wcDepth]} />
+          {/* Vertical partition wall running front-to-back, 205cm long from back wall */}
+          <mesh position={[wcPartX, height / 2 + floorThick, -halfD + wallThick + wcLength / 2]}>
+            <boxGeometry args={[partT, height, wcLength]} />
             <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
           </mesh>
 
-          {/* WC door opening (on left side of partition, toward back) */}
+          {/* Horizontal closing wall at front of WC (from partition to right wall) */}
+          <mesh position={[wcPartX + wcWidth / 2 + partT / 2, height / 2 + floorThick, -halfD + wallThick + wcLength]}>
+            <boxGeometry args={[wcWidth - partT / 2, height, partT]} />
+            <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+          </mesh>
+
+          {/* WC door opening on the closing wall */}
           <DoorPane
-            posX={wcPartX}
+            posX={wcPartX + wcWidth / 2}
             posY={winCY + floorThick}
             width={wcDoorW}
             height={winH}
             frameColor={frameColor}
-            z={-halfD + wallThick + wcDepth * 0.35}
-            rotate={true}
+            z={-halfD + wallThick + wcLength}
+            rotate={false}
           />
 
-          {/* Toilet fixture (simplified box) */}
-          <mesh position={[halfW - wallThick - 0.25, floorThick + 0.25, -halfD + wallThick + 0.3]}>
-            <boxGeometry args={[0.40, 0.45, 0.55]} />
+          {/* Toilet fixture */}
+          <mesh position={[halfW - wallThick - wcWidth / 2, floorThick + 0.25, -halfD + wallThick + 0.35]}>
+            <boxGeometry args={[0.38, 0.45, 0.55]} />
             <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
           </mesh>
 
           {/* Small sink */}
-          <mesh position={[halfW - wallThick - 0.25, floorThick + 0.50, halfD - wallThick - 0.25]}>
-            <boxGeometry args={[0.35, 0.08, 0.30]} />
+          <mesh position={[halfW - wallThick - wcWidth / 2, floorThick + 0.50, -halfD + wallThick + wcLength - 0.25]}>
+            <boxGeometry args={[0.30, 0.08, 0.25]} />
             <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
           </mesh>
         </group>
