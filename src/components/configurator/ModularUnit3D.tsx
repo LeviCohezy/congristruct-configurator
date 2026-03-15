@@ -2896,11 +2896,15 @@ function HubWalls({
   const partT = 0.10; // 10cm partition wall
   const hasWC = floorPlan === "a"; // Plan A = with WC
 
-  // Front wall segments (m from left edge at -5.0):
-  // 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall
-  const seg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
+  // Front wall segments scaled to fit the flat portion (between corner arcs)
+  // Original proportions: 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall = 10.0m
+  const flatW = width - cornerRadius * 2;
+  const flatStartX = -halfW + cornerRadius;
+  const rawSeg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
+  const rawTotal = rawSeg.reduce((a, b) => a + b, 0);
+  const seg = rawSeg.map(s => s * flatW / rawTotal);
   const cumX: number[] = [];
-  let acc = -halfW;
+  let acc = flatStartX;
   for (const s of seg) { cumX.push(acc); acc += s; }
   // cumX[i] = left edge of segment i
 
