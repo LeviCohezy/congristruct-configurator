@@ -2891,6 +2891,7 @@ function HubWalls({
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
   floorPlan, finishLevel,
+  shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 5.0
   const halfD = depth / 2;   // 1.75
