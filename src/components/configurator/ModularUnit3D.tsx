@@ -3350,18 +3350,20 @@ function HubWalls({
         const legInsetZ = 0.06;
         const legSize = 0.05;
 
-        // Chair dimensions — compact, tucked in
-        const chairSeatW = 0.32;
-        const chairSeatD = 0.30;
-        const chairSeatH = 0.015;
+        // Chair dimensions — original size
+        const chairSeatW = 0.42;
+        const chairSeatD = 0.40;
+        const chairSeatH = 0.02;
         const chairLegH = 0.44;
-        const chairLegSize = 0.02;
-        const chairBackH = 0.28;
-        const chairBackThick = 0.015;
-        const chairOffset = tableW / 2 + 0.02; // tucked right against table edge
+        const chairLegSize = 0.03;
+        const chairBackH = 0.36;
+        const chairBackThick = 0.02;
+        const chairOffset = tableW / 2 + chairSeatD / 2 + 0.08;
 
-        // 3 chairs per side, evenly spaced along table length
-        const chairPositions = [-1, 0, 1].map(i => tableCenterX + i * (tableLength / 4));
+        // Staggered: front side at positions 1,3,5 and back side at positions 2,4,6
+        const spacing = tableLength / 7;
+        const frontChairX = [1, 3, 5].map(i => tableStartX + spacing * i);
+        const backChairX = [2, 4, 6].map(i => tableStartX + spacing * i);
 
         return (
           <group>
@@ -3383,22 +3385,19 @@ function HubWalls({
               </mesh>
             ))}
 
-            {/* Chairs — front side (positive Z) */}
-            {chairPositions.map((cx, i) => (
+            {/* Chairs — front side (positive Z) — staggered positions 1,3,5 */}
+            {frontChairX.map((cx, i) => (
               <group key={`cf${i}`} position={[cx, 0, tableCenterZ + chairOffset]}>
-                {/* Seat */}
                 <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
                   <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
                   <meshStandardMaterial {...tableMatProps} />
                 </mesh>
-                {/* 4 chair legs */}
                 {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
                   <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
                     <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
                     <meshStandardMaterial {...tableMatProps} />
                   </mesh>
                 ))}
-                {/* Backrest (away from table) */}
                 <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, chairSeatD/2 - chairBackThick/2]}>
                   <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
                   <meshStandardMaterial {...tableMatProps} />
@@ -3406,22 +3405,19 @@ function HubWalls({
               </group>
             ))}
 
-            {/* Chairs — back side (negative Z) */}
-            {chairPositions.map((cx, i) => (
+            {/* Chairs — back side (negative Z) — staggered positions 2,4,6 */}
+            {backChairX.map((cx, i) => (
               <group key={`cb${i}`} position={[cx, 0, tableCenterZ - chairOffset]}>
-                {/* Seat */}
                 <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
                   <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
                   <meshStandardMaterial {...tableMatProps} />
                 </mesh>
-                {/* 4 chair legs */}
                 {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
                   <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
                     <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
                     <meshStandardMaterial {...tableMatProps} />
                   </mesh>
                 ))}
-                {/* Backrest (away from table) */}
                 <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, -chairSeatD/2 + chairBackThick/2]}>
                   <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
                   <meshStandardMaterial {...tableMatProps} />
