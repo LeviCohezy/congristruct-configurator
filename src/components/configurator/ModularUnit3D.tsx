@@ -2915,7 +2915,7 @@ function HubWalls({
   const doorCenterZ = halfD - 1.0 - DOOR_W / 2; // ~0.25m from front interior
 
   // WC partition: 205cm long (front-to-back), 60cm wide room, against right+back wall
-  const wcWidth = 0.60; // 60cm wide WC room
+  const wcWidth = 1.20; // 120cm wide WC room
   const wcLength = 2.05; // 205cm long
   const wcPartX = halfW - wallThick - wcWidth; // partition X position
   const wcDoorW = 0.64;
