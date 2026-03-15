@@ -3350,15 +3350,15 @@ function HubWalls({
         const legInsetZ = 0.06;
         const legSize = 0.05;
 
-        // Chair dimensions
-        const chairSeatW = 0.42;
-        const chairSeatD = 0.40;
-        const chairSeatH = 0.02;
+        // Chair dimensions — compact, tucked in
+        const chairSeatW = 0.32;
+        const chairSeatD = 0.30;
+        const chairSeatH = 0.015;
         const chairLegH = 0.44;
-        const chairLegSize = 0.03;
-        const chairBackH = 0.36;
-        const chairBackThick = 0.02;
-        const chairOffset = tableW / 2 + chairSeatD / 2 + 0.08; // gap from table edge
+        const chairLegSize = 0.02;
+        const chairBackH = 0.28;
+        const chairBackThick = 0.015;
+        const chairOffset = tableW / 2 + 0.02; // tucked right against table edge
 
         // 3 chairs per side, evenly spaced along table length
         const chairPositions = [-1, 0, 1].map(i => tableCenterX + i * (tableLength / 4));
