@@ -2985,7 +2985,7 @@ function HubWalls({
           <CladMaterial {...woodBase} wallWidth={seg[2]} />
         </mesh>
 
-        {/* Segment 3: 100cm window */}
+        {/* Segment 3: 350cm big window */}
         <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
           <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
           <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
@@ -2994,34 +2994,17 @@ function HubWalls({
           <boxGeometry args={[seg[3], height - winTop, wallThick]} />
           <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
         </mesh>
-        <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+        <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} hasDivider />
 
-        {/* Segment 4: 150cm solid wall */}
+        {/* Segment 4: 175cm wall (WC area) */}
         <mesh position={[cumX[4] + seg[4] / 2, extWallCY, 0]} castShadow>
           <boxGeometry args={[seg[4], extWallH, wallThick]} />
           <CladMaterial {...woodBase} wallWidth={seg[4]} />
         </mesh>
-
-        {/* Segment 5: 100cm window */}
-        <mesh position={[cumX[5] + seg[5] / 2, (winBot + floorThick) / 2, 0]} castShadow>
-          <boxGeometry args={[seg[5], winBot + floorThick, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[5]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
-        </mesh>
-        <mesh position={[cumX[5] + seg[5] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
-          <boxGeometry args={[seg[5], height - winTop, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[5]} wallHeight={height - winTop} fullWallHeight={extWallH} />
-        </mesh>
-        <GlassPane posX={cumX[5] + seg[5] / 2} posY={winCY + floorThick} width={seg[5]} height={winH} frameColor={frameColor} />
-
-        {/* Segment 6: 175cm wall (WC area) */}
-        <mesh position={[cumX[6] + seg[6] / 2, extWallCY, 0]} castShadow>
-          <boxGeometry args={[seg[6], extWallH, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[6]} />
-        </mesh>
       </group>
 
       {/* Interior front wall faces — only behind solid segments (not windows) */}
-      {[0, 2, 4, 6].map((i) => (
+      {[0, 2, 4].map((i) => (
         <mesh key={`ifw${i}`} position={[cumX[i] + seg[i] / 2, height / 2 + floorThick, halfD - wallThick - 0.01]}>
           <boxGeometry args={[seg[i], height, 0.01]} />
           <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
