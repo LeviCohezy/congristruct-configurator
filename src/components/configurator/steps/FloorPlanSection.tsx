@@ -16,8 +16,8 @@ const planOptions: Record<ConfigState["model"], { a: { label: string; desc: stri
     b: { label: "28 m² gesplitst", desc: "Aparte inkom + tweede ruimte" },
   },
   hub: {
-    a: { label: "Met WC", desc: "Vergaderruimte met apart toilet" },
-    b: { label: "Open ruimte", desc: "Volledig open zonder scheidingswand" },
+    a: { label: "Open ruimte", desc: "Volledig open zonder scheidingswand" },
+    b: { label: "Met WC", desc: "Vergaderruimte met apart toilet" },
   },
   base: {
     a: { label: "Casco", desc: "Lege ruimte, zelf in te delen" },

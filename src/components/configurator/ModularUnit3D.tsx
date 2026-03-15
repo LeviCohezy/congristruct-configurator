@@ -2894,7 +2894,7 @@ function HubWalls({
   const sideInset = Math.max(cornerRadius, wallThick);
   const sideFlatD = depth - sideInset * 2;
   const partT = 0.10; // 10cm partition wall
-  const hasWC = floorPlan === "a"; // Plan A = with WC
+  const hasWC = floorPlan === "b"; // Plan B = with WC
 
   // Front wall segments scaled to fit the flat portion (between corner arcs)
   // Original proportions: 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall = 10.0m
