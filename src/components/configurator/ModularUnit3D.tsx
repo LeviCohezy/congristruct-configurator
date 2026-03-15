@@ -3110,11 +3110,30 @@ function HubWalls({
         </group>
       )}
 
-      {/* Interior left wall */}
-      <mesh position={[-halfW + wallThick + 0.01, height / 2 + floorThick, 0]}>
-        <boxGeometry args={[0.01, height, sideFlatD]} />
-        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
-      </mesh>
+      {/* Interior left wall — split around door opening */}
+      {(() => {
+        const ilX = -halfW + wallThick + 0.01;
+        const doorZ1 = halfD - wallThick - 0.45 - DOOR_W;
+        const doorZ2 = halfD - wallThick - 0.45;
+        const backD = doorZ1 - (-halfD + sideInset);
+        const frontD = (halfD - sideInset) - doorZ2;
+        return (
+          <>
+            {backD > 0 && (
+              <mesh position={[ilX, height / 2 + floorThick, (-halfD + sideInset) + backD / 2]}>
+                <boxGeometry args={[0.01, height, backD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+              </mesh>
+            )}
+            {frontD > 0 && (
+              <mesh position={[ilX, height / 2 + floorThick, doorZ2 + frontD / 2]}>
+                <boxGeometry args={[0.01, height, frontD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+              </mesh>
+            )}
+          </>
+        );
+      })()}
     </group>
   );
 }
