@@ -2914,10 +2914,11 @@ function HubWalls({
   const DOOR_W = 1.0;
   const doorCenterZ = halfD - 1.0 - DOOR_W / 2; // ~0.25m from front interior
 
-  // WC partition: vertical wall from front wall inward, 1.75m from right edge
-  const wcPartX = cumX[6]; // x = 3.25
-  const wcDepth = depth - wallThick * 2; // full depth partition
-  const wcDoorW = 0.84;
+  // WC partition: 205cm long (front-to-back), 60cm wide room, against right+back wall
+  const wcWidth = 0.60; // 60cm wide WC room
+  const wcLength = 2.05; // 205cm long
+  const wcPartX = halfW - wallThick - wcWidth; // partition X position
+  const wcDoorW = 0.64;
 
   return (
     <group>
