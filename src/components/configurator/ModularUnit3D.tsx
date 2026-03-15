@@ -2915,7 +2915,7 @@ function HubWalls({
   const doorCenterZ = halfD - 1.0 - DOOR_W / 2; // ~0.25m from front interior
 
   // WC partition: vertical wall from front wall inward, 1.75m from right edge
-  const wcPartX = cumX[6]; // x = 3.25
+  const wcPartX = cumX[4]; // left edge of WC wall segment
   const wcDepth = depth - wallThick * 2; // full depth partition
   const wcDoorW = 0.84;
 
