@@ -2897,10 +2897,10 @@ function HubWalls({
   const hasWC = floorPlan === "a"; // Plan A = with WC
 
   // Front wall segments scaled to fit the flat portion (between corner arcs)
-  // Original proportions: 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall = 10.0m
+  // 75 wall | 200 window | 200 wall | 350 window (one big) | 175 wall (WC)
   const flatW = width - cornerRadius * 2;
   const flatStartX = -halfW + cornerRadius;
-  const rawSeg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
+  const rawSeg = [0.75, 2.00, 2.00, 3.50, 1.75];
   const rawTotal = rawSeg.reduce((a, b) => a + b, 0);
   const seg = rawSeg.map(s => s * flatW / rawTotal);
   const cumX: number[] = [];
