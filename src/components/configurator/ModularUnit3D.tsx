@@ -3198,7 +3198,7 @@ function HubWalls({
             {/* Open niche back panel */}
             <mesh position={[kitchenBackX - 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
               <boxGeometry args={[0.01, (upperBottom - counterH) - 0.06, kitchenW - 0.04]} />
-              <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+              <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Middle shelf in niche */}
             <mesh position={[kitchenCX, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
