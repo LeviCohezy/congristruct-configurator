@@ -747,6 +747,18 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           shelfColor={config.shelfColor} ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
         />
+      ) : isHub ? (
+        <HubWalls
+          width={width} height={height} depth={depth}
+          wallThick={wallThick} floorThick={floorThick} cornerRadius={cornerRadius}
+          extWallH={extWallH} extWallCY={extWallCY}
+          winH={winH} winBot={winBot} winTop={winTop} winCY={winCY}
+          woodBase={woodBase} frameColor={frameColor}
+          interiorColor={interiorColor} interiorRoughness={interiorRoughness}
+          osbTex={osbTex} isShell={isShell}
+          floorPlan={config.floorPlan}
+          finishLevel={config.finishLevel}
+        />
       ) : (
         <GenericWalls
           width={width} height={height} depth={depth}
