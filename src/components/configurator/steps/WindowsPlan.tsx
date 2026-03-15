@@ -19,8 +19,8 @@ const planOptions: Record<ConfigState["model"], { a: { label: string; desc: stri
     b: { label: "28 m² gesplitst", desc: "Aparte inkom + tweede ruimte" },
   },
   hub: {
-    a: { label: "Open indeling", desc: "Volledig open zonder scheidingswand" },
-    b: { label: "Met scheidingswand", desc: "Opgedeeld in twee zones" },
+    a: { label: "Met WC", desc: "Vergaderruimte met apart toilet" },
+    b: { label: "Open ruimte", desc: "Volledig open zonder scheidingswand" },
   },
   base: {
     a: { label: "Casco", desc: "Lege ruimte, zelf in te delen" },
@@ -39,6 +39,9 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
   if (model === "flow") {
     return <FlowPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
   }
+  if (model === "hub") {
+    return <HubPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
+  }
 
   // Generic fallback for other models
   const w = 160;
@@ -52,15 +55,74 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
         <line x1={20} y1={h - 4} x2={70} y2={h - 4} stroke={winColor} strokeWidth={3} />
         <line x1={90} y1={h - 4} x2={w - 20} y2={h - 4} stroke={winColor} strokeWidth={3} />
         <rect x={75} y={h - 8} width={12} height={4} fill={winColor} opacity={0.5} />
-        {plan === "b" && model === "hub" && (
-          <line x1={w / 2} y1={4} x2={w / 2} y2={h - 4} stroke={wallColor} strokeWidth={1.5} opacity={0.5} />
-        )}
-        {plan === "b" && model === "base" && (
+        {plan === "b" && (
           <>
             <line x1={60} y1={4} x2={60} y2={h - 4} stroke={wallColor} strokeWidth={1.5} opacity={0.5} />
             <line x1={110} y1={4} x2={110} y2={60} stroke={wallColor} strokeWidth={1.5} opacity={0.5} />
           </>
         )}
+      </g>
+    </svg>
+  );
+}
+
+/* ── HUB model: 1000×350cm ────────────────────────────────────────── */
+function HubPlanSVG({ plan, mirrored, wallColor, winColor }: {
+  plan: "a" | "b"; mirrored: boolean; wallColor: string; winColor: string;
+}) {
+  // Scale: 1000cm → 500 SVG, 350cm → 175 SVG (÷2)
+  const vw = 500;
+  const vh = 175;
+  const wt = 9; // wall thickness
+  const transform = mirrored ? `scale(-1,1) translate(${-vw},0)` : undefined;
+
+  // Front wall segments (cm/2): 37.5 | 100 win | 100 wall | 50 win | 75 wall | 50 win | 87.5 wall
+  const hasWC = plan === "a";
+
+  return (
+    <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 100 }}>
+      <g transform={transform}>
+        {/* Outer walls */}
+        <rect x={0} y={0} width={vw} height={vh} fill="none" stroke={wallColor} strokeWidth={wt} rx={1} opacity={0.7} />
+
+        {/* Front windows (bottom wall) */}
+        {/* Window 1: 75–275cm → 37.5–137.5 SVG */}
+        <line x1={37.5} y1={vh} x2={137.5} y2={vh} stroke={winColor} strokeWidth={4} />
+        {/* Window 2: 475–575cm → 237.5–287.5 SVG */}
+        <line x1={237.5} y1={vh} x2={287.5} y2={vh} stroke={winColor} strokeWidth={4} />
+        {/* Window 3: 625–725cm → 312.5–362.5 SVG (adjusted from 725-825) */}
+        <line x1={312.5} y1={vh} x2={362.5} y2={vh} stroke={winColor} strokeWidth={4} />
+
+        {/* Entrance door on left wall */}
+        <rect x={0} y={vh - wt - 60} width={wt} height={50} fill={winColor} opacity={0.4} />
+        {/* Door swing arc */}
+        <path d={`M ${wt} ${vh - wt - 10} A 50 50 0 0 0 ${wt + 50} ${vh - wt - 60}`} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.4} />
+
+        {hasWC && (
+          <>
+            {/* WC partition at x=412.5 (825cm/2) */}
+            <line x1={412.5} y1={wt} x2={412.5} y2={vh - wt} stroke={wallColor} strokeWidth={5} opacity={0.6} />
+            {/* WC door */}
+            <rect x={412.5 - 2} y={vh * 0.35} width={5} height={25} fill={winColor} opacity={0.3} />
+            {/* Toilet icon */}
+            <rect x={vw - wt - 20} y={wt + 15} width={14} height={18} rx={3} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
+            {/* Sink icon */}
+            <rect x={vw - wt - 18} y={vh - wt - 25} width={10} height={10} rx={2} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
+          </>
+        )}
+
+        {/* Meeting table (centered) */}
+        <rect x={hasWC ? 140 : 170} y={vh / 2 - 25} width={hasWC ? 180 : 160} height={50} rx={3} fill="none" stroke={wallColor} strokeWidth={1.2} opacity={0.3} />
+        {/* Chairs (3 per side) */}
+        {[0, 1, 2].map(i => {
+          const cx = (hasWC ? 170 : 200) + i * (hasWC ? 60 : 50);
+          return (
+            <g key={i}>
+              <circle cx={cx} cy={vh / 2 - 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
+              <circle cx={cx} cy={vh / 2 + 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
+            </g>
+          );
+        })}
       </g>
     </svg>
   );

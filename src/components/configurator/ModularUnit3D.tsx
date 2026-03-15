@@ -416,7 +416,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
       case "flow":
         return { width: config.floorPlan === "b" ? 8.0 : 6.0, height: 3.0, depth: 4.0 };
       case "hub":
-        return { width: 8.75, height: 3.0, depth: 4.0 };
+        return { width: 10.0, height: 3.0, depth: 3.5 };
       case "base":
         return { width: 12.5, height: 3.0, depth: 4.0 };
     }
@@ -589,6 +589,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const isStart = config.model === "start";
   const isFlowA = config.model === "flow" && config.floorPlan === "a";
   const isFlowB = config.model === "flow" && config.floorPlan === "b";
+  const isHub = config.model === "hub";
 
   // Convert cm to 3D units for the START model
   const cmToUnit = (cm: number) => (cm / 400) * width; // width maps to 400cm
@@ -745,6 +746,18 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           finishLevel={config.finishLevel}
           shelfColor={config.shelfColor} ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
+        />
+      ) : isHub ? (
+        <HubWalls
+          width={width} height={height} depth={depth}
+          wallThick={wallThick} floorThick={floorThick} cornerRadius={cornerRadius}
+          extWallH={extWallH} extWallCY={extWallCY}
+          winH={winH} winBot={winBot} winTop={winTop} winCY={winCY}
+          woodBase={woodBase} frameColor={frameColor}
+          interiorColor={interiorColor} interiorRoughness={interiorRoughness}
+          osbTex={osbTex} isShell={isShell}
+          floorPlan={config.floorPlan}
+          finishLevel={config.finishLevel}
         />
       ) : (
         <GenericWalls
@@ -2857,6 +2870,197 @@ function FlowBWalls({
           </>
         );
       })()}
+    </group>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HUB model walls — 1000×350cm
+   Front: 75 wall | 200 win | 200 wall | 100 win | 150 wall | 100 win | 175 wall (WC)
+   Left wall: entrance door near front corner
+   Right wall: solid
+   Back wall: solid
+   WC room: right side, 175cm wide partition
+   ═══════════════════════════════════════════════════════════════════════ */
+function HubWalls({
+  width, height, depth, wallThick, floorThick, cornerRadius,
+  extWallH, extWallCY,
+  winH, winBot, winTop, winCY, woodBase, frameColor,
+  interiorColor, interiorRoughness, osbTex, isShell,
+  floorPlan, finishLevel,
+}: any) {
+  const halfW = width / 2;   // 5.0
+  const halfD = depth / 2;   // 1.75
+  const sideInset = Math.max(cornerRadius, wallThick);
+  const sideFlatD = depth - sideInset * 2;
+  const partT = 0.10; // 10cm partition wall
+  const hasWC = floorPlan === "a"; // Plan A = with WC
+
+  // Front wall segments (m from left edge at -5.0):
+  // 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall
+  const seg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
+  const cumX: number[] = [];
+  let acc = -halfW;
+  for (const s of seg) { cumX.push(acc); acc += s; }
+  // cumX[i] = left edge of segment i
+
+  const frontZ = halfD - wallThick / 2;
+
+  // Entrance door on left wall, near front, 1.0m wide, centered 1.0m from front
+  const DOOR_W = 1.0;
+  const doorCenterZ = halfD - 1.0 - DOOR_W / 2; // ~0.25m from front interior
+
+  // WC partition: vertical wall from front wall inward, 1.75m from right edge
+  const wcPartX = cumX[6]; // x = 3.25
+  const wcDepth = depth - wallThick * 2; // full depth partition
+  const wcDoorW = 0.84;
+
+  return (
+    <group>
+      {/* ── Back wall ── */}
+      <mesh position={[0, extWallCY, -halfD + wallThick / 2]} castShadow>
+        <boxGeometry args={[width - cornerRadius * 2, extWallH, wallThick]} />
+        <CladMaterial {...woodBase} wallWidth={width - cornerRadius * 2} />
+      </mesh>
+      {/* Interior back wall */}
+      <mesh position={[0, height / 2 + floorThick, -halfD + wallThick + 0.01]}>
+        <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+      </mesh>
+
+      {/* ── Right wall (solid) ── */}
+      <mesh position={[halfW - wallThick / 2, extWallCY, 0]} castShadow>
+        <boxGeometry args={[wallThick, extWallH, sideFlatD]} />
+        <CladMaterial {...woodBase} wallWidth={sideFlatD} />
+      </mesh>
+      {/* Interior right wall */}
+      <mesh position={[halfW - wallThick - 0.01, height / 2 + floorThick, 0]}>
+        <boxGeometry args={[0.01, height, sideFlatD]} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+      </mesh>
+
+      {/* ── Left wall (with entrance door) ── */}
+      {/* Above door */}
+      <mesh position={[-halfW + wallThick / 2, extWallCY, 0]} castShadow>
+        <boxGeometry args={[wallThick, extWallH, sideFlatD]} />
+        <CladMaterial {...woodBase} wallWidth={sideFlatD} />
+      </mesh>
+      {/* Door cutout on left wall */}
+      <DoorPane
+        posX={-halfW + wallThick / 2}
+        posY={winCY + floorThick}
+        width={DOOR_W}
+        height={winH}
+        frameColor={frameColor}
+        z={doorCenterZ}
+        rotate={true}
+      />
+
+      {/* ── Front facade ── */}
+      <group position={[0, 0, frontZ]}>
+        {/* Segment 0: 75cm wall pillar */}
+        <mesh position={[cumX[0] + seg[0] / 2, extWallCY, 0]} castShadow>
+          <boxGeometry args={[seg[0], extWallH, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[0]} />
+        </mesh>
+
+        {/* Segment 1: 200cm window */}
+        <mesh position={[cumX[1] + seg[1] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+          <boxGeometry args={[seg[1], winBot + floorThick, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[1]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+        </mesh>
+        <mesh position={[cumX[1] + seg[1] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+          <boxGeometry args={[seg[1], height - winTop, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[1]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+        </mesh>
+        <GlassPane posX={cumX[1] + seg[1] / 2} posY={winCY + floorThick} width={seg[1]} height={winH} frameColor={frameColor} hasDivider />
+
+        {/* Segment 2: 200cm solid wall */}
+        <mesh position={[cumX[2] + seg[2] / 2, extWallCY, 0]} castShadow>
+          <boxGeometry args={[seg[2], extWallH, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[2]} />
+        </mesh>
+
+        {/* Segment 3: 100cm window */}
+        <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+          <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+        </mesh>
+        <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+          <boxGeometry args={[seg[3], height - winTop, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+        </mesh>
+        <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+
+        {/* Segment 4: 150cm solid wall */}
+        <mesh position={[cumX[4] + seg[4] / 2, extWallCY, 0]} castShadow>
+          <boxGeometry args={[seg[4], extWallH, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[4]} />
+        </mesh>
+
+        {/* Segment 5: 100cm window */}
+        <mesh position={[cumX[5] + seg[5] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+          <boxGeometry args={[seg[5], winBot + floorThick, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[5]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+        </mesh>
+        <mesh position={[cumX[5] + seg[5] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+          <boxGeometry args={[seg[5], height - winTop, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[5]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+        </mesh>
+        <GlassPane posX={cumX[5] + seg[5] / 2} posY={winCY + floorThick} width={seg[5]} height={winH} frameColor={frameColor} />
+
+        {/* Segment 6: 175cm wall (WC area) */}
+        <mesh position={[cumX[6] + seg[6] / 2, extWallCY, 0]} castShadow>
+          <boxGeometry args={[seg[6], extWallH, wallThick]} />
+          <CladMaterial {...woodBase} wallWidth={seg[6]} />
+        </mesh>
+      </group>
+
+      {/* Interior front wall face */}
+      <mesh position={[0, height / 2 + floorThick, halfD - wallThick - 0.01]}>
+        <boxGeometry args={[width - wallThick * 2, height, 0.01]} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+      </mesh>
+
+      {/* ── WC partition (Plan A only) ── */}
+      {hasWC && (
+        <group>
+          {/* Vertical partition wall running front-to-back at x=3.25 */}
+          <mesh position={[wcPartX, height / 2 + floorThick, 0]}>
+            <boxGeometry args={[partT, height, wcDepth]} />
+            <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+          </mesh>
+
+          {/* WC door opening (on left side of partition, toward back) */}
+          <DoorPane
+            posX={wcPartX}
+            posY={winCY + floorThick}
+            width={wcDoorW}
+            height={winH}
+            frameColor={frameColor}
+            z={-halfD + wallThick + wcDepth * 0.35}
+            rotate={true}
+          />
+
+          {/* Toilet fixture (simplified box) */}
+          <mesh position={[halfW - wallThick - 0.25, floorThick + 0.25, -halfD + wallThick + 0.3]}>
+            <boxGeometry args={[0.40, 0.45, 0.55]} />
+            <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
+          </mesh>
+
+          {/* Small sink */}
+          <mesh position={[halfW - wallThick - 0.25, floorThick + 0.50, halfD - wallThick - 0.25]}>
+            <boxGeometry args={[0.35, 0.08, 0.30]} />
+            <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
+          </mesh>
+        </group>
+      )}
+
+      {/* Interior left wall */}
+      <mesh position={[-halfW + wallThick + 0.01, height / 2 + floorThick, 0]}>
+        <boxGeometry args={[0.01, height, sideFlatD]} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+      </mesh>
     </group>
   );
 }
