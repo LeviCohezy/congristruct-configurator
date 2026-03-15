@@ -3330,6 +3330,48 @@ function HubWalls({
           </group>
         );
       })()}
+
+      {/* ── BIG TABLE (fully-finished) ── */}
+      {finishLevel === "fully-finished" && (() => {
+        const sc = getShelfColors(shelfColor || "brown");
+        const tableMatProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
+
+        // Table runs from middle of big window (seg[1]) to start of last window (seg[5])
+        const tableStartX = cumX[1] + seg[1] / 2;
+        const tableEndX = cumX[5];
+        const tableLength = tableEndX - tableStartX;
+        const tableCenterX = (tableStartX + tableEndX) / 2;
+
+        const tableW = 0.90; // 90cm wide
+        const tableH = 0.04; // 4cm thick top
+        const tableLegH = 0.72; // 72cm leg height (total table height ~76cm)
+        const tableCenterZ = 0; // centered in room
+        const legInsetX = 0.08;
+        const legInsetZ = 0.06;
+        const legSize = 0.05;
+
+        return (
+          <group>
+            {/* Table top */}
+            <mesh position={[tableCenterX, tableLegH + tableH / 2 + floorThick, tableCenterZ]}>
+              <boxGeometry args={[tableLength, tableH, tableW]} />
+              <meshStandardMaterial {...tableMatProps} />
+            </mesh>
+            {/* 4 legs */}
+            {[
+              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ - tableW / 2 + legInsetZ],
+              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ + tableW / 2 - legInsetZ],
+              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ - tableW / 2 + legInsetZ],
+              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ + tableW / 2 - legInsetZ],
+            ].map(([lx, lz], i) => (
+              <mesh key={`tleg${i}`} position={[lx, tableLegH / 2 + floorThick, lz]}>
+                <boxGeometry args={[legSize, tableLegH, legSize]} />
+                <meshStandardMaterial {...tableMatProps} />
+              </mesh>
+            ))}
+          </group>
+        );
+      })()}
     </group>
   );
 }
