@@ -2977,7 +2977,7 @@ function HubWalls({
           <boxGeometry args={[seg[1], height - winTop, wallThick]} />
           <CladMaterial {...woodBase} wallWidth={seg[1]} wallHeight={height - winTop} fullWallHeight={extWallH} />
         </mesh>
-        <GlassPane posX={cumX[1] + seg[1] / 2} posY={winCY + floorThick} width={seg[1]} height={winH} frameColor={frameColor} hasDivider />
+        <GlassPane posX={cumX[1] + seg[1] / 2} posY={winCY + floorThick} width={seg[1]} height={winH} frameColor={frameColor} />
 
         {/* Segment 2: 200cm solid wall */}
         <mesh position={[cumX[2] + seg[2] / 2, extWallCY, 0]} castShadow>
