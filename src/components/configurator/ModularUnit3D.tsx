@@ -3145,7 +3145,7 @@ function HubWalls({
         const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
         // Kitchen runs along the left face of the WC partition wall (205cm long)
-        const kitchenBackX = wcPartX - 0.02; // flush against partition
+        const kitchenBackX = wcPartX - partT / 2 - 0.02; // flush against outside of partition
         const kitchenD = 0.40; // 40cm deep cabinets
         const kitchenCX = kitchenBackX - kitchenD / 2;
         // Kitchen runs from back wall to end of WC partition
