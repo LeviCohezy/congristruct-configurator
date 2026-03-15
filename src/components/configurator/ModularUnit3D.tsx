@@ -758,6 +758,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           osbTex={osbTex} isShell={isShell}
           floorPlan={config.floorPlan}
           finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor}
+          ledStrip={config.kastLedStrip}
+          lightOakTex={lightOakTex}
         />
       ) : (
         <GenericWalls
@@ -2888,6 +2891,7 @@ function HubWalls({
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
   floorPlan, finishLevel,
+  shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 5.0
   const halfD = depth / 2;   // 1.75
@@ -3132,6 +3136,153 @@ function HubWalls({
               </mesh>
             )}
           </>
+        );
+      })()}
+
+      {/* ── KITCHEN (fully-finished + Plan B, against WC partition long side) ── */}
+      {finishLevel === "fully-finished" && hasWC && (() => {
+        const sc = getShelfColors(shelfColor || "brown");
+        const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
+
+        // Kitchen runs along the left face of the WC partition wall (205cm long)
+        const kitchenBackX = wcPartX - 0.02; // flush against partition
+        const kitchenD = 0.40; // 40cm deep cabinets
+        const kitchenCX = kitchenBackX - kitchenD / 2;
+        // Kitchen runs from back wall to end of WC partition
+        const kitchenStartZ = -halfD + wallThick + 0.02;
+        const kitchenEndZ = -halfD + wallThick + wcLength - partT;
+        const kitchenW = kitchenEndZ - kitchenStartZ;
+        const kitchenCZ = (kitchenStartZ + kitchenEndZ) / 2;
+
+        const counterH = height * 0.25;
+        const upperBottom = height * 0.65;
+        const upperH = height - upperBottom;
+
+        // Sink dimensions
+        const sinkW = 0.40;
+        const sinkD = 0.30;
+        const sinkDepth = 0.12;
+
+        return (
+          <group>
+            {/* Back panel on WC partition */}
+            <mesh position={[kitchenBackX, height / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[0.04, height, kitchenW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Side panel — back wall side */}
+            <mesh position={[kitchenCX, height / 2 + floorThick, kitchenStartZ - 0.01]}>
+              <boxGeometry args={[kitchenD, height, 0.02]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Side panel — front side */}
+            <mesh position={[kitchenCX, height / 2 + floorThick, kitchenEndZ + 0.01]}>
+              <boxGeometry args={[kitchenD, height, 0.02]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Lower cabinet */}
+            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[kitchenD, counterH, kitchenW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Countertop */}
+            <mesh position={[kitchenCX, counterH + 0.015 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[kitchenD + 0.02, 0.03, kitchenW + 0.02]} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+            </mesh>
+            {/* Upper cabinet */}
+            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[kitchenD, upperH, kitchenW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Open niche back panel */}
+            <mesh position={[kitchenBackX - 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[0.01, (upperBottom - counterH) - 0.06, kitchenW - 0.04]} />
+              <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+            </mesh>
+            {/* Middle shelf in niche */}
+            <mesh position={[kitchenCX, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[kitchenD - 0.02, 0.025, kitchenW - 0.04]} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+            </mesh>
+            {/* Door lines lower */}
+            {[0.33, 0.67].map((frac, i) => (
+              <mesh key={`hkl${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, counterH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+                <boxGeometry args={[0.004, counterH - 0.02, 0.008]} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+              </mesh>
+            ))}
+            {/* Door lines upper */}
+            {[0.33, 0.67].map((frac, i) => (
+              <mesh key={`hku${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, upperBottom + upperH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+                <boxGeometry args={[0.004, upperH - 0.02, 0.008]} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+              </mesh>
+            ))}
+            {/* Integrated sink */}
+            <mesh position={[kitchenCX, counterH + 0.03 + 0.001 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[sinkD, 0.003, sinkW]} />
+              <meshStandardMaterial color="#e8e8e8" roughness={0.1} metalness={0.6} />
+            </mesh>
+            <mesh position={[kitchenCX, counterH + 0.03 - sinkDepth / 2 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[sinkD - 0.02, sinkDepth, sinkW - 0.02]} />
+              <meshStandardMaterial color="#d0d0d0" roughness={0.15} metalness={0.5} />
+            </mesh>
+            {/* Faucet */}
+            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.01 + floorThick, kitchenCZ]}>
+              <cylinderGeometry args={[0.015, 0.02, 0.02, 8]} />
+              <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+            </mesh>
+            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.12 + floorThick, kitchenCZ]}>
+              <cylinderGeometry args={[0.008, 0.008, 0.20, 8]} />
+              <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+            </mesh>
+            <mesh position={[kitchenCX + sinkD / 2 - 0.08, counterH + 0.03 + 0.21 + floorThick, kitchenCZ]} rotation={[0, 0, Math.PI / 6]}>
+              <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
+              <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
+            </mesh>
+            {/* Coffee machine */}
+            <group position={[kitchenCX, counterH + 0.03 + floorThick, kitchenStartZ + 0.20]}>
+              <mesh position={[0, 0.14, 0]}>
+                <boxGeometry args={[0.18, 0.28, 0.25]} />
+                <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+              </mesh>
+              <mesh position={[0.06, 0.18, 0]}>
+                <boxGeometry args={[0.06, 0.36, 0.20]} />
+                <meshStandardMaterial color="#2a2a2a" roughness={0.2} metalness={0.1} />
+              </mesh>
+              <mesh position={[0, 0.005, 0]}>
+                <boxGeometry args={[0.16, 0.01, 0.12]} />
+                <meshStandardMaterial color="#333333" roughness={0.3} metalness={0.5} />
+              </mesh>
+              <mesh position={[-0.02, 0.22, 0]}>
+                <boxGeometry args={[0.04, 0.04, 0.04]} />
+                <meshStandardMaterial color="#222222" roughness={0.5} metalness={0.4} />
+              </mesh>
+            </group>
+            {/* Shelf under upper cabinet */}
+            <mesh position={[kitchenCX, upperBottom - 0.30 + floorThick, kitchenCZ]}>
+              <boxGeometry args={[kitchenD + 0.01, 0.02, kitchenW - 0.02]} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+            </mesh>
+            {/* LED strips */}
+            {ledStrip && <>
+              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.01 + floorThick, kitchenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.30 - 0.01 + floorThick, kitchenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <mesh position={[kitchenBackX - 0.03, counterH + 0.03 - 0.01 + floorThick, kitchenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+                <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+              </mesh>
+              <pointLight position={[kitchenCX, upperBottom - 0.05 + floorThick, kitchenCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+              <pointLight position={[kitchenCX, counterH + floorThick, kitchenCZ]} intensity={0.25} distance={0.5} color="#fffde8" />
+            </>}
+          </group>
         );
       })()}
     </group>
