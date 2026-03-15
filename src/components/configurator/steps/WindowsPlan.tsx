@@ -39,6 +39,9 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
   if (model === "flow") {
     return <FlowPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
   }
+  if (model === "hub") {
+    return <HubPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
+  }
 
   // Generic fallback for other models
   const w = 160;
