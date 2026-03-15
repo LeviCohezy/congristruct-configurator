@@ -3342,13 +3342,26 @@ function HubWalls({
         const tableLength = tableEndX - tableStartX;
         const tableCenterX = (tableStartX + tableEndX) / 2;
 
-        const tableW = 0.90; // 90cm wide
+        const tableW = 1.35; // 135cm wide (90 + 50%)
         const tableH = 0.04; // 4cm thick top
         const tableLegH = 0.72; // 72cm leg height (total table height ~76cm)
         const tableCenterZ = 0; // centered in room
         const legInsetX = 0.08;
         const legInsetZ = 0.06;
         const legSize = 0.05;
+
+        // Chair dimensions
+        const chairSeatW = 0.42;
+        const chairSeatD = 0.40;
+        const chairSeatH = 0.02;
+        const chairLegH = 0.44;
+        const chairLegSize = 0.03;
+        const chairBackH = 0.36;
+        const chairBackThick = 0.02;
+        const chairOffset = tableW / 2 + chairSeatD / 2 + 0.08; // gap from table edge
+
+        // 3 chairs per side, evenly spaced along table length
+        const chairPositions = [-1, 0, 1].map(i => tableCenterX + i * (tableLength / 4));
 
         return (
           <group>
@@ -3368,6 +3381,52 @@ function HubWalls({
                 <boxGeometry args={[legSize, tableLegH, legSize]} />
                 <meshStandardMaterial {...tableMatProps} />
               </mesh>
+            ))}
+
+            {/* Chairs — front side (positive Z) */}
+            {chairPositions.map((cx, i) => (
+              <group key={`cf${i}`} position={[cx, 0, tableCenterZ + chairOffset]}>
+                {/* Seat */}
+                <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
+                  <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
+                  <meshStandardMaterial {...tableMatProps} />
+                </mesh>
+                {/* 4 chair legs */}
+                {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
+                  <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
+                    <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
+                    <meshStandardMaterial {...tableMatProps} />
+                  </mesh>
+                ))}
+                {/* Backrest (away from table) */}
+                <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, chairSeatD/2 - chairBackThick/2]}>
+                  <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
+                  <meshStandardMaterial {...tableMatProps} />
+                </mesh>
+              </group>
+            ))}
+
+            {/* Chairs — back side (negative Z) */}
+            {chairPositions.map((cx, i) => (
+              <group key={`cb${i}`} position={[cx, 0, tableCenterZ - chairOffset]}>
+                {/* Seat */}
+                <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
+                  <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
+                  <meshStandardMaterial {...tableMatProps} />
+                </mesh>
+                {/* 4 chair legs */}
+                {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
+                  <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
+                    <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
+                    <meshStandardMaterial {...tableMatProps} />
+                  </mesh>
+                ))}
+                {/* Backrest (away from table) */}
+                <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, -chairSeatD/2 + chairBackThick/2]}>
+                  <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
+                  <meshStandardMaterial {...tableMatProps} />
+                </mesh>
+              </group>
             ))}
           </group>
         );
