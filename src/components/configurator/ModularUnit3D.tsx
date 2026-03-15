@@ -3139,7 +3139,52 @@ function HubWalls({
         );
       })()}
 
-      {/* ── KITCHEN (fully-finished + Plan B, against WC partition long side) ── */}
+      {/* ── LEFT WALL CLOSET (fully-finished, 3 doors, from back wall to door) ── */}
+      {finishLevel === "fully-finished" && (() => {
+        const sc = getShelfColors(shelfColor || "brown");
+        const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
+
+        const closetD = 0.45; // 45cm deep
+        const closetX = -halfW + wallThick + closetD / 2;
+        const backPanelX = -halfW + wallThick + 0.06; // 4cm back panel flush against interior wall
+
+        // Closet runs from back wall to entrance door opening
+        const closetStartZ = -halfD + wallThick + 0.02;
+        const doorZ1 = halfD - wallThick - 0.45 - DOOR_W; // back edge of entrance door
+        const closetEndZ = doorZ1 - 0.02; // small gap before door
+        const closetW = closetEndZ - closetStartZ;
+        const closetCZ = (closetStartZ + closetEndZ) / 2;
+
+        const frontFaceX = -halfW + wallThick + closetD + 0.002;
+
+        return (
+          <group>
+            {/* Full-height back panel */}
+            <mesh position={[backPanelX, height / 2 + floorThick, closetCZ]}>
+              <boxGeometry args={[0.02, height, closetW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+
+            {/* Full-height cabinet body */}
+            <mesh position={[closetX, height / 2 + floorThick, closetCZ]}>
+              <boxGeometry args={[closetD, height, closetW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+
+            {/* Door lines: 3 doors → 2 dividers */}
+            {[1/3, 2/3].map((frac, i) => (
+              <mesh
+                key={`hcd${i}`}
+                position={[frontFaceX, height / 2 + floorThick, closetStartZ + closetW * frac]}
+              >
+                <boxGeometry args={[0.004, height - 0.02, 0.008]} />
+                <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+              </mesh>
+            ))}
+          </group>
+        );
+      })()}
+
       {finishLevel === "fully-finished" && hasWC && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
