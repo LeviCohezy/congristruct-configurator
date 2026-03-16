@@ -1,26 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
-import { Slider } from "@/components/ui/slider";
-
-const RAL_COLORS: { code: string; name: string; hex: string }[] = [
-  { code: "RAL 9005", name: "Gitzwart", hex: "#0e0e10" },
-  { code: "RAL 7016", name: "Antracietgrijs", hex: "#383e42" },
-  { code: "RAL 7021", name: "Zwartgrijs", hex: "#2f3234" },
-  { code: "RAL 7039", name: "Kwartsgrijs", hex: "#6b6b5e" },
-  { code: "RAL 7035", name: "Lichtgrijs", hex: "#c5c7c4" },
-  { code: "RAL 9006", name: "Wit aluminium", hex: "#a1a1a0" },
-  { code: "RAL 9007", name: "Grijs aluminium", hex: "#878581" },
-  { code: "RAL 9010", name: "Zuiver wit", hex: "#f1ece1" },
-  { code: "RAL 9016", name: "Verkeerswit", hex: "#f1f0ea" },
-  { code: "RAL 8019", name: "Grijsbruin", hex: "#3b3332" },
-  { code: "RAL 6009", name: "Dennengroen", hex: "#27352a" },
-  { code: "RAL 5011", name: "Staalblauw", hex: "#1a2b3c" },
-  { code: "RAL 3005", name: "Wijnrood", hex: "#5e2028" },
-  { code: "RAL 1015", name: "Licht ivoor", hex: "#e6d2b5" },
-  { code: "RAL 8014", name: "Sepiabruin", hex: "#49392d" },
-];
+import { RAL_COLORS, RAL_GROUPS } from "@/data/ralColors";
 import thermowoodBlackImg from "@/assets/thermowood-black-texture.png";
 import thermowoodNaturalImg from "@/assets/thermowood-natural-texture.png";
 import brickStripsImg from "@/assets/brick-strips-texture.png";
