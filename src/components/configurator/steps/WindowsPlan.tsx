@@ -42,28 +42,11 @@ function FloorPlanSVG({ model, plan, mirrored, hubDoorSwap }: { model: ConfigSta
   if (model === "hub") {
     return <HubPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} doorSwap={hubDoorSwap} />;
   }
+  if (model === "base") {
+    return <BasePlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
+  }
 
-  // Generic fallback for other models
-  const w = 160;
-  const h = 120;
-  const transform = mirrored ? `scale(-1,1) translate(${-w},0)` : undefined;
-
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className="w-full h-auto" style={{ maxHeight: 100 }}>
-      <g transform={transform}>
-        <rect x={4} y={4} width={w - 8} height={h - 8} fill="none" stroke={wallColor} strokeWidth={2.5} rx={1} opacity={0.7} />
-        <line x1={20} y1={h - 4} x2={70} y2={h - 4} stroke={winColor} strokeWidth={3} />
-        <line x1={90} y1={h - 4} x2={w - 20} y2={h - 4} stroke={winColor} strokeWidth={3} />
-        <rect x={75} y={h - 8} width={12} height={4} fill={winColor} opacity={0.5} />
-        {plan === "b" && (
-          <>
-            <line x1={60} y1={4} x2={60} y2={h - 4} stroke={wallColor} strokeWidth={1.5} opacity={0.5} />
-            <line x1={110} y1={4} x2={110} y2={60} stroke={wallColor} strokeWidth={1.5} opacity={0.5} />
-          </>
-        )}
-      </g>
-    </svg>
-  );
+  return null;
 }
 
 /* ── HUB model: 1000×350cm ────────────────────────────────────────── */
