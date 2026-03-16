@@ -209,12 +209,20 @@ export function useConfigurator() {
     return price;
   }, [config]);
 
-  // Detect price increase for animation
+  // Detect price increase/decrease for animation
   useEffect(() => {
-    if (prevPriceRef.current !== null && totalPrice > prevPriceRef.current) {
-      setPriceJustIncreased(true);
-      const t = setTimeout(() => setPriceJustIncreased(false), 1200);
-      return () => clearTimeout(t);
+    if (prevPriceRef.current !== null) {
+      if (totalPrice > prevPriceRef.current) {
+        setPriceJustIncreased(true);
+        setPriceJustDecreased(false);
+        const t = setTimeout(() => setPriceJustIncreased(false), 1200);
+        return () => clearTimeout(t);
+      } else if (totalPrice < prevPriceRef.current) {
+        setPriceJustDecreased(true);
+        setPriceJustIncreased(false);
+        const t = setTimeout(() => setPriceJustDecreased(false), 1200);
+        return () => clearTimeout(t);
+      }
     }
     prevPriceRef.current = totalPrice;
   }, [totalPrice]);
@@ -225,5 +233,6 @@ export function useConfigurator() {
     updateContact,
     totalPrice,
     priceJustIncreased,
+    priceJustDecreased,
   };
 }
