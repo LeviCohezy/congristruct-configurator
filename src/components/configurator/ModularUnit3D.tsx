@@ -3064,7 +3064,12 @@ function HubWalls({
         {/* Segment 3: 100cm — window OR door (if doorSwap) */}
         {doorSwap ? (
           <>
-            {/* Door at segment 3 position — glass door, aligned with wall */}
+            {/* Below door — same as below windows */}
+            <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+              <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+            </mesh>
+            {/* Above door */}
             <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
               <boxGeometry args={[seg[3], height - winTop, wallThick]} />
               <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
