@@ -3843,12 +3843,14 @@ function BaseWalls({
 
   // Plan B interior: WC + Tech room block
   const hasPlanB = floorPlan === "b";
-  // Block positioned to align with entrance door area
-  const blockWidth = 1.75; // 175cm wide block
-  const blockLeftX = cumX[2] + seg[2] / 2 - blockWidth / 2; // centered around segment 2-3 area
-  const blockRightX = blockLeftX + blockWidth;
-  const techDepth = 1.75; // 175cm from back wall
-  const wcDepth = 1.30;   // 130cm WC depth
+  // Block: right side aligns with middle of entrance door (seg 3)
+  const doorMidX = cumX[3] + seg[3] / 2;
+  const blockWidth = 1.0; // ~100cm wide, same as other toilet blocks
+  const blockRightX = doorMidX;
+  const blockLeftX = blockRightX - blockWidth;
+  const totalBlockDepth = 1.5; // 150cm total depth from back wall
+  const techDepth = 0.85; // tech room at back
+  const wcDepth = totalBlockDepth - techDepth; // WC in front
   const techBottomZ = -halfD + wallThick + techDepth;
   const wcBottomZ = techBottomZ + wcDepth;
 
