@@ -150,6 +150,7 @@ export function useConfigurator() {
   const [config, setConfig] = useState<ConfigState>(defaultConfig);
   const prevPriceRef = useRef<number | null>(null);
   const [priceJustIncreased, setPriceJustIncreased] = useState(false);
+  const [priceJustDecreased, setPriceJustDecreased] = useState(false);
 
   const updateConfig = useCallback(<K extends keyof ConfigState>(key: K, value: ConfigState[K]) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
@@ -208,12 +209,20 @@ export function useConfigurator() {
     return price;
   }, [config]);
 
-  // Detect price increase for animation
+  // Detect price increase/decrease for animation
   useEffect(() => {
-    if (prevPriceRef.current !== null && totalPrice > prevPriceRef.current) {
-      setPriceJustIncreased(true);
-      const t = setTimeout(() => setPriceJustIncreased(false), 1200);
-      return () => clearTimeout(t);
+    if (prevPriceRef.current !== null) {
+      if (totalPrice > prevPriceRef.current) {
+        setPriceJustIncreased(true);
+        setPriceJustDecreased(false);
+        const t = setTimeout(() => setPriceJustIncreased(false), 1200);
+        return () => clearTimeout(t);
+      } else if (totalPrice < prevPriceRef.current) {
+        setPriceJustDecreased(true);
+        setPriceJustIncreased(false);
+        const t = setTimeout(() => setPriceJustDecreased(false), 1200);
+        return () => clearTimeout(t);
+      }
     }
     prevPriceRef.current = totalPrice;
   }, [totalPrice]);
@@ -224,5 +233,6 @@ export function useConfigurator() {
     updateContact,
     totalPrice,
     priceJustIncreased,
+    priceJustDecreased,
   };
 }

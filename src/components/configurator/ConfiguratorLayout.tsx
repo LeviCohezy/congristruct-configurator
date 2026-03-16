@@ -16,7 +16,7 @@ import { X, MousePointerClick } from "lucide-react";
 import { BlurredPrice } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
-  const { config, updateConfig, updateContact, totalPrice, priceJustIncreased } = useConfigurator();
+  const { config, updateConfig, updateContact, totalPrice, priceJustIncreased, priceJustDecreased } = useConfigurator();
   const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);
@@ -156,13 +156,13 @@ export function ConfiguratorLayout() {
             {!priceRevealed && (
               <MousePointerClick className="absolute right-[7.5rem] -bottom-3 w-8 h-8 text-accent animate-bounce pointer-events-none drop-shadow-md" />
             )}
-            {/* Floating euro signs on price increase */}
+            {/* Floating euro signs on price change */}
             <AnimatePresence>
               {priceJustIncreased && (
                 <>
                   {[0, 1, 2].map((i) => (
                     <motion.span
-                      key={`euro-${i}-${totalPrice}`}
+                      key={`euro-up-${i}-${totalPrice}`}
                       initial={{ opacity: 1, y: 0, scale: 1 }}
                       animate={{ opacity: 0, y: -60, scale: 1.3 }}
                       transition={{ duration: 1.2, delay: i * 0.18, ease: "easeOut" }}
@@ -170,6 +170,22 @@ export function ConfiguratorLayout() {
                       style={{ left: `calc(50% + ${(i - 1) * 22}px)` }}
                     >
                       €
+                    </motion.span>
+                  ))}
+                </>
+              )}
+              {priceJustDecreased && (
+                <>
+                  {[0, 1, 2].map((i) => (
+                    <motion.span
+                      key={`euro-down-${i}-${totalPrice}`}
+                      initial={{ opacity: 1, y: 0, scale: 1 }}
+                      animate={{ opacity: 0, y: 60, scale: 1.3 }}
+                      transition={{ duration: 1.2, delay: i * 0.18, ease: "easeOut" }}
+                      className="absolute -top-3 pointer-events-none text-red-400 font-bold text-lg drop-shadow-md"
+                      style={{ left: `calc(50% + ${(i - 1) * 22}px)` }}
+                    >
+                      -€
                     </motion.span>
                   ))}
                 </>
