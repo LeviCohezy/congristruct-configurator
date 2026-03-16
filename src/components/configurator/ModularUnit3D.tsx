@@ -2886,7 +2886,7 @@ function HubWalls({
   extWallH, extWallCY,
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
-  floorPlan, finishLevel,
+  floorPlan, hubDoorSwap, finishLevel,
   shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 5.0
@@ -2894,10 +2894,10 @@ function HubWalls({
   const sideInset = Math.max(cornerRadius, wallThick);
   const sideFlatD = depth - sideInset * 2;
   const partT = 0.10; // 10cm partition wall
-  const hasWC = floorPlan === "b"; // Plan B = with WC
+  const hasTussenmuur = floorPlan === "b";
+  const doorSwap = !!hubDoorSwap;
 
   // Front wall segments scaled to fit the flat portion (between corner arcs)
-  // Original proportions: 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall = 10.0m
   const flatW = width - cornerRadius * 2;
   const flatStartX = -halfW + cornerRadius;
   const rawSeg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
@@ -2906,19 +2906,22 @@ function HubWalls({
   const cumX: number[] = [];
   let acc = flatStartX;
   for (const s of seg) { cumX.push(acc); acc += s; }
-  // cumX[i] = left edge of segment i
 
   const frontZ = halfD - wallThick / 2;
 
-  // Entrance door on left wall, 100cm wide, 45cm from front (window) wall
+  // Entrance door dimensions
   const DOOR_W = 1.0;
-  const doorCenterZ = halfD - wallThick - 0.45 - DOOR_W / 2; // 45cm from front interior wall
+  // Default door on left wall, 45cm from front
+  const doorCenterZ = halfD - wallThick - 0.45 - DOOR_W / 2;
 
-  // WC partition: 205cm long (front-to-back), 60cm wide room, against right+back wall
-  const wcWidth = 1.20; // 120cm wide WC room
-  const wcLength = 2.05; // 205cm long
-  const wcPartX = halfW - wallThick - wcWidth; // partition X position
+  // WC partition: always present, 120cm wide × 205cm long, right side
+  const wcWidth = 1.20;
+  const wcLength = 2.05;
+  const wcPartX = halfW - wallThick - wcWidth;
   const wcDoorW = 0.84;
+
+  // Tussenmuur position: middle of segment 2
+  const tussenmuurX = cumX[2] + seg[2] / 2;
 
   return (
     <group>
