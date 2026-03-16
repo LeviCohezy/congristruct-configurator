@@ -131,7 +131,10 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                       onClick={() => updateConfig("shelfColor", c.id)}
                       className={cn("option-card text-center", config.shelfColor === c.id && "option-card-active")}
                     >
-                      <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
+                      <div
+                        className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center"
+                        style={c.texture ? { backgroundImage: `url(${c.texture})` } : { backgroundColor: c.color ?? "#fff" }}
+                      />
                       <p className="text-xs font-medium">{c.label}</p>
                       <RelativePrice
                         prices={sPrices}
