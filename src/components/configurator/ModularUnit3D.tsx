@@ -3644,10 +3644,10 @@ function HubWalls({
 
               {/* Big room desk (against tussenmuur) */}
               {renderDesk(bigDeskCX, bigDeskCZ, smallDeskLength, tableW)}
-              {/* Big room: 2 chairs behind table (window side, +Z) */}
+              {/* Big room: 2 chairs behind table, 20cm from closet front */}
               {[1, 2].map(i => renderSimpleChair(
                 bigDeskStartX + smallChairSpacing * i,
-                bigDeskCZ + chairUnderOffset,
+                closetCZ + closetD2 / 2 + 0.20 + chairSeatD / 2,
                 1
               ))}
 
