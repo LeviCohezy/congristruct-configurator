@@ -16,10 +16,15 @@ interface Props {
   onPriceClick?: () => void;
 }
 
+const finishPricesDisplay: Record<string, Record<string, string>> = {
+  start: { shell: "", finished: "3.780", "fully-finished": "7.500" },
+  flow:  { shell: "", finished: "6.600", "fully-finished": "16.180" },
+};
+
 const finishLevels = [
-  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen", priceNum: "" },
-  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€3.780", priceNum: "3.780" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€7.500", priceNum: "7.500" },
+  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "" },
 ];
 
 const floorOptions = [
@@ -28,10 +33,15 @@ const floorOptions = [
   { id: "stone-vinyl" as const, label: "Steenlook", texture: stoneFloorTexture },
 ];
 
+const shelfPricesDisplay: Record<string, Record<string, string>> = {
+  start: { brown: "160", "light-oak": "141", white: "" },
+  flow:  { brown: "330", "light-oak": "260", white: "" },
+};
+
 const shelfColors = [
-  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture, price: "160" },
-  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture, price: "141" },
-  { id: "white" as const, label: "Wit", texture: brickStripsTexture, price: "" },
+  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture },
+  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture },
+  { id: "white" as const, label: "Wit", texture: brickStripsTexture },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
