@@ -41,7 +41,7 @@ const shelfPrices: Record<string, Record<string, number>> = {
 const shelfColors = [
   { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture },
   { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture },
-  { id: "white" as const, label: "Wit", texture: brickStripsTexture },
+  { id: "white" as const, label: "Wit", texture: null, color: "#f5f5f0" },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
