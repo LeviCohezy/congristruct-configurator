@@ -3648,11 +3648,13 @@ function HubWalls({
           // Chair spacing along desk length
           const smallChairSpacing = smallDeskLength / 3;
 
+          const tTableTopY = tableLegH + tableH + floorThick;
+
           return (
             <group>
               {/* Small room desk */}
               {renderDesk(smallDeskCX, smallDeskCZ, smallDeskLength, tableW)}
-              {/* Small room: 2 chairs on each side, facing inward (rotated 180°) */}
+              {/* Small room: 2 chairs on each side, facing inward */}
               {[1, 2].map(i => renderSimpleChair(
                 smallDeskEndX + smallChairSpacing * i,
                 smallDeskCZ + chairUnderOffset,
@@ -3663,6 +3665,13 @@ function HubWalls({
                 smallDeskCZ - chairUnderOffset,
                 1
               ))}
+              {/* Small room: 2 laptops on back-wall side (in front of chairs facing from back wall) */}
+              {[1, 2].map(i => renderLaptop(
+                smallDeskEndX + smallChairSpacing * i,
+                tTableTopY,
+                smallDeskCZ - tableW / 2 + 0.35,
+                0
+              ))}
 
               {/* Big room desk (against tussenmuur) */}
               {renderDesk(bigDeskCX, bigDeskCZ, smallDeskLength, tableW)}
@@ -3671,6 +3680,13 @@ function HubWalls({
                 bigDeskStartX + smallChairSpacing * i,
                 closetCZ + closetD2 / 2 + 0.20 + chairSeatD / 2,
                 1
+              ))}
+              {/* Big room: 2 laptops in front of the 2 chairs on the table */}
+              {[1, 2].map(i => renderLaptop(
+                bigDeskStartX + smallChairSpacing * i,
+                tTableTopY,
+                bigDeskCZ + tableW / 2 - 0.35,
+                Math.PI
               ))}
 
               {/* Closet behind desk in big room */}
