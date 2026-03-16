@@ -3818,7 +3818,7 @@ function BaseWalls({
   extWallH, extWallCY,
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
-  floorPlan, finishLevel,
+  floorPlan, finishLevel, shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 6.25
   const halfD = depth / 2;   // 2.0
