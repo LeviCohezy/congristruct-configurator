@@ -129,11 +129,13 @@ function CircleGrid<T extends string>({
 
 export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
+  const isHub = config.model === "hub";
   const packageOn = config.lightingPackage === "full";
   const hasToilet = config.floorPlan === "b";
   const [flickerCard, setFlickerCard] = useState(false);
 
-  const keukenPrice = isFlow ? "150" : "350";
+  const packagePrice = isHub ? "1.990" : "1.500";
+  const keukenPrice = (isFlow || isHub) ? "150" : "350";
   const kastPrice = isFlow ? "530" : "300";
 
   const handleDisabledClick = () => {
