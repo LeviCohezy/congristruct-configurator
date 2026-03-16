@@ -776,6 +776,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           osbTex={osbTex} isShell={isShell}
           floorPlan={config.floorPlan}
           finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor}
+          ledStrip={config.kastLedStrip}
+          lightOakTex={lightOakTex}
         />
       ) : (
         <GenericWalls
@@ -3815,7 +3818,7 @@ function BaseWalls({
   extWallH, extWallCY,
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
-  floorPlan, finishLevel,
+  floorPlan, finishLevel, shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 6.25
   const halfD = depth / 2;   // 2.0
@@ -4195,6 +4198,173 @@ function BaseWalls({
                   <cylinderGeometry args={[0.012, 0.012, 0.12, 8]} />
                   <meshStandardMaterial {...chrome} />
                 </mesh>
+              </group>
+            );
+          })()}
+
+          {/* ── FURNITURE: Desk, chairs & back-wall closet (fully-finished) ── */}
+          {finishLevel === "fully-finished" && (() => {
+            const sc = getShelfColors(shelfColor || "white");
+            const chairMatProps = { color: "#1a1a1a", roughness: 0.6, metalness: 0.1 };
+            const deskMatProps = { color: "#d5d5d0", roughness: 0.3, metalness: 0.05 };
+
+            const chairSeatW = 0.42;
+            const chairSeatD = 0.40;
+            const chairSeatH = 0.02;
+            const chairLegH = 0.44;
+            const chairLegSize = 0.03;
+            const chairBackH = 0.36;
+            const chairBackThick = 0.02;
+
+            const renderSimpleChair = (cx: number, cz: number, faceZ: number) => {
+              const flip = faceZ < 0 ? -1 : 1;
+              return (
+                <group position={[cx, 0, cz]}>
+                  <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
+                    <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
+                    <meshStandardMaterial {...chairMatProps} />
+                  </mesh>
+                  {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
+                    <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
+                      <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
+                      <meshStandardMaterial {...chairMatProps} />
+                    </mesh>
+                  ))}
+                  <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, flip * (-chairSeatD/2 + chairBackThick/2)]}>
+                    <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
+                    <meshStandardMaterial {...chairMatProps} />
+                  </mesh>
+                </group>
+              );
+            };
+
+            // Desk: starts at beginning of big window (seg 7) → ends at half of wall seg 4
+            const deskStartX = cumX[7]; // start of big 200cm window
+            const deskEndX = cumX[4] + seg[4] / 2; // halfway through wall between small window and door
+            const deskLength = deskStartX - deskEndX;
+            const deskCX = (deskStartX + deskEndX) / 2;
+            const tableH = 0.04;
+            const tableLegH = 0.72;
+            const tableW = 0.90; // depth in Z
+            const legInsetX = 0.08;
+            const legInsetZ = 0.06;
+            const legSize = 0.05;
+            // Center desk in the room depth (between front wall and back closet)
+            const closetD = 0.45;
+            const closetBackZ = -halfD + wallThick + closetD;
+            const roomFrontZ = halfD - wallThick;
+            const deskCZ = (closetBackZ + 0.10 + roomFrontZ) / 2; // centered in remaining space
+
+            // Chair offsets
+            const chairUnderOffset = tableW / 2 - chairSeatD * 0.3;
+            const chairSpacing = deskLength / 4; // 3 chairs spaced across the desk
+
+            // Back-wall closet: spans from right wall to left wall (full room width)
+            // But only the main room part (right of the WC/tech block)
+            const closetLeftX = blockLeftX - partT / 2; // up to left partition wall
+            const closetRightX = halfW - wallThick; // up to right exterior wall
+            const closetWidth = closetRightX - closetLeftX;
+            const closetCX = (closetLeftX + closetRightX) / 2;
+            const closetCZ = -halfD + wallThick + closetD / 2;
+            const closetH = height;
+            const matProps = { color: sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
+
+            return (
+              <group>
+                {/* ── Desk ── */}
+                <mesh position={[deskCX, tableLegH + tableH / 2 + floorThick, deskCZ]}>
+                  <boxGeometry args={[deskLength, tableH, tableW]} />
+                  <meshStandardMaterial {...deskMatProps} />
+                </mesh>
+                {[
+                  [deskCX - deskLength / 2 + legInsetX, deskCZ - tableW / 2 + legInsetZ],
+                  [deskCX - deskLength / 2 + legInsetX, deskCZ + tableW / 2 - legInsetZ],
+                  [deskCX + deskLength / 2 - legInsetX, deskCZ - tableW / 2 + legInsetZ],
+                  [deskCX + deskLength / 2 - legInsetX, deskCZ + tableW / 2 - legInsetZ],
+                ].map(([lx, lz], i) => (
+                  <mesh key={`bleg${i}`} position={[lx, tableLegH / 2 + floorThick, lz]}>
+                    <boxGeometry args={[legSize, tableLegH, legSize]} />
+                    <meshStandardMaterial {...deskMatProps} />
+                  </mesh>
+                ))}
+
+                {/* ── 3 chairs on front side (+Z, facing table) ── */}
+                {[1, 2, 3].map(i => renderSimpleChair(
+                  deskEndX + chairSpacing * i,
+                  deskCZ + chairUnderOffset,
+                  -1
+                ))}
+                {/* ── 3 chairs on back side (-Z, facing table) ── */}
+                {[1, 2, 3].map(i => renderSimpleChair(
+                  deskEndX + chairSpacing * i,
+                  deskCZ - chairUnderOffset,
+                  1
+                ))}
+
+                {/* ── Back-wall closet with shelves ── */}
+                {/* Back panel (against wall) */}
+                <mesh position={[closetCX, closetH / 2 + floorThick, -halfD + wallThick + 0.02]}>
+                  <boxGeometry args={[closetWidth, closetH, 0.02]} />
+                  <meshStandardMaterial {...matProps} />
+                </mesh>
+                {/* Top shelf */}
+                <mesh position={[closetCX, closetH - 0.02 + floorThick, closetCZ]}>
+                  <boxGeometry args={[closetWidth, 0.025, closetD]} />
+                  <meshStandardMaterial {...matProps} />
+                </mesh>
+                {/* Side panels */}
+                <mesh position={[closetLeftX, closetH / 2 + floorThick, closetCZ]}>
+                  <boxGeometry args={[0.02, closetH, closetD]} />
+                  <meshStandardMaterial {...matProps} />
+                </mesh>
+                <mesh position={[closetRightX, closetH / 2 + floorThick, closetCZ]}>
+                  <boxGeometry args={[0.02, closetH, closetD]} />
+                  <meshStandardMaterial {...matProps} />
+                </mesh>
+                {/* Center divider with door */}
+                {(() => {
+                  const dividerX = closetCX;
+                  const doorH = closetH - 0.05;
+                  const doorW = closetWidth * 0.15; // narrow closet door
+                  return (
+                    <>
+                      {/* Door panel */}
+                      <mesh position={[dividerX, doorH / 2 + floorThick, closetCZ + closetD / 2 + 0.002]}>
+                        <boxGeometry args={[doorW, doorH, 0.02]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Door line left */}
+                      <mesh position={[dividerX - doorW / 2, doorH / 2 + floorThick, closetCZ + closetD / 2 + 0.014]}>
+                        <boxGeometry args={[0.008, doorH - 0.02, 0.004]} />
+                        <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                      </mesh>
+                      {/* Door line right */}
+                      <mesh position={[dividerX + doorW / 2, doorH / 2 + floorThick, closetCZ + closetD / 2 + 0.014]}>
+                        <boxGeometry args={[0.008, doorH - 0.02, 0.004]} />
+                        <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                      </mesh>
+                      {/* Door handle */}
+                      <mesh position={[dividerX + doorW / 2 - 0.04, doorH * 0.48 + floorThick, closetCZ + closetD / 2 + 0.025]} rotation={[Math.PI / 2, 0, 0]}>
+                        <cylinderGeometry args={[0.008, 0.008, 0.03, 8]} />
+                        <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+                      </mesh>
+                    </>
+                  );
+                })()}
+                {/* Shelves in left section */}
+                {[0.25, 0.50, 0.75].map((frac, i) => (
+                  <mesh key={`slL${i}`} position={[(closetLeftX + closetCX) / 2, closetH * frac + floorThick, closetCZ]}>
+                    <boxGeometry args={[closetWidth / 2 - 0.03, 0.02, closetD - 0.02]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                ))}
+                {/* Shelves in right section */}
+                {[0.25, 0.50, 0.75].map((frac, i) => (
+                  <mesh key={`slR${i}`} position={[(closetCX + closetRightX) / 2, closetH * frac + floorThick, closetCZ]}>
+                    <boxGeometry args={[closetWidth / 2 - 0.03, 0.02, closetD - 0.02]} />
+                    <meshStandardMaterial {...matProps} />
+                  </mesh>
+                ))}
               </group>
             );
           })()}
