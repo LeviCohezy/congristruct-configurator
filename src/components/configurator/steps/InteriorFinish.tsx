@@ -125,7 +125,9 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {shelfColors.map((c) => (
+                  {shelfColors.map((c) => {
+                    const sp = sPrices[c.id] ?? "";
+                    return (
                     <button
                       key={c.id}
                       onClick={() => updateConfig("shelfColor", c.id)}
@@ -133,13 +135,14 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                     >
                       <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
                       <p className="text-xs font-medium">{c.label}</p>
-                      {c.price ? (
-                        <BlurredPrice text={c.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
+                      {sp ? (
+                        <BlurredPrice text={sp} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
                       ) : (
                         <p className="text-[10px] font-medium text-muted-foreground mt-0.5">inbegrepen</p>
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
