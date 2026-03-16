@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Archive } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 import { RelativePrice } from "@/components/configurator/RelativePrice";
 
 import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
