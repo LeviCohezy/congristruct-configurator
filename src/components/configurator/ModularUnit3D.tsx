@@ -590,6 +590,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
   const isFlowA = config.model === "flow" && config.floorPlan === "a";
   const isFlowB = config.model === "flow" && config.floorPlan === "b";
   const isHub = config.model === "hub";
+  const isBase = config.model === "base";
 
   // Convert cm to 3D units for the START model
   const cmToUnit = (cm: number) => (cm / 400) * width; // width maps to 400cm
