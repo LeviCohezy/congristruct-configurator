@@ -3423,9 +3423,22 @@ function HubWalls({
               <boxGeometry args={[kitchenD, height, 0.02]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Side panel — front side */}
+            {/* Side panel — front side (40cm closed border where closet meets kitchen) */}
             <mesh position={[kitchenCX, height / 2 + floorThick, kitchenEndZ + 0.01]}>
               <boxGeometry args={[kitchenD, height, 0.02]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* 40cm closed border panel at closet side */}
+            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD, counterH, 0.40]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            <mesh position={[kitchenCX, counterH + 0.015 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD + 0.02, 0.03, 0.42]} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+            </mesh>
+            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD, upperH, 0.40]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Lower cabinet */}
