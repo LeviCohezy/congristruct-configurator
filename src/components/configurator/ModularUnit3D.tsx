@@ -3520,7 +3520,8 @@ function HubWalls({
       {finishLevel === "fully-finished" && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const tableMatProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
-        // Desk color: 30% less white → warm light grey
+        const chairMatProps = { color: "#1a1a1a", roughness: 0.6, metalness: 0.1 };
+        const planATableMatProps = { color: "#ffffff", roughness: 0.7, metalness: 0.05 };
         const deskColor = "#d5d5d0";
         const deskMatProps = { color: deskColor, roughness: 0.3, metalness: 0.05 };
 
@@ -3539,17 +3540,17 @@ function HubWalls({
             <group position={[cx, 0, cz]}>
               <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
                 <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...chairMatProps} />
               </mesh>
               {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
                 <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
                   <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
-                  <meshStandardMaterial {...tableMatProps} />
+                  <meshStandardMaterial {...chairMatProps} />
                 </mesh>
               ))}
               <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, flip * (-chairSeatD/2 + chairBackThick/2)]}>
                 <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...chairMatProps} />
               </mesh>
             </group>
           );
@@ -3695,7 +3696,7 @@ function HubWalls({
             {/* Table top */}
             <mesh position={[tableCenterX, tableLegH2 + tableH2 / 2 + floorThick, tableCenterZ]}>
               <boxGeometry args={[tableLength, tableH2, tableW2]} />
-              <meshStandardMaterial {...tableMatProps} />
+              <meshStandardMaterial {...planATableMatProps} />
             </mesh>
             {/* 4 legs */}
             {[
@@ -3706,7 +3707,7 @@ function HubWalls({
             ].map(([lx, lz], i) => (
               <mesh key={`tleg${i}`} position={[lx, tableLegH2 / 2 + floorThick, lz]}>
                 <boxGeometry args={[legSize, tableLegH2, legSize]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...planATableMatProps} />
               </mesh>
             ))}
             {/* Chairs — front side (+Z), rotated 180° */}
