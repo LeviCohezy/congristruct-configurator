@@ -4258,7 +4258,8 @@ function BaseWalls({
 
             // Chair offsets
             const chairUnderOffset = tableW / 2 - chairSeatD * 0.3;
-            const chairSpacing = deskLength / 4; // 3 chairs spaced across the desk
+            const numChairs = 3;
+            const chairSpacing = deskLength / (numChairs + 1); // equal spacing from edges
 
             // Back-wall closet: spans from right wall to left wall (full room width)
             // But only the main room part (right of the WC/tech block)
