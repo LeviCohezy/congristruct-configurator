@@ -4416,15 +4416,15 @@ function BaseWalls({
             );
           })()}
 
-          {/* ── KITCHEN against WC/tech block left wall ── */}
+          {/* ── KITCHEN against WC/tech block right wall (facing big room) ── */}
           {hasKitchen && hasPlanB && (() => {
             const sc = getShelfColors(shelfColor || "white");
             const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
-            // Kitchen runs along the left face of the WC/tech block
-            const kitchenBackX = blockLeftX - partT / 2 - 0.02; // flush against outside of partition
+            // Kitchen runs along the right face of the WC/tech block (facing the big open room)
+            const kitchenBackX = blockRightX + partT / 2 + 0.02; // flush against outside of right partition
             const kitchenD = 0.40; // 40cm deep cabinets
-            const kitchenCX = kitchenBackX - kitchenD / 2;
+            const kitchenCX = kitchenBackX + kitchenD / 2;
             // Kitchen runs from back wall to front of block
             const kitchenStartZ = -halfD + wallThick + 0.02;
             const kitchenEndZ = wcBottomZ - 0.02;
@@ -4473,7 +4473,7 @@ function BaseWalls({
                   <meshStandardMaterial {...matProps} />
                 </mesh>
                 {/* Open niche back panel */}
-                <mesh position={[kitchenBackX - 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
+                <mesh position={[kitchenBackX + 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
                   <boxGeometry args={[0.01, (upperBottom - counterH) - 0.06, kitchenW - 0.04]} />
                   <meshStandardMaterial {...matProps} />
                 </mesh>
@@ -4482,16 +4482,16 @@ function BaseWalls({
                   <boxGeometry args={[kitchenD - 0.02, 0.025, kitchenW - 0.04]} />
                   <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
                 </mesh>
-                {/* Door lines lower */}
+                {/* Door lines lower (facing +X into room) */}
                 {[0.33, 0.67].map((frac, i) => (
-                  <mesh key={`bkl${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, counterH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+                  <mesh key={`bkl${i}`} position={[kitchenCX + kitchenD / 2 + 0.002, counterH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
                     <boxGeometry args={[0.004, counterH - 0.02, 0.008]} />
                     <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                   </mesh>
                 ))}
                 {/* Door lines upper */}
                 {[0.33, 0.67].map((frac, i) => (
-                  <mesh key={`bku${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, upperBottom + upperH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+                  <mesh key={`bku${i}`} position={[kitchenCX + kitchenD / 2 + 0.002, upperBottom + upperH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
                     <boxGeometry args={[0.004, upperH - 0.02, 0.008]} />
                     <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                   </mesh>
@@ -4506,15 +4506,15 @@ function BaseWalls({
                   <meshStandardMaterial color="#d0d0d0" roughness={0.15} metalness={0.5} />
                 </mesh>
                 {/* Faucet */}
-                <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.01 + floorThick, kitchenCZ]}>
+                <mesh position={[kitchenCX - sinkD / 2 + 0.02, counterH + 0.03 + 0.01 + floorThick, kitchenCZ]}>
                   <cylinderGeometry args={[0.015, 0.02, 0.02, 8]} />
                   <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                 </mesh>
-                <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.12 + floorThick, kitchenCZ]}>
+                <mesh position={[kitchenCX - sinkD / 2 + 0.02, counterH + 0.03 + 0.12 + floorThick, kitchenCZ]}>
                   <cylinderGeometry args={[0.008, 0.008, 0.20, 8]} />
                   <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                 </mesh>
-                <mesh position={[kitchenCX + sinkD / 2 - 0.08, counterH + 0.03 + 0.21 + floorThick, kitchenCZ]} rotation={[0, 0, Math.PI / 6]}>
+                <mesh position={[kitchenCX - sinkD / 2 + 0.08, counterH + 0.03 + 0.21 + floorThick, kitchenCZ]} rotation={[0, 0, -Math.PI / 6]}>
                   <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
                   <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
                 </mesh>
