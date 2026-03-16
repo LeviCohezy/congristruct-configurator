@@ -3078,11 +3078,33 @@ function HubWalls({
             <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
           </mesh>
 
-          {/* Horizontal closing wall at front of WC (from partition to right wall) */}
-          <mesh position={[wcPartX + wcWidth / 2 + partT / 2, height / 2 + floorThick, -halfD + wallThick + wcLength]}>
-            <boxGeometry args={[wcWidth - partT / 2, height, partT]} />
-            <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
-          </mesh>
+          {/* Horizontal closing wall at front of WC — split around door opening */}
+          {(() => {
+            const wallZ = -halfD + wallThick + wcLength;
+            const wcDoorCX = wcPartX + wcWidth / 2;
+            const doorLeft = wcDoorCX - wcDoorW / 2;
+            const doorRight = wcDoorCX + wcDoorW / 2;
+            const wallLeft = wcPartX + partT;
+            const wallRight = wcPartX + wcWidth + partT / 2;
+            const leftSegW = doorLeft - wallLeft;
+            const rightSegW = wallRight - doorRight;
+            return (
+              <>
+                {leftSegW > 0.01 && (
+                  <mesh position={[wallLeft + leftSegW / 2, height / 2 + floorThick, wallZ]}>
+                    <boxGeometry args={[leftSegW, height, partT]} />
+                    <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                  </mesh>
+                )}
+                {rightSegW > 0.01 && (
+                  <mesh position={[doorRight + rightSegW / 2, height / 2 + floorThick, wallZ]}>
+                    <boxGeometry args={[rightSegW, height, partT]} />
+                    <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                  </mesh>
+                )}
+              </>
+            );
+          })()}
 
           {/* WC door — white panel with black frame (same style as BLOQ Flow) */}
           {(() => {
