@@ -48,13 +48,19 @@ const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" ||
 const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-finished";
 
 export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
+  const m = config.model;
+  const fPrices = finishPricesDisplay[m] ?? finishPricesDisplay.start;
+  const sPrices = shelfPricesDisplay[m] ?? shelfPricesDisplay.start;
+
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Interieur & afwerking</h3>
       <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
       <div className="grid gap-6">
-        {finishLevels.map((f) => (
+        {finishLevels.map((f) => {
+          const priceNum = fPrices[f.id] ?? "";
+          return (
           <button
             key={f.id}
             onClick={() => updateConfig("finishLevel", f.id)}
@@ -65,14 +71,15 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                 <p className="font-medium">{f.label}</p>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </div>
-              {f.priceNum ? (
-                <BlurredPrice text={f.priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
+              {priceNum ? (
+                <BlurredPrice text={priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
               ) : (
-                <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+                <p className="text-sm font-medium shrink-0 ml-3">{f.price || "inbegrepen"}</p>
               )}
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Floor option */}
