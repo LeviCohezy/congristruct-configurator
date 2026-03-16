@@ -24,6 +24,7 @@ export interface ConfigState {
   keukenLedStrip: boolean;
   kastLedStrip: boolean;
   lightingPackage: "base" | "full";
+  hasKitchen: boolean;
   extraCloset: boolean;
   heatPump: boolean;
   extraHeatPump: boolean;
