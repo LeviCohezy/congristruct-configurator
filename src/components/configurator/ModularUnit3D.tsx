@@ -4352,6 +4352,22 @@ function BaseWalls({
                           <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                         </mesh>
                       ))}
+
+                      {/* Shelves in left compartment */}
+                      {[0.20, 0.40, 0.60, 0.80].map((frac, i) => (
+                        <mesh key={`shL${i}`} position={[closetLeftX + leftSectionW / 2, frac * closetH + floorThick, closetCZ]}>
+                          <boxGeometry args={[leftSectionW - 0.02, 0.018, closetD - 0.02]} />
+                          <meshStandardMaterial {...matProps} />
+                        </mesh>
+                      ))}
+
+                      {/* Shelves in right compartment */}
+                      {[0.20, 0.40, 0.60, 0.80].map((frac, i) => (
+                        <mesh key={`shR${i}`} position={[closetCX + doorW / 2 + leftSectionW / 2, frac * closetH + floorThick, closetCZ]}>
+                          <boxGeometry args={[leftSectionW - 0.02, 0.018, closetD - 0.02]} />
+                          <meshStandardMaterial {...matProps} />
+                        </mesh>
+                      ))}
                     </>
                   );
                 })()}
