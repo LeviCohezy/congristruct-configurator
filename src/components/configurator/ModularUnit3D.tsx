@@ -4416,15 +4416,15 @@ function BaseWalls({
             );
           })()}
 
-          {/* ── KITCHEN against WC/tech block left wall ── */}
+          {/* ── KITCHEN against WC/tech block right wall (facing big room) ── */}
           {hasKitchen && hasPlanB && (() => {
             const sc = getShelfColors(shelfColor || "white");
             const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
-            // Kitchen runs along the left face of the WC/tech block
-            const kitchenBackX = blockLeftX - partT / 2 - 0.02; // flush against outside of partition
+            // Kitchen runs along the right face of the WC/tech block (facing the big open room)
+            const kitchenBackX = blockRightX + partT / 2 + 0.02; // flush against outside of right partition
             const kitchenD = 0.40; // 40cm deep cabinets
-            const kitchenCX = kitchenBackX - kitchenD / 2;
+            const kitchenCX = kitchenBackX + kitchenD / 2;
             // Kitchen runs from back wall to front of block
             const kitchenStartZ = -halfD + wallThick + 0.02;
             const kitchenEndZ = wcBottomZ - 0.02;
