@@ -8,7 +8,13 @@ interface Props {
   onPriceClick?: () => void;
 }
 
+const windowPriceDisplay: Record<string, string> = {
+  start: "180",
+  flow: "300",
+};
+
 export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
+  const priceText = windowPriceDisplay[config.model] ?? "180";
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Ramen</h3>
@@ -18,7 +24,7 @@ export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
         <div>
           <p className="text-sm font-medium">Kiepraam</p>
           <p className="text-xs text-muted-foreground">Upgrade naar kiepramen voor betere ventilatie</p>
-          <BlurredPrice text="180" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
+          <BlurredPrice text={priceText} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
         </div>
         <button
           onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}

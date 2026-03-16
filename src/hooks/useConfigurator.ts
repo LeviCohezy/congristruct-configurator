@@ -88,31 +88,55 @@ const defaultConfig: ConfigState = {
   priceRevealed: hasStoredContact,
 };
 
-// ── START model pricing ──
-const startBasePrices: Record<string, number> = {
-  a: 16700, // without WC
-  b: 18470, // with WC
+// ── Per-model pricing tables ──
+const basePrices: Record<string, Record<string, number>> = {
+  start: { a: 16700, b: 18470 },
+  flow:  { a: 22550, b: 29470 },
+  hub:   { a: 42000, b: 42000 }, // placeholder
+  base:  { a: 42000, b: 42000 }, // placeholder
 };
 
-const facadePrices: Record<string, number> = {
-  "thermowood-natural": 0,
-  "thermowood-black": 265,
-  "composite-white": 335,
-  "composite-black": 335,
-  "aluminium": 935,
-  "brick-grey": 1335,
+const facadePricesByModel: Record<string, Record<string, number>> = {
+  start: {
+    "thermowood-natural": 0, "thermowood-black": 265,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
+  flow: {
+    "thermowood-natural": 0, "thermowood-black": 335,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
-const finishPrices: Record<string, number> = {
-  shell: 0,
-  finished: 3780,
-  "fully-finished": 7500,
+const finishPricesByModel: Record<string, Record<string, number>> = {
+  start: { shell: 0, finished: 3780, "fully-finished": 7500 },
+  flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
 };
 
-const shelfPrices: Record<string, number> = {
-  brown: 160,
-  "light-oak": 141,
-  white: 0,
+const shelfPricesByModel: Record<string, Record<string, number>> = {
+  start: { brown: 160, "light-oak": 141, white: 0 },
+  flow:  { brown: 330, "light-oak": 260, white: 0 },
+};
+
+const windowPriceByModel: Record<string, number> = {
+  start: 180,
+  flow: 300, // €150 × 2 windows
+};
+
+const insulationPriceByModel: Record<string, number> = {
+  start: 900,
+  flow: 1450,
+};
+
+const ledKeukenPriceByModel: Record<string, number> = {
+  start: 350,
+  flow: 150,
+};
+
+const ledKastPriceByModel: Record<string, number> = {
+  start: 300,
+  flow: 530,
 };
 
 /** Roof is auto-derived: white facades → white roof, else black */
@@ -140,43 +164,44 @@ export function useConfigurator() {
   }, []);
 
   const totalPrice = useMemo(() => {
-    // Base price depends on plan (WC or not) for START
-    let price = config.model === "start"
-      ? (startBasePrices[config.floorPlan] ?? 16700)
-      : 42000; // placeholder for other models
+    const m = config.model;
+    const modelBase = basePrices[m] ?? basePrices.start;
+    let price = modelBase[config.floorPlan] ?? modelBase.a;
 
-    price += facadePrices[config.facade] ?? 0;
-    price += finishPrices[config.finishLevel] ?? 0;
+    const facadeTable = facadePricesByModel[m] ?? facadePricesByModel.start;
+    price += facadeTable[config.facade] ?? 0;
+
+    const finishTable = finishPricesByModel[m] ?? finishPricesByModel.start;
+    price += finishTable[config.finishLevel] ?? 0;
 
     // Shelf color only when fully-finished
     if (config.finishLevel === "fully-finished") {
-      price += shelfPrices[config.shelfColor] ?? 0;
+      const shelfTable = shelfPricesByModel[m] ?? shelfPricesByModel.start;
+      price += shelfTable[config.shelfColor] ?? 0;
     }
 
     if (config.roundedCorners) price += 1500;
-    if (config.tiltTurnWindow) price += 180;
+    if (config.tiltTurnWindow) price += (windowPriceByModel[m] ?? 180);
 
     // Lighting
     if (config.lightingPackage === "full") {
       price += 1500;
-      // Spots & rail: +€5 each, opbouw spots: +€10
       if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") {
         price += 10;
       } else {
         price += 5;
       }
-      // Rail: +€5
       price += 5;
     }
-    if (config.keukenLedStrip) price += 350;
-    if (config.kastLedStrip) price += 300;
+    if (config.keukenLedStrip) price += (ledKeukenPriceByModel[m] ?? 350);
+    if (config.kastLedStrip) price += (ledKastPriceByModel[m] ?? 300);
 
     // Extras
     if (config.heatPump) price += 2500;
     if (config.solarBattery) price += 4500;
-    if (config.insulation) price += 900;
+    if (config.insulation) price += (insulationPriceByModel[m] ?? 900);
 
-    // Transport — only count when user has entered a distance > 0
+    // Transport
     if (config.transportDistance > 0) {
       price += config.transportDistance * 8;
     }

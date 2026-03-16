@@ -118,6 +118,9 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const hasToilet = config.floorPlan === "b";
   const [flickerCard, setFlickerCard] = useState(false);
 
+  const keukenPrice = isFlow ? "150" : "350";
+  const kastPrice = isFlow ? "530" : "300";
+
   const handleDisabledClick = () => {
     setFlickerCard(true);
     setTimeout(() => setFlickerCard(false), 1500);
@@ -206,7 +209,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Keuken LED</p>
-                <BlurredPrice text="350" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
+                <BlurredPrice text={keukenPrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
               <Toggle
                 on={config.keukenLedStrip}
@@ -228,7 +231,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Kast LED</p>
-                <BlurredPrice text="300" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
+                <BlurredPrice text={kastPrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
               <Toggle
                 on={config.kastLedStrip}

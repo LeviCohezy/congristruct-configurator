@@ -16,10 +16,15 @@ interface Props {
   onPriceClick?: () => void;
 }
 
+const finishPricesDisplay: Record<string, Record<string, string>> = {
+  start: { shell: "", finished: "3.780", "fully-finished": "7.500" },
+  flow:  { shell: "", finished: "6.600", "fully-finished": "16.180" },
+};
+
 const finishLevels = [
-  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen", priceNum: "" },
-  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "+€3.780", priceNum: "3.780" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "+€7.500", priceNum: "7.500" },
+  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "" },
 ];
 
 const floorOptions = [
@@ -28,23 +33,34 @@ const floorOptions = [
   { id: "stone-vinyl" as const, label: "Steenlook", texture: stoneFloorTexture },
 ];
 
+const shelfPricesDisplay: Record<string, Record<string, string>> = {
+  start: { brown: "160", "light-oak": "141", white: "" },
+  flow:  { brown: "330", "light-oak": "260", white: "" },
+};
+
 const shelfColors = [
-  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture, price: "160" },
-  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture, price: "141" },
-  { id: "white" as const, label: "Wit", texture: brickStripsTexture, price: "" },
+  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture },
+  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture },
+  { id: "white" as const, label: "Wit", texture: brickStripsTexture },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
 const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-finished";
 
 export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
+  const m = config.model;
+  const fPrices = finishPricesDisplay[m] ?? finishPricesDisplay.start;
+  const sPrices = shelfPricesDisplay[m] ?? shelfPricesDisplay.start;
+
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Interieur & afwerking</h3>
       <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
       <div className="grid gap-6">
-        {finishLevels.map((f) => (
+        {finishLevels.map((f) => {
+          const priceNum = fPrices[f.id] ?? "";
+          return (
           <button
             key={f.id}
             onClick={() => updateConfig("finishLevel", f.id)}
@@ -55,14 +71,15 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                 <p className="font-medium">{f.label}</p>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </div>
-              {f.priceNum ? (
-                <BlurredPrice text={f.priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
+              {priceNum ? (
+                <BlurredPrice text={priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
               ) : (
-                <p className="text-sm font-medium shrink-0 ml-3">{f.price}</p>
+                <p className="text-sm font-medium shrink-0 ml-3">{f.price || "inbegrepen"}</p>
               )}
             </div>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Floor option */}
@@ -108,7 +125,9 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {shelfColors.map((c) => (
+                  {shelfColors.map((c) => {
+                    const sp = sPrices[c.id] ?? "";
+                    return (
                     <button
                       key={c.id}
                       onClick={() => updateConfig("shelfColor", c.id)}
@@ -116,13 +135,14 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                     >
                       <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
                       <p className="text-xs font-medium">{c.label}</p>
-                      {c.price ? (
-                        <BlurredPrice text={c.price} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
+                      {sp ? (
+                        <BlurredPrice text={sp} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
                       ) : (
                         <p className="text-[10px] font-medium text-muted-foreground mt-0.5">inbegrepen</p>
                       )}
                     </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
