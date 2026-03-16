@@ -3084,16 +3084,47 @@ function HubWalls({
             <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
           </mesh>
 
-          {/* WC door opening on the closing wall */}
-          <DoorPane
-            posX={wcPartX + wcWidth / 2}
-            posY={winCY + floorThick}
-            width={wcDoorW}
-            height={winH}
-            frameColor={frameColor}
-            z={-halfD + wallThick + wcLength}
-            rotate={false}
-          />
+          {/* WC door — white panel with black frame (same style as BLOQ Flow) */}
+          {(() => {
+            const wcDoorH = 2.1;
+            const wcDoorCX = wcPartX + wcWidth / 2;
+            const wcDoorZ = -halfD + wallThick + wcLength;
+            return (
+              <>
+                {/* Black door frame */}
+                <mesh position={[wcDoorCX - wcDoorW / 2 - 0.015, wcDoorH / 2 + floorThick, wcDoorZ]}>
+                  <boxGeometry args={[0.03, wcDoorH, partT + 0.01]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                <mesh position={[wcDoorCX + wcDoorW / 2 + 0.015, wcDoorH / 2 + floorThick, wcDoorZ]}>
+                  <boxGeometry args={[0.03, wcDoorH, partT + 0.01]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                <mesh position={[wcDoorCX, wcDoorH + floorThick + 0.015, wcDoorZ]}>
+                  <boxGeometry args={[wcDoorW + 0.06, 0.03, partT + 0.01]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                {/* White door panel */}
+                <mesh position={[wcDoorCX, wcDoorH / 2 + floorThick, wcDoorZ]}>
+                  <boxGeometry args={[wcDoorW - 0.04, wcDoorH - 0.02, 0.035]} />
+                  <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
+                </mesh>
+                {/* Header above door */}
+                <mesh position={[wcDoorCX, wcDoorH + (height - wcDoorH) / 2 + floorThick, wcDoorZ]}>
+                  <boxGeometry args={[wcDoorW, height - wcDoorH, partT]} />
+                  <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                </mesh>
+                {/* Chrome cylinder handle (BLOQ Flow style) */}
+                <mesh
+                  position={[wcDoorCX + wcDoorW / 2 - 0.06, wcDoorH * 0.48 + floorThick, wcDoorZ + 0.04]}
+                  rotation={[Math.PI / 2, 0, 0]}
+                >
+                  <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+                  <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+                </mesh>
+              </>
+            );
+          })()}
 
           {/* Toilet fixture */}
           <mesh position={[halfW - wallThick - wcWidth / 2, floorThick + 0.25, -halfD + wallThick + 0.35]}>
