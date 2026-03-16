@@ -3022,6 +3022,11 @@ function HubWalls({
                   <CladMaterial {...woodBase} wallWidth={DOOR_W} />
                 </mesh>
               )}
+              {/* Below door — covers floor slab */}
+              <mesh position={[wallCenterX, floorThick / 2, doorMidZ]} castShadow>
+                <boxGeometry args={[wallThick, floorThick, DOOR_W]} />
+                <CladMaterial {...woodBase} wallWidth={DOOR_W} wallHeight={floorThick} fullWallHeight={extWallH} />
+              </mesh>
               <DoorPane
                 posX={wallCenterX}
                 posY={winCY + floorThick}
