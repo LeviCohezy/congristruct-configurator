@@ -463,6 +463,137 @@ function StartPlanSVG({ plan, mirrored, wallColor, winColor }: {
   );
 }
 
+/* ── BASE model: 1250×400cm ───────────────────────────────────────── */
+/* Scale: /2 → 625×200 SVG units. Walls 23cm = 11.5 SVG.
+   Front (bottom) wall segments (cm→SVG/2):
+     100(50) wall | 200(100) win | 125(62.5) wall | 100(50) door | 150(75) wall | 100(50) win | 180(90) wall | 200(100) win | 95(47.5) wall
+   Right wall: 100(50) wall(bottom) | 100(50) window | 200(100) wall(top) */
+function BasePlanSVG({ plan, mirrored, wallColor, winColor }: {
+  plan: "a" | "b"; mirrored: boolean; wallColor: string; winColor: string;
+}) {
+  const vw = 625;  // 1250/2
+  const vh = 200;  // 400/2
+  const wt = 11.5; // 23/2
+  const iw = 5;    // internal wall thickness
+  const transform = mirrored ? `scale(-1,1) translate(${-vw},0)` : undefined;
+  const furnitureColor = wallColor;
+
+  // Front wall segment positions (cumulative, SVG units)
+  const f0 = 50;         // end of first wall
+  const f1 = 150;        // end of window 1 (200cm)
+  const f2 = 212.5;      // end of wall
+  const f3 = 262.5;      // end of door (100cm)
+  const f4 = 337.5;      // end of wall
+  const f5 = 387.5;      // end of window 2 (100cm)
+  const f6 = 477.5;      // end of wall
+  const f7 = 577.5;      // end of window 3 (200cm)
+  // f8 = 625             // end of last wall
+
+  // Right wall window: 100cm from bottom edge, 100cm tall
+  const rWinBottom = vh - wt - 50;  // 100cm/2 from front
+  const rWinTop = rWinBottom - 50;  // 100cm/2 tall
+
+  // Interior block (WC + Tech room) — only for Plan B
+  // Block sits left-center, right edge aligns near door
+  const blockLeft = 125;   // ~250cm from left = 125 SVG
+  const blockRight = 212.5; // ~425cm from left = 212.5 SVG (aligns with door)
+  const techBottomY = wt + 87.5;  // tech room 175cm deep from back = 87.5 SVG
+  const wcBottomY = techBottomY + 65; // WC 130cm deep = 65 SVG
+
+  return (
+    <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 110 }}>
+      <g transform={transform}>
+        {/* Outer walls */}
+        <rect x={0} y={0} width={vw} height={wt} fill={wallColor} opacity={0.85} />
+        <rect x={0} y={vh - wt} width={vw} height={wt} fill={wallColor} opacity={0.85} />
+        <rect x={0} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
+        <rect x={vw - wt} y={0} width={wt} height={vh} fill={wallColor} opacity={0.85} />
+
+        {/* Front window 1: 200cm */}
+        <rect x={f0} y={vh - wt} width={f1 - f0} height={wt} fill="hsl(var(--background))" />
+        <line x1={f0} y1={vh - wt / 2} x2={f1} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
+
+        {/* Front entrance door: 100cm */}
+        <rect x={f2} y={vh - wt} width={f3 - f2} height={wt} fill="hsl(var(--background))" />
+        <path d={`M ${f2} ${vh - wt} A ${f3 - f2} ${f3 - f2} 0 0 0 ${f3} ${vh - wt - (f3 - f2)}`}
+          fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+
+        {/* Front window 2: 100cm */}
+        <rect x={f4} y={vh - wt} width={f5 - f4} height={wt} fill="hsl(var(--background))" />
+        <line x1={f4} y1={vh - wt / 2} x2={f5} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
+
+        {/* Front window 3: 200cm */}
+        <rect x={f6} y={vh - wt} width={f7 - f6} height={wt} fill="hsl(var(--background))" />
+        <line x1={f6} y1={vh - wt / 2} x2={f7} y2={vh - wt / 2} stroke={winColor} strokeWidth={2.5} />
+
+        {/* Right wall window: 100cm */}
+        <rect x={vw - wt} y={rWinTop} width={wt} height={rWinBottom - rWinTop} fill="hsl(var(--background))" />
+        <line x1={vw - wt / 2} y1={rWinTop} x2={vw - wt / 2} y2={rWinBottom} stroke={winColor} strokeWidth={2.5} />
+
+        {/* Plan B: interior rooms */}
+        {plan === "b" && (
+          <>
+            {/* Left partition wall */}
+            <rect x={blockLeft} y={wt} width={iw} height={wcBottomY - wt} fill={wallColor} opacity={0.7} />
+            {/* Right partition wall */}
+            <rect x={blockRight} y={wt} width={iw} height={wcBottomY - wt} fill={wallColor} opacity={0.7} />
+
+            {/* Horizontal wall between tech room and WC */}
+            <rect x={blockLeft} y={techBottomY} width={blockRight - blockLeft + iw} height={iw} fill={wallColor} opacity={0.7} />
+
+            {/* Horizontal wall at bottom of WC (inkom boundary) */}
+            <rect x={blockLeft} y={wcBottomY} width={blockRight - blockLeft + iw} height={iw} fill={wallColor} opacity={0.7} />
+
+            {/* Tech room door (opens into main room from right partition) */}
+            {(() => {
+              const techDoorH = 40; // ~80cm
+              const techDoorY = techBottomY - 10 - techDoorH;
+              return (
+                <>
+                  <rect x={blockRight} y={techDoorY} width={iw} height={techDoorH} fill="hsl(var(--background))" />
+                  <path d={`M ${blockRight + iw} ${techDoorY + techDoorH} A ${techDoorH} ${techDoorH} 0 0 1 ${blockRight + iw + techDoorH} ${techDoorY}`}
+                    fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+                </>
+              );
+            })()}
+
+            {/* WC door (opens into inkom from bottom wall of WC) */}
+            {(() => {
+              const wcDoorW = 40; // ~80cm
+              const wcDoorX = blockLeft + (blockRight - blockLeft - wcDoorW) / 2 + 10;
+              return (
+                <>
+                  <rect x={wcDoorX} y={wcBottomY} width={wcDoorW} height={iw} fill="hsl(var(--background))" />
+                  <path d={`M ${wcDoorX} ${wcBottomY + iw} A ${wcDoorW} ${wcDoorW} 0 0 0 ${wcDoorX + wcDoorW} ${wcBottomY + iw + wcDoorW * 0.6}`}
+                    fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+                </>
+              );
+            })()}
+
+            {/* Toilet fixture */}
+            <ellipse cx={blockRight - 15} cy={techBottomY + 30} rx={7} ry={9} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+            <rect x={blockRight - 21} y={techBottomY + iw + 10} width={12} height={7} rx={3} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+
+            {/* Sink */}
+            <rect x={blockLeft + iw + 5} y={wcBottomY - 18} width={9} height={8} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.3} />
+
+            {/* "Technische ruimte" label area — small equipment icon */}
+            <rect x={blockLeft + 15} y={wt + 20} width={20} height={15} rx={2} fill="none" stroke={wallColor} strokeWidth={0.7} opacity={0.25} />
+          </>
+        )}
+
+        {/* Main room furniture hints (both plans) */}
+        {plan === "a" && (
+          <>
+            {/* Large empty space — just subtle center mark */}
+            <rect x={vw / 2 - 60} y={vh / 2 - 20} width={120} height={40} rx={3} fill="none" stroke={furnitureColor} strokeWidth={0.8} opacity={0.15} strokeDasharray="4 3" />
+          </>
+        )}
+      </g>
+    </svg>
+  );
+}
+
 export function WindowsPlan({ config, updateConfig }: Props) {
   const plans = planOptions[config.model];
 
