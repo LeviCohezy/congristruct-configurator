@@ -71,6 +71,7 @@ const materials: MaterialFamily[] = [
     id: "brick-grey",
     label: "Gevelsteen strips",
     desc: "Grijze steenstrips look",
+    desc2: "Baksteen naar keuze",
     facadeId: "brick-grey",
     color: "hsl(0,0%,55%)",
     image: brickStripsImg,
