@@ -4238,14 +4238,14 @@ function BaseWalls({
               );
             };
 
-            // Desk: extends to 2/3 of big window (seg 7) → ends at half of wall seg 4
+            // Desk: extends to 2/3 of big window (seg 7) → ends at start of wall seg 4
             const deskStartX = cumX[7] + seg[7] * (2 / 3); // 2/3 into the big 200cm window
-            const deskEndX = cumX[4] + seg[4] / 2; // halfway through wall between small window and door
+            const deskEndX = cumX[4]; // start of wall between small window and door
             const deskLength = deskStartX - deskEndX;
             const deskCX = (deskStartX + deskEndX) / 2;
             const tableH = 0.04;
             const tableLegH = 0.72;
-            const tableW = 1.10; // wider depth in Z
+            const tableW = 1.30; // wider depth in Z
             const legInsetX = 0.08;
             const legInsetZ = 0.06;
             const legSize = 0.05;
