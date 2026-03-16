@@ -4301,77 +4301,59 @@ function BaseWalls({
                   1
                 ))}
 
-                {/* ── Back-wall closet (FLOW-style: solid body + door lines + narrow center door) ── */}
-                {/* Back panel (against wall) */}
-                <mesh position={[closetCX, closetH / 2 + floorThick, -halfD + wallThick + 0.02]}>
-                  <boxGeometry args={[closetWidth, closetH, 0.02]} />
-                  <meshStandardMaterial {...matProps} />
-                </mesh>
-                {/* Full-height cabinet body */}
-                <mesh position={[closetCX, closetH / 2 + floorThick, closetCZ]}>
-                  <boxGeometry args={[closetWidth, closetH, closetD]} />
-                  <meshStandardMaterial {...matProps} />
-                </mesh>
-                {/* Side panels */}
-                <mesh position={[closetLeftX, closetH / 2 + floorThick, closetCZ]}>
-                  <boxGeometry args={[0.02, closetH, closetD]} />
-                  <meshStandardMaterial {...matProps} />
-                </mesh>
-                <mesh position={[closetRightX, closetH / 2 + floorThick, closetCZ]}>
-                  <boxGeometry args={[0.02, closetH, closetD]} />
-                  <meshStandardMaterial {...matProps} />
-                </mesh>
-                {/* Narrow center door (~30cm) */}
+                {/* ── Back-wall closet (FLOW-style: back panel + body + door lines, 30cm center door) ── */}
                 {(() => {
-                  const doorW = 0.30;
-                  const doorH = closetH - 0.05;
                   const frontZ = closetCZ + closetD / 2 + 0.002;
+                  const doorW = 0.30; // narrow center door
+                  const leftSectionW = (closetWidth - doorW) / 2;
+                  const leftCX = closetLeftX + leftSectionW / 2;
+                  const rightCX = closetRightX - leftSectionW / 2;
+
                   return (
                     <>
-                      <mesh position={[closetCX, doorH / 2 + floorThick, frontZ]}>
-                        <boxGeometry args={[doorW, doorH, 0.02]} />
+                      {/* Back panel */}
+                      <mesh position={[closetCX, closetH / 2 + floorThick, -halfD + wallThick + 0.02]}>
+                        <boxGeometry args={[closetWidth, closetH, 0.02]} />
                         <meshStandardMaterial {...matProps} />
                       </mesh>
-                      {/* Door edge lines */}
-                      <mesh position={[closetCX - doorW / 2, doorH / 2 + floorThick, frontZ + 0.012]}>
-                        <boxGeometry args={[0.008, doorH - 0.02, 0.004]} />
+                      {/* Full cabinet body */}
+                      <mesh position={[closetCX, closetH / 2 + floorThick, closetCZ]}>
+                        <boxGeometry args={[closetWidth, closetH, closetD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+
+                      {/* Left section door lines */}
+                      {[1/3, 2/3].map((frac, i) => (
+                        <mesh key={`dlL${i}`} position={[closetLeftX + leftSectionW * frac, closetH / 2 + floorThick, frontZ]}>
+                          <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
+                          <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                        </mesh>
+                      ))}
+
+                      {/* Center door edge lines */}
+                      <mesh position={[closetCX - doorW / 2, closetH / 2 + floorThick, frontZ]}>
+                        <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
                         <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                       </mesh>
-                      <mesh position={[closetCX + doorW / 2, doorH / 2 + floorThick, frontZ + 0.012]}>
-                        <boxGeometry args={[0.008, doorH - 0.02, 0.004]} />
+                      <mesh position={[closetCX + doorW / 2, closetH / 2 + floorThick, frontZ]}>
+                        <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
                         <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
                       </mesh>
-                      {/* Door handle */}
-                      <mesh position={[closetCX + doorW / 2 - 0.04, doorH * 0.48 + floorThick, frontZ + 0.025]} rotation={[Math.PI / 2, 0, 0]}>
+                      {/* Center door handle */}
+                      <mesh position={[closetCX + doorW / 2 - 0.04, closetH * 0.48 + floorThick, frontZ + 0.02]} rotation={[Math.PI / 2, 0, 0]}>
                         <cylinderGeometry args={[0.008, 0.008, 0.03, 8]} />
                         <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
                       </mesh>
+
+                      {/* Right section door lines */}
+                      {[1/3, 2/3].map((frac, i) => (
+                        <mesh key={`dlR${i}`} position={[closetCX + doorW / 2 + leftSectionW * frac, closetH / 2 + floorThick, frontZ]}>
+                          <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
+                          <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                        </mesh>
+                      ))}
                     </>
                   );
-                })()}
-                {/* Left section door lines (3 doors) */}
-                {(() => {
-                  const leftW = closetCX - 0.15 - closetLeftX; // left section width
-                  const leftCX = (closetLeftX + closetCX - 0.15) / 2;
-                  const frontZ = closetCZ + closetD / 2 + 0.002;
-                  return [1/3, 2/3].map((frac, i) => (
-                    <mesh key={`dlL${i}`} position={[closetLeftX + leftW * frac, closetH / 2 + floorThick, frontZ]}>
-                      <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
-                      <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
-                    </mesh>
-                  ));
-                })()}
-                {/* Right section door lines (3 doors) */}
-                {(() => {
-                  const rightStart = closetCX + 0.15;
-                  const rightW = closetRightX - rightStart;
-                  const frontZ = closetCZ + closetD / 2 + 0.002;
-                  return [1/3, 2/3].map((frac, i) => (
-                    <mesh key={`dlR${i}`} position={[rightStart + rightW * frac, closetH / 2 + floorThick, frontZ]}>
-                      <boxGeometry args={[0.008, closetH - 0.02, 0.004]} />
-                      <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
-                    </mesh>
-                  ));
                 })()}
               </group>
             );
