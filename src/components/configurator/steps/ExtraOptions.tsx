@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Flame, Battery, Layers, Archive } from "lucide-react";
+import { Flame, Battery, Layers } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
