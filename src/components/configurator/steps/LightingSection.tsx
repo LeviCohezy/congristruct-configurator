@@ -163,7 +163,15 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
         </div>
         <Toggle
           on={packageOn}
-          onToggle={() => updateConfig("lightingPackage", packageOn ? "base" : "full")}
+          onToggle={() => {
+            if (packageOn) {
+              updateConfig("lightingPackage", "base");
+              updateConfig("keukenLedStrip", false);
+              updateConfig("kastLedStrip", false);
+            } else {
+              updateConfig("lightingPackage", "full");
+            }
+          }}
         />
       </div>
 
