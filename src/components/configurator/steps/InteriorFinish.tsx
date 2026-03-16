@@ -6,9 +6,8 @@ import { RelativePrice } from "@/components/configurator/RelativePrice";
 import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
 import darkWoodFloorTexture from "@/assets/dark-wood-floor-texture.png";
 import stoneFloorTexture from "@/assets/stone-floor-texture.png";
-import thermowoodNaturalTexture from "@/assets/thermowood-natural-texture.png";
+import darkCabinetTexture from "@/assets/dark-cabinet-texture.png";
 import lightOakTexture from "@/assets/light-oak-texture.png";
-import brickStripsTexture from "@/assets/brick-strips-texture.png";
 
 interface Props {
   config: ConfigState;
