@@ -757,6 +757,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           floorPlan={config.floorPlan}
+          hubDoorSwap={config.hubDoorSwap}
           finishLevel={config.finishLevel}
           shelfColor={config.shelfColor}
           ledStrip={config.kastLedStrip}
@@ -2885,7 +2886,7 @@ function HubWalls({
   extWallH, extWallCY,
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
-  floorPlan, finishLevel,
+  floorPlan, hubDoorSwap, finishLevel,
   shelfColor, ledStrip, lightOakTex,
 }: any) {
   const halfW = width / 2;   // 5.0
@@ -2893,10 +2894,10 @@ function HubWalls({
   const sideInset = Math.max(cornerRadius, wallThick);
   const sideFlatD = depth - sideInset * 2;
   const partT = 0.10; // 10cm partition wall
-  const hasWC = floorPlan === "b"; // Plan B = with WC
+  const hasTussenmuur = floorPlan === "b";
+  const doorSwap = !!hubDoorSwap;
 
   // Front wall segments scaled to fit the flat portion (between corner arcs)
-  // Original proportions: 0.75 | 2.00 win | 2.00 wall | 1.00 win | 1.50 wall | 1.00 win | 1.75 wall = 10.0m
   const flatW = width - cornerRadius * 2;
   const flatStartX = -halfW + cornerRadius;
   const rawSeg = [0.75, 2.00, 2.00, 1.00, 1.50, 1.00, 1.75];
@@ -2905,19 +2906,22 @@ function HubWalls({
   const cumX: number[] = [];
   let acc = flatStartX;
   for (const s of seg) { cumX.push(acc); acc += s; }
-  // cumX[i] = left edge of segment i
 
   const frontZ = halfD - wallThick / 2;
 
-  // Entrance door on left wall, 100cm wide, 45cm from front (window) wall
+  // Entrance door dimensions
   const DOOR_W = 1.0;
-  const doorCenterZ = halfD - wallThick - 0.45 - DOOR_W / 2; // 45cm from front interior wall
+  // Default door on left wall, 45cm from front
+  const doorCenterZ = halfD - wallThick - 0.45 - DOOR_W / 2;
 
-  // WC partition: 205cm long (front-to-back), 60cm wide room, against right+back wall
-  const wcWidth = 1.20; // 120cm wide WC room
-  const wcLength = 2.05; // 205cm long
-  const wcPartX = halfW - wallThick - wcWidth; // partition X position
+  // WC partition: always present, 120cm wide × 205cm long, right side
+  const wcWidth = 1.20;
+  const wcLength = 2.05;
+  const wcPartX = halfW - wallThick - wcWidth;
   const wcDoorW = 0.84;
+
+  // Tussenmuur position: middle of segment 2
+  const tussenmuurX = cumX[2] + seg[2] / 2;
 
   return (
     <group>
@@ -2943,62 +2947,93 @@ function HubWalls({
         <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
-      {/* ── Left wall (with entrance door) ── */}
+      {/* ── Left wall ── */}
       {(() => {
-        // Door: 100cm wide, 45cm from front wall, on left side wall
-        const doorBot = 0; // door starts at floor
-        const doorTop = winH; // full-height glass door
-        const doorZ1 = halfD - wallThick - 0.45 - DOOR_W; // back edge of door
-        const doorZ2 = halfD - wallThick - 0.45; // front edge of door
         const wallCenterX = -halfW + wallThick / 2;
         
-        // Section behind the door (from back wall to door back edge)
-        const backSectionD = doorZ1 - (-halfD + sideInset);
-        const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
-        
-        // Section in front of the door (from door front edge to front wall)  
-        const frontSectionD = (halfD - sideInset) - doorZ2;
-        const frontSectionZ = doorZ2 + frontSectionD / 2;
-        
-        // Above door section (full width, above door height)
-        const aboveDoorH = extWallH - doorTop - floorThick;
-        const doorMidZ = (doorZ1 + doorZ2) / 2;
-        
-        return (
-          <group>
-            {/* Wall section behind door */}
-            {backSectionD > 0 && (
-              <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
-                <boxGeometry args={[wallThick, extWallH, backSectionD]} />
-                <CladMaterial {...woodBase} wallWidth={backSectionD} />
+        if (doorSwap) {
+          // Door swapped to front: left wall has a 100cm window instead (same position as where door was)
+          const winW = 1.0;
+          const winZ1 = halfD - wallThick - 0.45 - winW;
+          const winZ2 = halfD - wallThick - 0.45;
+          const backSectionD = winZ1 - (-halfD + sideInset);
+          const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
+          const frontSectionD = (halfD - sideInset) - winZ2;
+          const frontSectionZ = winZ2 + frontSectionD / 2;
+          const winMidZ = (winZ1 + winZ2) / 2;
+          
+          return (
+            <group>
+              {backSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, backSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={backSectionD} />
+                </mesh>
+              )}
+              {frontSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+                </mesh>
+              )}
+              {/* Below window */}
+              <mesh position={[wallCenterX, (winBot + floorThick) / 2, winMidZ]} castShadow>
+                <boxGeometry args={[wallThick, winBot + floorThick, winW]} />
+                <CladMaterial {...woodBase} wallWidth={winW} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
               </mesh>
-            )}
-            {/* Wall section in front of door */}
-            {frontSectionD > 0 && (
-              <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
-                <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
-                <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+              {/* Above window */}
+              <mesh position={[wallCenterX, winTop + (height - winTop) / 2 + floorThick, winMidZ]} castShadow>
+                <boxGeometry args={[wallThick, height - winTop, winW]} />
+                <CladMaterial {...woodBase} wallWidth={winW} wallHeight={height - winTop} fullWallHeight={extWallH} />
               </mesh>
-            )}
-            {/* Wall section above door */}
-            {aboveDoorH > 0 && (
-              <mesh position={[wallCenterX, doorTop + floorThick + aboveDoorH / 2, doorMidZ]} castShadow>
-                <boxGeometry args={[wallThick, aboveDoorH, DOOR_W]} />
-                <CladMaterial {...woodBase} wallWidth={DOOR_W} />
-              </mesh>
-            )}
-            {/* Door */}
-            <DoorPane
-              posX={wallCenterX}
-              posY={winCY + floorThick}
-              width={DOOR_W}
-              height={doorTop}
-              frameColor={frameColor}
-              z={doorMidZ}
-              rotate={true}
-            />
-          </group>
-        );
+              <GlassPane posX={wallCenterX} posY={winCY + floorThick} width={winW} height={winH} frameColor={frameColor} z={winMidZ} rotate={true} />
+            </group>
+          );
+        } else {
+          // Default: entrance door on left wall
+          const doorBot = 0;
+          const doorTop = winH;
+          const doorZ1 = halfD - wallThick - 0.45 - DOOR_W;
+          const doorZ2 = halfD - wallThick - 0.45;
+          const backSectionD = doorZ1 - (-halfD + sideInset);
+          const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
+          const frontSectionD = (halfD - sideInset) - doorZ2;
+          const frontSectionZ = doorZ2 + frontSectionD / 2;
+          const aboveDoorH = extWallH - doorTop - floorThick;
+          const doorMidZ = (doorZ1 + doorZ2) / 2;
+          
+          return (
+            <group>
+              {backSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, backSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={backSectionD} />
+                </mesh>
+              )}
+              {frontSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+                </mesh>
+              )}
+              {aboveDoorH > 0 && (
+                <mesh position={[wallCenterX, doorTop + floorThick + aboveDoorH / 2, doorMidZ]} castShadow>
+                  <boxGeometry args={[wallThick, aboveDoorH, DOOR_W]} />
+                  <CladMaterial {...woodBase} wallWidth={DOOR_W} />
+                </mesh>
+              )}
+              <DoorPane
+                posX={wallCenterX}
+                posY={winCY + floorThick}
+                width={DOOR_W}
+                height={doorTop}
+                frameColor={frameColor}
+                z={doorMidZ}
+                rotate={true}
+              />
+            </group>
+          );
+        }
       })()}
 
       {/* ── Front facade ── */}
@@ -3026,16 +3061,36 @@ function HubWalls({
           <CladMaterial {...woodBase} wallWidth={seg[2]} />
         </mesh>
 
-        {/* Segment 3: 100cm window */}
-        <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
-          <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
-        </mesh>
-        <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
-          <boxGeometry args={[seg[3], height - winTop, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
-        </mesh>
-        <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+        {/* Segment 3: 100cm — window OR door (if doorSwap) */}
+        {doorSwap ? (
+          <>
+            {/* Door at segment 3 position */}
+            <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+              <boxGeometry args={[seg[3], height - winTop, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+            </mesh>
+            <DoorPane
+              posX={cumX[3] + seg[3] / 2}
+              posY={winCY + floorThick}
+              width={seg[3]}
+              height={winH}
+              frameColor={frameColor}
+              z={0}
+            />
+          </>
+        ) : (
+          <>
+            <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+              <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+            </mesh>
+            <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+              <boxGeometry args={[seg[3], height - winTop, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+            </mesh>
+            <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+          </>
+        )}
 
         {/* Segment 4: 150cm solid wall */}
         <mesh position={[cumX[4] + seg[4] / 2, extWallCY, 0]} castShadow>
@@ -3062,15 +3117,16 @@ function HubWalls({
       </group>
 
       {/* Interior front wall faces — only behind solid segments (not windows) */}
-      {[0, 2, 4, 6].map((i) => (
+      {/* When doorSwap, segment 3 becomes a door (still needs interior face for above-door area) */}
+      {[0, 2, 4, 6, ...(doorSwap ? [3] : [])].map((i) => (
         <mesh key={`ifw${i}`} position={[cumX[i] + seg[i] / 2, height / 2 + floorThick, halfD - wallThick - 0.01]}>
           <boxGeometry args={[seg[i], height, 0.01]} />
           <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
         </mesh>
       ))}
 
-      {/* ── WC partition (Plan A only) ── */}
-      {hasWC && (
+      {/* ── WC partition (always present) ── */}
+      {(
         <group>
           {/* Vertical partition wall running front-to-back, 205cm long from back wall */}
           <mesh position={[wcPartX, height / 2 + floorThick, -halfD + wallThick + wcLength / 2]}>
@@ -3162,6 +3218,72 @@ function HubWalls({
         </group>
       )}
 
+      {/* ── Tussenmuur (Plan B only) ── */}
+      {hasTussenmuur && (() => {
+        // Partition wall across the full depth at tussenmuurX (middle of segment 2)
+        const tmDoorW = 0.84; // 84cm door
+        const tmDoorH = 2.1;
+        // Door positioned 45cm from the front wall (glass side)
+        const tmDoorCZ = halfD - wallThick - 0.45 - tmDoorW / 2;
+        const tmDoorZ1 = halfD - wallThick - 0.45 - tmDoorW; // back edge
+        const tmDoorZ2 = halfD - wallThick - 0.45; // front edge
+
+        // Wall segments: back section, door gap, front section
+        const wallBackZ = -halfD + wallThick;
+        const wallFrontZ = halfD - wallThick;
+        const backSegD = tmDoorZ1 - wallBackZ;
+        const frontSegD = wallFrontZ - tmDoorZ2;
+
+        return (
+          <group>
+            {/* Back wall section (from back wall to door) */}
+            {backSegD > 0.01 && (
+              <mesh position={[tussenmuurX, height / 2 + floorThick, wallBackZ + backSegD / 2]}>
+                <boxGeometry args={[partT, height, backSegD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Front wall section (from door to front wall) */}
+            {frontSegD > 0.01 && (
+              <mesh position={[tussenmuurX, height / 2 + floorThick, tmDoorZ2 + frontSegD / 2]}>
+                <boxGeometry args={[partT, height, frontSegD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Header above door */}
+            <mesh position={[tussenmuurX, tmDoorH + (height - tmDoorH) / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[partT, height - tmDoorH, tmDoorW]} />
+              <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+            </mesh>
+            {/* White door panel with black frame */}
+            <mesh position={[tussenmuurX - tmDoorW / 2 - 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX + tmDoorW / 2 + 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX, tmDoorH + floorThick + 0.015, tmDoorCZ]}>
+              <boxGeometry args={[tmDoorW + 0.06, 0.03, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[tmDoorW - 0.04, tmDoorH - 0.02, 0.035]} />
+              <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
+            </mesh>
+            {/* Handle */}
+            <mesh
+              position={[tussenmuurX - 0.04, tmDoorH * 0.48 + floorThick, tmDoorCZ + 0.04]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
+              <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+              <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+            </mesh>
+          </group>
+        );
+      })()}
+
       {/* Interior left wall — split around door opening */}
       {(() => {
         const ilX = -halfW + wallThick + 0.01;
@@ -3233,7 +3355,7 @@ function HubWalls({
         );
       })()}
 
-      {finishLevel === "fully-finished" && hasWC && (() => {
+      {finishLevel === "fully-finished" && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
