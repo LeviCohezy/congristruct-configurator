@@ -534,17 +534,22 @@ export function WindowsPlan({ config, updateConfig }: Props) {
             <p className="text-xs text-muted-foreground">Vervang vast raam door draai-kiepraam · +€450</p>
           </div>
           <button
-            onClick={() => updateConfig("tiltTurnWindow", !config.tiltTurnWindow)}
-            className={cn(
-              "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
-              config.tiltTurnWindow ? "bg-accent" : "bg-muted"
-            )}
-          >
-            <span className={cn(
-              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
-              config.tiltTurnWindow ? "translate-x-5" : "translate-x-0"
-            )} />
-          </button>
+          <div className="flex gap-1.5 ml-3">
+            {([0, 1, 2] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => updateConfig("tiltTurnWindow", v)}
+                className={cn(
+                  "w-9 h-9 rounded-lg text-sm font-medium transition-all duration-150 border",
+                  config.tiltTurnWindow === v
+                    ? "bg-accent text-accent-foreground border-accent"
+                    : "bg-secondary text-foreground border-border hover:border-accent/40"
+                )}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Mirror toggle */}

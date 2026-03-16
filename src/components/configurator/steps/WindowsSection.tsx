@@ -25,7 +25,8 @@ export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
           <div>
             <p className="text-sm font-medium">Kiepraam</p>
             <p className="text-xs text-muted-foreground">Upgrade naar kiepramen voor betere ventilatie</p>
-            <BlurredPrice text="150" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" suffix="/stuk" />
+            <BlurredPrice text="150" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
+            <span className="text-xs text-muted-foreground">/stuk</span>
           </div>
           <div className="flex gap-1.5 ml-3">
             {countOptions.map((o) => (
