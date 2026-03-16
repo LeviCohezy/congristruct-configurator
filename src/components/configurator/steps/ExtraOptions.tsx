@@ -22,9 +22,6 @@ const getExtras = (model: string, floorPlan: string) => {
     { key: "solarBattery", label: "Solar batterij", icon: Battery, price: "4.500", desc: "Energieopslag" },
     { key: "insulation", label: "Houtvezelplaat isolatie", icon: Layers, price: isHub ? "1.145" : model === "flow" ? "1.450" : "900", desc: "Extra isolatie met houtvezelplaat" },
   );
-  if (isHub && floorPlan === "b") {
-    extras.push({ key: "extraCloset", label: "Extra 6-deurs kast", icon: Archive, price: "4.000", desc: "Grote kast achter bureau in de grote kamer" });
-  }
   return extras;
 };
 
