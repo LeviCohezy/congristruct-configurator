@@ -182,7 +182,7 @@ export function useConfigurator() {
     }
 
     if (config.roundedCorners) price += 1500;
-    if (config.tiltTurnWindow) price += (windowPriceByModel[m] ?? 180);
+    if (config.tiltTurnWindow > 0) price += config.tiltTurnWindow * 150;
 
     // Lighting
     if (config.lightingPackage === "full") {
