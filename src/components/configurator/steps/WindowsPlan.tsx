@@ -67,17 +67,36 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
 }
 
 /* ── HUB model: 1000×350cm ────────────────────────────────────────── */
-function HubPlanSVG({ plan, mirrored, wallColor, winColor }: {
-  plan: "a" | "b"; mirrored: boolean; wallColor: string; winColor: string;
+function HubPlanSVG({ plan, mirrored, wallColor, winColor, doorSwap }: {
+  plan: "a" | "b"; mirrored: boolean; wallColor: string; winColor: string; doorSwap?: boolean;
 }) {
   // Scale: 1000cm → 500 SVG, 350cm → 175 SVG (÷2)
   const vw = 500;
   const vh = 175;
-  const wt = 9; // wall thickness
+  const wt = 9;
+  const iw = 5; // internal wall thickness
   const transform = mirrored ? `scale(-1,1) translate(${-vw},0)` : undefined;
+  const hasTussenmuur = plan === "b";
 
   // Front wall segments (cm/2): 37.5 | 100 win | 100 wall | 50 win | 75 wall | 50 win | 87.5 wall
-  const hasWC = plan === "a";
+  // Segment positions
+  const seg0End = 37.5;       // wall
+  const seg1End = 137.5;      // window (200cm)
+  const seg2End = 237.5;      // wall (200cm)
+  const seg3End = 287.5;      // window (100cm) — can swap with door
+  const seg4End = 362.5;      // wall (150cm)
+  const seg5End = 412.5;      // window (100cm)
+  const seg6End = 500;         // wall (175cm)
+
+  // WC enclosure: always present, right side, 120cm wide × 205cm long
+  const wcPartX = seg6End - wt - 60; // 120cm/2 = 60 from right inner wall
+  const wcLength = 102.5; // 205cm/2
+
+  // Tussenmuur position: middle of segment 2 (the 200cm wall between big window and first small window)
+  const tussenmuurX = (seg1End + seg2End) / 2; // = 187.5
+
+  // Door position: default on left wall, or swapped to segment 3 window position
+  const doorOnFront = doorSwap;
 
   return (
     <svg viewBox={`0 0 ${vw} ${vh}`} className="w-full h-auto" style={{ maxHeight: 100 }}>
@@ -85,44 +104,84 @@ function HubPlanSVG({ plan, mirrored, wallColor, winColor }: {
         {/* Outer walls */}
         <rect x={0} y={0} width={vw} height={vh} fill="none" stroke={wallColor} strokeWidth={wt} rx={1} opacity={0.7} />
 
-        {/* Front windows (bottom wall) */}
-        {/* Window 1: 75–275cm → 37.5–137.5 SVG */}
-        <line x1={37.5} y1={vh} x2={137.5} y2={vh} stroke={winColor} strokeWidth={4} />
-        {/* Window 2: 475–575cm → 237.5–287.5 SVG */}
-        <line x1={237.5} y1={vh} x2={287.5} y2={vh} stroke={winColor} strokeWidth={4} />
-        {/* Window 3: 625–725cm → 312.5–362.5 SVG (adjusted from 725-825) */}
-        <line x1={312.5} y1={vh} x2={362.5} y2={vh} stroke={winColor} strokeWidth={4} />
+        {/* Front windows */}
+        {/* Window 1: 200cm (segment 1) */}
+        <line x1={seg0End} y1={vh} x2={seg1End} y2={vh} stroke={winColor} strokeWidth={4} />
 
-        {/* Entrance door on left wall */}
-        <rect x={0} y={vh - wt - 60} width={wt} height={50} fill={winColor} opacity={0.4} />
-        {/* Door swing arc */}
-        <path d={`M ${wt} ${vh - wt - 10} A 50 50 0 0 0 ${wt + 50} ${vh - wt - 60}`} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.4} />
-
-        {hasWC && (
+        {/* Segment 3 position: window OR door depending on swap */}
+        {doorOnFront ? (
           <>
-            {/* WC partition at x=412.5 (825cm/2) */}
-            <line x1={412.5} y1={wt} x2={412.5} y2={vh - wt} stroke={wallColor} strokeWidth={5} opacity={0.6} />
-            {/* WC door */}
-            <rect x={412.5 - 2} y={vh * 0.35} width={5} height={25} fill={winColor} opacity={0.3} />
-            {/* Toilet icon */}
-            <rect x={vw - wt - 20} y={wt + 15} width={14} height={18} rx={3} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
-            {/* Sink icon */}
-            <rect x={vw - wt - 18} y={vh - wt - 25} width={10} height={10} rx={2} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
+            {/* Door at segment 3 position */}
+            <rect x={seg2End} y={vh - wt} width={seg3End - seg2End} height={wt} fill={winColor} opacity={0.4} />
+            <path d={`M ${seg2End} ${vh - wt} A ${seg3End - seg2End} ${seg3End - seg2End} 0 0 0 ${seg3End} ${vh - wt - (seg3End - seg2End)}`}
+              fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.35} />
+          </>
+        ) : (
+          /* Window at segment 3 */
+          <line x1={seg2End} y1={vh} x2={seg3End} y2={vh} stroke={winColor} strokeWidth={4} />
+        )}
+
+        {/* Window 3: segment 5 */}
+        <line x1={seg4End} y1={vh} x2={seg5End} y2={vh} stroke={winColor} strokeWidth={4} />
+
+        {/* Left wall: door OR window depending on swap */}
+        {doorOnFront ? (
+          <>
+            {/* Window on left wall (swapped from segment 3: 100cm = 50 SVG) */}
+            <rect x={0} y={vh - wt - 72.5} width={wt} height={50} fill="hsl(var(--background))" />
+            <line x1={wt / 2} y1={vh - wt - 72.5} x2={wt / 2} y2={vh - wt - 22.5} stroke={winColor} strokeWidth={2.5} />
+          </>
+        ) : (
+          <>
+            {/* Entrance door on left wall, 45cm from front */}
+            <rect x={0} y={vh - wt - 60} width={wt} height={50} fill={winColor} opacity={0.4} />
+            <path d={`M ${wt} ${vh - wt - 10} A 50 50 0 0 0 ${wt + 50} ${vh - wt - 60}`} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.4} />
           </>
         )}
 
-        {/* Meeting table (centered) */}
-        <rect x={hasWC ? 140 : 170} y={vh / 2 - 25} width={hasWC ? 180 : 160} height={50} rx={3} fill="none" stroke={wallColor} strokeWidth={1.2} opacity={0.3} />
-        {/* Chairs (3 per side) */}
-        {[0, 1, 2].map(i => {
-          const cx = (hasWC ? 170 : 200) + i * (hasWC ? 60 : 50);
+        {/* WC enclosure: always present */}
+        {/* Vertical partition */}
+        <line x1={wcPartX} y1={wt} x2={wcPartX} y2={wt + wcLength} stroke={wallColor} strokeWidth={iw} opacity={0.6} />
+        {/* Horizontal closing wall */}
+        <line x1={wcPartX} y1={wt + wcLength} x2={vw - wt} y2={wt + wcLength} stroke={wallColor} strokeWidth={iw} opacity={0.6} />
+        {/* WC door */}
+        <rect x={wcPartX - 2} y={wt + wcLength * 0.55} width={iw} height={25} fill="hsl(var(--background))" />
+        {/* Toilet icon */}
+        <rect x={vw - wt - 20} y={wt + 15} width={14} height={18} rx={3} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
+        {/* Sink icon */}
+        <rect x={wcPartX + 8} y={wt + wcLength - 20} width={10} height={10} rx={2} fill="none" stroke={wallColor} strokeWidth={1} opacity={0.35} />
+
+        {/* Tussenmuur (Plan B only) */}
+        {hasTussenmuur && (
+          <>
+            {/* Partition wall across the width at tussenmuurX */}
+            <line x1={tussenmuurX} y1={wt} x2={tussenmuurX} y2={vh - wt} stroke={wallColor} strokeWidth={iw} opacity={0.6} />
+            {/* Door in tussenmuur: 45cm from front wall (bottom), 84cm door = 42 SVG */}
+            <rect x={tussenmuurX - 2} y={vh - wt - 22.5 - 42} width={iw} height={42} fill="hsl(var(--background))" />
+            <path d={`M ${tussenmuurX - iw / 2} ${vh - wt - 22.5} A 42 42 0 0 0 ${tussenmuurX - iw / 2 - 42} ${vh - wt - 22.5 - 42}`}
+              fill="none" stroke={wallColor} strokeWidth={0.6} opacity={0.25} />
+          </>
+        )}
+
+        {/* Meeting table (centered in main room area) */}
+        {(() => {
+          const tableLeft = hasTussenmuur ? wt + 10 : 140;
+          const tableW = hasTussenmuur ? tussenmuurX - wt - 20 : 180;
           return (
-            <g key={i}>
-              <circle cx={cx} cy={vh / 2 - 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
-              <circle cx={cx} cy={vh / 2 + 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
-            </g>
+            <>
+              <rect x={tableLeft} y={vh / 2 - 25} width={tableW} height={50} rx={3} fill="none" stroke={wallColor} strokeWidth={1.2} opacity={0.3} />
+              {[0, 1, 2].map(i => {
+                const cx = tableLeft + 30 + i * (tableW - 60) / 2;
+                return (
+                  <g key={i}>
+                    <circle cx={cx} cy={vh / 2 - 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
+                    <circle cx={cx} cy={vh / 2 + 35} r={6} fill="none" stroke={wallColor} strokeWidth={0.8} opacity={0.25} />
+                  </g>
+                );
+              })}
+            </>
           );
-        })}
+        })()}
       </g>
     </svg>
   );
