@@ -3418,14 +3418,9 @@ function HubWalls({
 
         return (
           <group>
-            {/* Back panel on WC partition */}
+            {/* Back panel on WC partition (full width for border section) */}
             <mesh position={[kitchenBackX, height / 2 + floorThick, kitchenCZ]}>
               <boxGeometry args={[0.04, height, kitchenW]} />
-              <meshStandardMaterial {...matProps} />
-            </mesh>
-            {/* Back panel full height (only open section) */}
-            <mesh position={[kitchenBackX, height / 2 + floorThick, kitchenOpenCZ]}>
-              <boxGeometry args={[0.04, height, kitchenOpenW]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Side panel — back wall side */}
@@ -3433,7 +3428,7 @@ function HubWalls({
               <boxGeometry args={[kitchenD, height, 0.02]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Side panel — front side (40cm closed border where closet meets kitchen) */}
+            {/* Side panel — front side */}
             <mesh position={[kitchenCX, height / 2 + floorThick, kitchenEndZ + 0.01]}>
               <boxGeometry args={[kitchenD, height, 0.02]} />
               <meshStandardMaterial {...matProps} />
@@ -3451,19 +3446,19 @@ function HubWalls({
               <boxGeometry args={[kitchenD, upperH, 0.40]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Lower cabinet */}
-            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD, counterH, kitchenW]} />
+            {/* Lower cabinet (open section) */}
+            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD, counterH, kitchenOpenW]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Countertop */}
+            {/* Countertop (full width) */}
             <mesh position={[kitchenCX, counterH + 0.015 + floorThick, kitchenCZ]}>
               <boxGeometry args={[kitchenD + 0.02, 0.03, kitchenW + 0.02]} />
               <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
-            {/* Upper cabinet */}
-            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD, upperH, kitchenW]} />
+            {/* Upper cabinet (open section) */}
+            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD, upperH, kitchenOpenW]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Open niche back panel */}
