@@ -776,6 +776,9 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           osbTex={osbTex} isShell={isShell}
           floorPlan={config.floorPlan}
           finishLevel={config.finishLevel}
+          shelfColor={config.shelfColor}
+          ledStrip={config.kastLedStrip}
+          lightOakTex={lightOakTex}
         />
       ) : (
         <GenericWalls
