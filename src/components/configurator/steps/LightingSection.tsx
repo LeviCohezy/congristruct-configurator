@@ -118,6 +118,9 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const hasToilet = config.floorPlan === "b";
   const [flickerCard, setFlickerCard] = useState(false);
 
+  const keukenPrice = isFlow ? "150" : "350";
+  const kastPrice = isFlow ? "530" : "300";
+
   const handleDisabledClick = () => {
     setFlickerCard(true);
     setTimeout(() => setFlickerCard(false), 1500);
