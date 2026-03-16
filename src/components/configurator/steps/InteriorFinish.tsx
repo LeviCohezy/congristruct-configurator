@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
-import { BlurredPrice } from "@/components/configurator/BlurredPrice";
+import { RelativePrice } from "@/components/configurator/RelativePrice";
 
 import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
 import darkWoodFloorTexture from "@/assets/dark-wood-floor-texture.png";
@@ -16,15 +16,15 @@ interface Props {
   onPriceClick?: () => void;
 }
 
-const finishPricesDisplay: Record<string, Record<string, string>> = {
-  start: { shell: "", finished: "3.780", "fully-finished": "7.500" },
-  flow:  { shell: "", finished: "6.600", "fully-finished": "16.180" },
+const finishPrices: Record<string, Record<string, number>> = {
+  start: { shell: 0, finished: 3780, "fully-finished": 7500 },
+  flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
 };
 
 const finishLevels = [
-  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking", price: "inbegrepen" },
-  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting", price: "" },
-  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten", price: "" },
+  { id: "shell" as const, label: "Casco (OSB)", desc: "Basisafwerking in OSB, klaar voor verdere afwerking" },
+  { id: "finished" as const, label: "Instapklaar", desc: "Volledig afgewerkt, maar zonder meubelinrichting" },
+  { id: "fully-finished" as const, label: "Volledig ingericht", desc: "Afgewerkt én ingericht met bureau en kasten" },
 ];
 
 const floorOptions = [
@@ -33,9 +33,9 @@ const floorOptions = [
   { id: "stone-vinyl" as const, label: "Steenlook", texture: stoneFloorTexture },
 ];
 
-const shelfPricesDisplay: Record<string, Record<string, string>> = {
-  start: { brown: "160", "light-oak": "141", white: "" },
-  flow:  { brown: "330", "light-oak": "260", white: "" },
+const shelfPrices: Record<string, Record<string, number>> = {
+  start: { brown: 160, "light-oak": 141, white: 0 },
+  flow:  { brown: 330, "light-oak": 260, white: 0 },
 };
 
 const shelfColors = [
@@ -49,8 +49,8 @@ const showFurnished = (level: ConfigState["finishLevel"]) => level === "fully-fi
 
 export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
   const m = config.model;
-  const fPrices = finishPricesDisplay[m] ?? finishPricesDisplay.start;
-  const sPrices = shelfPricesDisplay[m] ?? shelfPricesDisplay.start;
+  const fPrices = finishPrices[m] ?? finishPrices.start;
+  const sPrices = shelfPrices[m] ?? shelfPrices.start;
 
   return (
     <div className="config-section">
@@ -58,9 +58,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
       <p className="text-sm text-muted-foreground mb-5">Kies je afwerkingsniveau</p>
 
       <div className="grid gap-6">
-        {finishLevels.map((f) => {
-          const priceNum = fPrices[f.id] ?? "";
-          return (
+        {finishLevels.map((f) => (
           <button
             key={f.id}
             onClick={() => updateConfig("finishLevel", f.id)}
@@ -71,15 +69,17 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                 <p className="font-medium">{f.label}</p>
                 <p className="text-sm text-muted-foreground">{f.desc}</p>
               </div>
-              {priceNum ? (
-                <BlurredPrice text={priceNum} revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium shrink-0 ml-3" prefix="+€" />
-              ) : (
-                <p className="text-sm font-medium shrink-0 ml-3">{f.price || "inbegrepen"}</p>
-              )}
+              <RelativePrice
+                prices={fPrices}
+                selected={config.finishLevel}
+                optionId={f.id}
+                revealed={config.priceRevealed}
+                onPriceClick={onPriceClick}
+                className="text-sm font-medium shrink-0 ml-3"
+              />
             </div>
           </button>
-          );
-        })}
+        ))}
       </div>
 
       {/* Floor option */}
@@ -125,9 +125,7 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
               <div>
                 <p className="config-label mb-4">Kleur kasten & legplanken</p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {shelfColors.map((c) => {
-                    const sp = sPrices[c.id] ?? "";
-                    return (
+                  {shelfColors.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => updateConfig("shelfColor", c.id)}
@@ -135,14 +133,16 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                     >
                       <div className="w-full h-10 rounded-lg mb-2 border border-border bg-cover bg-center" style={{ backgroundImage: `url(${c.texture})` }} />
                       <p className="text-xs font-medium">{c.label}</p>
-                      {sp ? (
-                        <BlurredPrice text={sp} revealed={config.priceRevealed} onClick={onPriceClick} className="text-[10px] font-medium text-accent mt-0.5" prefix="+€" />
-                      ) : (
-                        <p className="text-[10px] font-medium text-muted-foreground mt-0.5">inbegrepen</p>
-                      )}
+                      <RelativePrice
+                        prices={sPrices}
+                        selected={config.shelfColor}
+                        optionId={c.id}
+                        revealed={config.priceRevealed}
+                        onPriceClick={onPriceClick}
+                        className="text-[10px] font-medium mt-0.5"
+                      />
                     </button>
-                    );
-                  })}
+                  ))}
                 </div>
               </div>
             </div>
