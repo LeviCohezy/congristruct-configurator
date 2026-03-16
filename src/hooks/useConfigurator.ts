@@ -82,7 +82,7 @@ const defaultConfig: ConfigState = {
   keukenLedStrip: false,
   kastLedStrip: false,
   lightingPackage: "base",
-  extraCloset: true,
+  extraCloset: false,
   heatPump: false,
   extraHeatPump: false,
   solarBattery: false,
