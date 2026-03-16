@@ -3237,7 +3237,7 @@ function HubWalls({
         );
       })()}
 
-      {finishLevel === "fully-finished" && hasWC && (() => {
+      {finishLevel === "fully-finished" && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const matProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
 
