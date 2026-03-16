@@ -3125,7 +3125,7 @@ function HubWalls({
       ))}
 
       {/* ── WC partition (always present) ── */}
-      {true && (
+      {(
         <group>
           {/* Vertical partition wall running front-to-back, 205cm long from back wall */}
           <mesh position={[wcPartX, height / 2 + floorThick, -halfD + wallThick + wcLength / 2]}>
