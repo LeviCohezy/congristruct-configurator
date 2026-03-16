@@ -4011,11 +4011,7 @@ function BaseWalls({
             <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
           </mesh>
 
-          {/* Horizontal wall between tech room and WC */}
-          <mesh position={[(blockLeftX + blockRightX) / 2, height / 2 + floorThick, techBottomZ]}>
-            <boxGeometry args={[blockWidth, height, partT]} />
-            <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
-          </mesh>
+          {/* Horizontal wall between tech room and WC is rendered as part of the tech room door section below */}
 
           {/* Horizontal wall at bottom of WC (inkom boundary) — with door opening */}
           {(() => {
