@@ -2917,7 +2917,7 @@ function HubWalls({
   const wcWidth = 1.20; // 120cm wide WC room
   const wcLength = 2.05; // 205cm long
   const wcPartX = halfW - wallThick - wcWidth; // partition X position
-  const wcDoorW = 0.64;
+  const wcDoorW = 0.84;
 
   return (
     <group>
