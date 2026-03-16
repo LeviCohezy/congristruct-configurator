@@ -150,9 +150,9 @@ function RalColorSlider({ value, onChange }: { value: string; onChange: (hex: st
 }
 
 
-  export function ExteriorFacade({ config, updateConfig }: Props) {
+export function ExteriorFacade({ config, updateConfig }: Props) {
+  const [expandedFamily, setExpandedFamily] = useState(() => getActiveFamily(config.facade));
 
-  const selectFamily = (family: MaterialFamily) => {
     setExpandedFamily(family.id);
     if (config.facade !== family.facadeId) {
       updateConfig("facade", family.facadeId);
