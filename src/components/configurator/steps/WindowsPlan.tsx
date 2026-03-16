@@ -29,7 +29,7 @@ const planOptions: Record<ConfigState["model"], { a: { label: string; desc: stri
 };
 
 /* ── Inline SVG floorplan diagrams ─────────────────────────────────── */
-function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; plan: "a" | "b"; mirrored: boolean }) {
+function FloorPlanSVG({ model, plan, mirrored, hubDoorSwap }: { model: ConfigState["model"]; plan: "a" | "b"; mirrored: boolean; hubDoorSwap?: boolean }) {
   const wallColor = "hsl(var(--foreground))";
   const winColor = "hsl(var(--accent))";
 
@@ -40,7 +40,7 @@ function FloorPlanSVG({ model, plan, mirrored }: { model: ConfigState["model"]; 
     return <FlowPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
   }
   if (model === "hub") {
-    return <HubPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} />;
+    return <HubPlanSVG plan={plan} mirrored={mirrored} wallColor={wallColor} winColor={winColor} doorSwap={hubDoorSwap} />;
   }
 
   // Generic fallback for other models
