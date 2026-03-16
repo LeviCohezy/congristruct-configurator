@@ -150,6 +150,7 @@ export function useConfigurator() {
   const [config, setConfig] = useState<ConfigState>(defaultConfig);
   const prevPriceRef = useRef<number | null>(null);
   const [priceJustIncreased, setPriceJustIncreased] = useState(false);
+  const [priceJustDecreased, setPriceJustDecreased] = useState(false);
 
   const updateConfig = useCallback(<K extends keyof ConfigState>(key: K, value: ConfigState[K]) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
