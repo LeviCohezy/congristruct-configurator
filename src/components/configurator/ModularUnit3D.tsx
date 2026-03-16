@@ -4316,9 +4316,29 @@ function BaseWalls({
                         <boxGeometry args={[closetWidth, closetH, 0.02]} />
                         <meshStandardMaterial {...matProps} />
                       </mesh>
-                      {/* Full cabinet body */}
+                      {/* Left side panel */}
+                      <mesh position={[closetLeftX, closetH / 2 + floorThick, closetCZ]}>
+                        <boxGeometry args={[0.02, closetH, closetD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Right side panel */}
+                      <mesh position={[closetRightX, closetH / 2 + floorThick, closetCZ]}>
+                        <boxGeometry args={[0.02, closetH, closetD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Top panel */}
+                      <mesh position={[closetCX, closetH + floorThick, closetCZ]}>
+                        <boxGeometry args={[closetWidth, 0.02, closetD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Bottom panel */}
+                      <mesh position={[closetCX, floorThick, closetCZ]}>
+                        <boxGeometry args={[closetWidth, 0.02, closetD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Center divider (behind the 30cm door) */}
                       <mesh position={[closetCX, closetH / 2 + floorThick, closetCZ]}>
-                        <boxGeometry args={[closetWidth, closetH, closetD]} />
+                        <boxGeometry args={[0.02, closetH, closetD]} />
                         <meshStandardMaterial {...matProps} />
                       </mesh>
 
