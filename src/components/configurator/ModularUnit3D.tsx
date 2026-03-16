@@ -3580,8 +3580,8 @@ function HubWalls({
           const smallRoomBackZ = -halfD + wallThick;
           const smallDeskCZ = (smallRoomFrontZ + smallRoomBackZ) / 2;
 
-          // Chair offset: 50% under table
-          const chairUnderOffset = tableW / 2 - chairSeatD * 0.5;
+          // Chair offset: pulled back a bit more from table
+          const chairUnderOffset = tableW / 2 - chairSeatD * 0.3;
 
           // ── BIG ROOM (right of tussenmuur) ──
           // Table against tussenmuur, same length as small room table
