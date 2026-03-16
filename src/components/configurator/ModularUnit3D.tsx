@@ -1533,8 +1533,8 @@ function FlowAWalls({
   const partX = halfW - wallThick - toiletStripW; // vertical partition x
   const toiletWallZ = -halfD + wallThick + toiletDepth; // horizontal wall z
 
-  // Toilet door: 70cm = 0.70m, on the LEFT wall (vertical partition) of toilet room
-  const toiletDoorW = 0.70;
+  // Toilet door: 84cm wide (same as BLOQ Flow interior doors)
+  const toiletDoorW = 0.84;
   const toiletDoorH = 2.1;
   // Door positioned in the vertical partition, centered vertically in the toilet room
   const toiletDoorCZ = -halfD + wallThick + toiletDepth * 0.5; // center of toilet depth
