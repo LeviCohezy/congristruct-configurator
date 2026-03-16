@@ -98,7 +98,7 @@ function RalSwatchPicker({ value, onChange }: { value: string; onChange: (hex: s
     <motion.div
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
-      className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
+      className="mt-2 p-3 rounded-lg border border-border bg-card/50"
     >
       {/* Selected color display */}
       <div className="flex items-center gap-3 mb-3">
