@@ -3516,26 +3516,14 @@ function HubWalls({
         );
       })()}
 
-      {/* ── BIG TABLE (fully-finished) ── */}
+      {/* ── TABLES & CHAIRS (fully-finished) ── */}
       {finishLevel === "fully-finished" && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const tableMatProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
+        // Desk color: 30% less white → warm light grey
+        const deskColor = "#d5d5d0";
+        const deskMatProps = { color: deskColor, roughness: 0.3, metalness: 0.05 };
 
-        // Table runs from middle of big window (seg[1]) to start of last window (seg[5])
-        const tableStartX = cumX[1] + seg[1] / 2;
-        const tableEndX = cumX[5];
-        const tableLength = tableEndX - tableStartX;
-        const tableCenterX = (tableStartX + tableEndX) / 2;
-
-        const tableW = 1.35; // 135cm wide (90 + 50%)
-        const tableH = 0.04; // 4cm thick top
-        const tableLegH = 0.72; // 72cm leg height (total table height ~76cm)
-        const tableCenterZ = 0; // centered in room
-        const legInsetX = 0.08;
-        const legInsetZ = 0.06;
-        const legSize = 0.05;
-
-        // Chair dimensions — original size
         const chairSeatW = 0.42;
         const chairSeatD = 0.40;
         const chairSeatH = 0.02;
@@ -3543,9 +3531,161 @@ function HubWalls({
         const chairLegSize = 0.03;
         const chairBackH = 0.36;
         const chairBackThick = 0.02;
-        const chairOffset = tableW / 2 + chairSeatD / 2 + 0.08;
 
-        // Staggered: front side at positions 1,3,5 and back side at positions 2,4,6
+        // Helper: render a simple wooden chair facing +Z (backrest at -Z)
+        const renderSimpleChair = (cx: number, cz: number, faceZ: number) => {
+          const flip = faceZ < 0 ? -1 : 1;
+          return (
+            <group position={[cx, 0, cz]}>
+              <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
+                <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
+                <meshStandardMaterial {...tableMatProps} />
+              </mesh>
+              {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
+                <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
+                  <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
+                  <meshStandardMaterial {...tableMatProps} />
+                </mesh>
+              ))}
+              <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, flip * (-chairSeatD/2 + chairBackThick/2)]}>
+                <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
+                <meshStandardMaterial {...tableMatProps} />
+              </mesh>
+            </group>
+          );
+        };
+
+        if (hasTussenmuur) {
+          // ── Plan B: two separate desks in small & big rooms ──
+
+          const tableH = 0.04;
+          const tableLegH = 0.72;
+          const tableW = 1.20; // depth of desk (Z direction)
+          const legInsetX = 0.08;
+          const legInsetZ = 0.06;
+          const legSize = 0.05;
+
+          // Tussenmuur door front edge (window side)
+          const tmDoorW2 = 0.84;
+          const tmDoorZ2 = halfD - wallThick - 0.45;
+
+          // ── SMALL ROOM (left of tussenmuur) ──
+          // Desk runs from tussenmuur toward left, ending just before start of big window
+          const smallDeskStartX = tussenmuurX - partT / 2; // at tussenmuur
+          const smallDeskEndX = cumX[1] + 0.05; // just past start of big window
+          const smallDeskLength = smallDeskStartX - smallDeskEndX;
+          const smallDeskCX = (smallDeskStartX + smallDeskEndX) / 2;
+          // Centered in room Z
+          const smallRoomFrontZ = halfD - wallThick;
+          const smallRoomBackZ = -halfD + wallThick;
+          const smallDeskCZ = (smallRoomFrontZ + smallRoomBackZ) / 2;
+
+          // Chair offset: 50% under table
+          const chairUnderOffset = tableW / 2 - chairSeatD * 0.5;
+
+          // ── BIG ROOM (right of tussenmuur) ──
+          // Table against tussenmuur, same length as small room table
+          const bigDeskStartX = tussenmuurX + partT / 2;
+          const bigDeskEndX = bigDeskStartX + smallDeskLength;
+          const bigDeskCX = (bigDeskStartX + bigDeskEndX) / 2;
+          // Table +Z edge aligns with door border (tmDoorZ2)
+          const bigDeskCZ = tmDoorZ2 - tableW / 2;
+
+          // Closet behind table (toward back wall), 60cm longer than table
+          const closetLength = smallDeskLength + 0.60;
+          const closetD2 = 0.45;
+          const closetStartX = bigDeskStartX;
+          const closetEndX = closetStartX + closetLength;
+          const closetCX = (closetStartX + closetEndX) / 2;
+          // Closet sits behind desk in Z (toward back wall)
+          const closetCZ = bigDeskCZ - tableW / 2 - closetD2 / 2 - 0.05;
+          const closetFrontX2 = closetCX; // for door lines
+
+          // Helper: render a desk (top + 4 legs)
+          const renderDesk = (cx: number, cz: number, length: number, w: number) => (
+            <>
+              <mesh position={[cx, tableLegH + tableH / 2 + floorThick, cz]}>
+                <boxGeometry args={[length, tableH, w]} />
+                <meshStandardMaterial {...deskMatProps} />
+              </mesh>
+              {[
+                [cx - length / 2 + legInsetX, cz - w / 2 + legInsetZ],
+                [cx - length / 2 + legInsetX, cz + w / 2 - legInsetZ],
+                [cx + length / 2 - legInsetX, cz - w / 2 + legInsetZ],
+                [cx + length / 2 - legInsetX, cz + w / 2 - legInsetZ],
+              ].map(([lx, lz], i) => (
+                <mesh key={`dleg${i}`} position={[lx, tableLegH / 2 + floorThick, lz]}>
+                  <boxGeometry args={[legSize, tableLegH, legSize]} />
+                  <meshStandardMaterial {...deskMatProps} />
+                </mesh>
+              ))}
+            </>
+          );
+
+          // Chair spacing along desk length
+          const smallChairSpacing = smallDeskLength / 3;
+
+          return (
+            <group>
+              {/* Small room desk */}
+              {renderDesk(smallDeskCX, smallDeskCZ, smallDeskLength, tableW)}
+              {/* Small room: 2 chairs on each side (front +Z, back -Z), 50% under */}
+              {[1, 2].map(i => renderSimpleChair(
+                smallDeskEndX + smallChairSpacing * i,
+                smallDeskCZ + chairUnderOffset,
+                1
+              ))}
+              {[1, 2].map(i => renderSimpleChair(
+                smallDeskEndX + smallChairSpacing * i,
+                smallDeskCZ - chairUnderOffset,
+                -1
+              ))}
+
+              {/* Big room desk (against tussenmuur) */}
+              {renderDesk(bigDeskCX, bigDeskCZ, smallDeskLength, tableW)}
+              {/* Big room: 2 chairs behind table (window side, +Z) */}
+              {[1, 2].map(i => renderSimpleChair(
+                bigDeskStartX + smallChairSpacing * i,
+                bigDeskCZ + chairUnderOffset,
+                1
+              ))}
+
+              {/* Closet behind desk in big room */}
+              <mesh position={[closetCX, height / 2 + floorThick, closetCZ]}>
+                <boxGeometry args={[closetLength, height, closetD2]} />
+                <meshStandardMaterial {...tableMatProps} />
+              </mesh>
+              {/* Closet back panel */}
+              <mesh position={[closetCX, height / 2 + floorThick, closetCZ - closetD2 / 2 - 0.01]}>
+                <boxGeometry args={[closetLength, height, 0.02]} />
+                <meshStandardMaterial {...tableMatProps} />
+              </mesh>
+              {/* Closet door lines (3 doors) */}
+              {[0.33, 0.67].map((frac, i) => (
+                <mesh key={`bcd${i}`} position={[closetStartX + closetLength * frac, height / 2 + floorThick, closetCZ + closetD2 / 2 + 0.002]}>
+                  <boxGeometry args={[0.008, height - 0.02, 0.004]} />
+                  <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                </mesh>
+              ))}
+            </group>
+          );
+        }
+
+        // ── Plan A: original big communal table ──
+        const tableStartX = cumX[1] + seg[1] / 2;
+        const tableEndX = cumX[5];
+        const tableLength = tableEndX - tableStartX;
+        const tableCenterX = (tableStartX + tableEndX) / 2;
+
+        const tableW2 = 1.35;
+        const tableH2 = 0.04;
+        const tableLegH2 = 0.72;
+        const tableCenterZ = 0;
+        const legInsetX = 0.08;
+        const legInsetZ = 0.06;
+        const legSize = 0.05;
+        const chairOffset = tableW2 / 2 + chairSeatD / 2 + 0.08;
+
         const spacing = tableLength / 7;
         const frontChairX = [1, 3, 5].map(i => tableStartX + spacing * i);
         const backChairX = [2, 4, 6].map(i => tableStartX + spacing * i);
@@ -3553,62 +3693,26 @@ function HubWalls({
         return (
           <group>
             {/* Table top */}
-            <mesh position={[tableCenterX, tableLegH + tableH / 2 + floorThick, tableCenterZ]}>
-              <boxGeometry args={[tableLength, tableH, tableW]} />
+            <mesh position={[tableCenterX, tableLegH2 + tableH2 / 2 + floorThick, tableCenterZ]}>
+              <boxGeometry args={[tableLength, tableH2, tableW2]} />
               <meshStandardMaterial {...tableMatProps} />
             </mesh>
             {/* 4 legs */}
             {[
-              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ - tableW / 2 + legInsetZ],
-              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ + tableW / 2 - legInsetZ],
-              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ - tableW / 2 + legInsetZ],
-              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ + tableW / 2 - legInsetZ],
+              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ - tableW2 / 2 + legInsetZ],
+              [tableCenterX - tableLength / 2 + legInsetX, tableCenterZ + tableW2 / 2 - legInsetZ],
+              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ - tableW2 / 2 + legInsetZ],
+              [tableCenterX + tableLength / 2 - legInsetX, tableCenterZ + tableW2 / 2 - legInsetZ],
             ].map(([lx, lz], i) => (
-              <mesh key={`tleg${i}`} position={[lx, tableLegH / 2 + floorThick, lz]}>
-                <boxGeometry args={[legSize, tableLegH, legSize]} />
+              <mesh key={`tleg${i}`} position={[lx, tableLegH2 / 2 + floorThick, lz]}>
+                <boxGeometry args={[legSize, tableLegH2, legSize]} />
                 <meshStandardMaterial {...tableMatProps} />
               </mesh>
             ))}
-
-            {/* Chairs — front side (positive Z) — staggered positions 1,3,5 */}
-            {frontChairX.map((cx, i) => (
-              <group key={`cf${i}`} position={[cx, 0, tableCenterZ + chairOffset]}>
-                <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
-                  <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
-                  <meshStandardMaterial {...tableMatProps} />
-                </mesh>
-                {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
-                  <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
-                    <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
-                    <meshStandardMaterial {...tableMatProps} />
-                  </mesh>
-                ))}
-                <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, chairSeatD/2 - chairBackThick/2]}>
-                  <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
-                  <meshStandardMaterial {...tableMatProps} />
-                </mesh>
-              </group>
-            ))}
-
-            {/* Chairs — back side (negative Z) — staggered positions 2,4,6 */}
-            {backChairX.map((cx, i) => (
-              <group key={`cb${i}`} position={[cx, 0, tableCenterZ - chairOffset]}>
-                <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
-                  <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
-                  <meshStandardMaterial {...tableMatProps} />
-                </mesh>
-                {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
-                  <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
-                    <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
-                    <meshStandardMaterial {...tableMatProps} />
-                  </mesh>
-                ))}
-                <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, -chairSeatD/2 + chairBackThick/2]}>
-                  <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
-                  <meshStandardMaterial {...tableMatProps} />
-                </mesh>
-              </group>
-            ))}
+            {/* Chairs — front side (+Z) */}
+            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, 1))}
+            {/* Chairs — back side (-Z) */}
+            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, -1))}
           </group>
         );
       })()}
