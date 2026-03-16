@@ -3540,17 +3540,17 @@ function HubWalls({
             <group position={[cx, 0, cz]}>
               <mesh position={[0, chairLegH + chairSeatH / 2 + floorThick, 0]}>
                 <boxGeometry args={[chairSeatW, chairSeatH, chairSeatD]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...chairMatProps} />
               </mesh>
               {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sz], li) => (
                 <mesh key={li} position={[sx * (chairSeatW/2 - 0.03), chairLegH/2 + floorThick, sz * (chairSeatD/2 - 0.03)]}>
                   <boxGeometry args={[chairLegSize, chairLegH, chairLegSize]} />
-                  <meshStandardMaterial {...tableMatProps} />
+                  <meshStandardMaterial {...chairMatProps} />
                 </mesh>
               ))}
               <mesh position={[0, chairLegH + chairSeatH + chairBackH/2 + floorThick, flip * (-chairSeatD/2 + chairBackThick/2)]}>
                 <boxGeometry args={[chairSeatW, chairBackH, chairBackThick]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...chairMatProps} />
               </mesh>
             </group>
           );
