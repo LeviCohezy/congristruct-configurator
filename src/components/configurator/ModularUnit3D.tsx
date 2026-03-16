@@ -3665,13 +3665,6 @@ function HubWalls({
                 smallDeskCZ - chairUnderOffset,
                 1
               ))}
-              {/* Small room: 2 laptops on back-wall side (in front of chairs facing from back wall) */}
-              {[1, 2].map(i => renderLaptop(
-                smallDeskEndX + smallChairSpacing * i,
-                tTableTopY,
-                smallDeskCZ - tableW / 2 + 0.35,
-                0
-              ))}
 
               {/* Big room desk (against tussenmuur) */}
               {renderDesk(bigDeskCX, bigDeskCZ, smallDeskLength, tableW)}
@@ -3681,13 +3674,37 @@ function HubWalls({
                 closetCZ + closetD2 / 2 + 0.20 + chairSeatD / 2,
                 1
               ))}
-              {/* Big room: 2 laptops in front of the 2 chairs on the table */}
-              {[1, 2].map(i => renderLaptop(
-                bigDeskStartX + smallChairSpacing * i,
-                tTableTopY,
-                bigDeskCZ + tableW / 2 - 0.35,
-                Math.PI
-              ))}
+              {/* Big room: 2 monitors in front of chairs on the table */}
+              {[1, 2].map(i => {
+                const mX = bigDeskStartX + smallChairSpacing * i;
+                const screenW2 = 0.54;
+                const screenH2 = 0.34;
+                const silver2 = { color: "#c8c8c8", roughness: 0.15, metalness: 0.7 };
+                return (
+                  <group key={`mon${i}`} position={[mX, 0, bigDeskCZ + tableW / 2 - 0.15]} rotation={[0, Math.PI, 0]}>
+                    {/* Base */}
+                    <mesh position={[0, tTableTopY + 0.004, 0]}>
+                      <boxGeometry args={[0.2, 0.008, 0.18]} />
+                      <meshStandardMaterial {...silver2} />
+                    </mesh>
+                    {/* Stand */}
+                    <mesh position={[0, tTableTopY + 0.1, 0]}>
+                      <boxGeometry args={[0.06, 0.18, 0.02]} />
+                      <meshStandardMaterial {...silver2} />
+                    </mesh>
+                    {/* Screen back */}
+                    <mesh position={[0, tTableTopY + 0.22 + screenH2 / 2, -0.01]}>
+                      <boxGeometry args={[screenW2, screenH2, 0.02]} />
+                      <meshStandardMaterial {...silver2} />
+                    </mesh>
+                    {/* Screen front (dark) */}
+                    <mesh position={[0, tTableTopY + 0.22 + screenH2 / 2, 0.002]}>
+                      <boxGeometry args={[screenW2 - 0.03, screenH2 - 0.03, 0.002]} />
+                      <meshStandardMaterial color="#1a1a2e" roughness={0.05} metalness={0.3} />
+                    </mesh>
+                  </group>
+                );
+              })}
 
               {/* Closet behind desk in big room */}
               <mesh position={[closetCX, height / 2 + floorThick, closetCZ]}>
