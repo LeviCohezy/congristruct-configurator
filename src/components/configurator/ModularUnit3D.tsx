@@ -3256,25 +3256,29 @@ function HubWalls({
               <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
             </mesh>
             {/* White door panel with black frame */}
-            <mesh position={[tussenmuurX - tmDoorW / 2 - 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
-              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+            {/* Left frame (along Z) */}
+            <mesh position={[tussenmuurX, tmDoorH / 2 + floorThick, tmDoorCZ - tmDoorW / 2 - 0.015]}>
+              <boxGeometry args={[partT + 0.01, tmDoorH, 0.03]} />
               <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
-            <mesh position={[tussenmuurX + tmDoorW / 2 + 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
-              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+            {/* Right frame (along Z) */}
+            <mesh position={[tussenmuurX, tmDoorH / 2 + floorThick, tmDoorCZ + tmDoorW / 2 + 0.015]}>
+              <boxGeometry args={[partT + 0.01, tmDoorH, 0.03]} />
               <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
+            {/* Top frame */}
             <mesh position={[tussenmuurX, tmDoorH + floorThick + 0.015, tmDoorCZ]}>
-              <boxGeometry args={[tmDoorW + 0.06, 0.03, partT + 0.01]} />
+              <boxGeometry args={[partT + 0.01, 0.03, tmDoorW + 0.06]} />
               <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
             </mesh>
+            {/* Door panel */}
             <mesh position={[tussenmuurX, tmDoorH / 2 + floorThick, tmDoorCZ]}>
-              <boxGeometry args={[tmDoorW - 0.04, tmDoorH - 0.02, 0.035]} />
+              <boxGeometry args={[0.035, tmDoorH - 0.02, tmDoorW - 0.04]} />
               <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
             </mesh>
             {/* Handle */}
             <mesh
-              position={[tussenmuurX - 0.04, tmDoorH * 0.48 + floorThick, tmDoorCZ + 0.04]}
+              position={[tussenmuurX + 0.04, tmDoorH * 0.48 + floorThick, tmDoorCZ - 0.04]}
               rotation={[Math.PI / 2, 0, 0]}
             >
               <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
