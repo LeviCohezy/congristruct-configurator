@@ -3117,7 +3117,8 @@ function HubWalls({
       </group>
 
       {/* Interior front wall faces — only behind solid segments (not windows) */}
-      {[0, 2, 4, 6].map((i) => (
+      {/* When doorSwap, segment 3 becomes a door (still needs interior face for above-door area) */}
+      {[0, 2, 4, 6, ...(doorSwap ? [3] : [])].map((i) => (
         <mesh key={`ifw${i}`} position={[cumX[i] + seg[i] / 2, height / 2 + floorThick, halfD - wallThick - 0.01]}>
           <boxGeometry args={[seg[i], height, 0.01]} />
           <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
