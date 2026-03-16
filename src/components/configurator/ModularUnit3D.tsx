@@ -3710,10 +3710,20 @@ function HubWalls({
                 <meshStandardMaterial {...planATableMatProps} />
               </mesh>
             ))}
-            {/* Chairs — front side (+Z), rotated 180° */}
-            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, -1))}
-            {/* Chairs — back side (-Z), rotated 180° */}
-            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, 1))}
+            {/* Laptops + Chairs — front side (+Z) */}
+            {frontChairX.map((cx, i) => (
+              <group key={`front-${i}`}>
+                {renderSimpleChair(cx, tableCenterZ + chairOffset, -1)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, Math.PI)}
+              </group>
+            ))}
+            {/* Laptops + Chairs — back side (-Z) */}
+            {backChairX.map((cx, i) => (
+              <group key={`back-${i}`}>
+                {renderSimpleChair(cx, tableCenterZ - chairOffset, 1)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, 0)}
+              </group>
+            ))}
           </group>
         );
       })()}
