@@ -71,7 +71,7 @@ const defaultConfig: ConfigState = {
   aluminiumColor: "#383e42",
   finishLevel: "shell",
   floorOption: "light-vinyl",
-  shelfColor: "brown",
+  shelfColor: "white",
   tiltTurnWindow: false,
   hubDoorSwap: false,
   spotType: "spot-zwart",
