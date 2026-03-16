@@ -3575,10 +3575,10 @@ function HubWalls({
           const smallDeskEndX = cumX[1] + 0.05; // just past start of big window
           const smallDeskLength = smallDeskStartX - smallDeskEndX;
           const smallDeskCX = (smallDeskStartX + smallDeskEndX) / 2;
-          // Centered in room Z
-          const smallRoomFrontZ = halfD - wallThick;
+          // Centered on the wall section next to the door (back wall to door opening)
+          const tmDoorZ1 = halfD - wallThick - 0.45 - 0.84; // back edge of tussenmuur door
           const smallRoomBackZ = -halfD + wallThick;
-          const smallDeskCZ = (smallRoomFrontZ + smallRoomBackZ) / 2;
+          const smallDeskCZ = (smallRoomBackZ + tmDoorZ1) / 2;
 
           // Chair offset: pulled back a bit more from table
           const chairUnderOffset = tableW / 2 - chairSeatD * 0.3;
