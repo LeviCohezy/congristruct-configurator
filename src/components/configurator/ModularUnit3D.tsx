@@ -1533,8 +1533,8 @@ function FlowAWalls({
   const partX = halfW - wallThick - toiletStripW; // vertical partition x
   const toiletWallZ = -halfD + wallThick + toiletDepth; // horizontal wall z
 
-  // Toilet door: 70cm = 0.70m, on the LEFT wall (vertical partition) of toilet room
-  const toiletDoorW = 0.70;
+  // Toilet door: 84cm wide (same as BLOQ Flow interior doors)
+  const toiletDoorW = 0.84;
   const toiletDoorH = 2.1;
   // Door positioned in the vertical partition, centered vertically in the toilet room
   const toiletDoorCZ = -halfD + wallThick + toiletDepth * 0.5; // center of toilet depth
@@ -1740,19 +1740,14 @@ function FlowAWalls({
         <boxGeometry args={[0.035, toiletDoorH - 0.02, toiletDoorW - 0.04]} />
         <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
       </mesh>
-      {/* Toilet door handles (both sides of partition) */}
-      {[-1, 1].map((side, i) => (
-        <group key={`th${i}`} position={[partX + partT / 2 + side * 0.032, 1.0 + floorThick, toiletDoorCZ + 0.2]}>
-          <mesh>
-            <boxGeometry args={[0.012, 0.06, 0.06]} />
-            <meshStandardMaterial color="#a8a8a8" roughness={0.2} metalness={0.85} />
-          </mesh>
-          <mesh position={[side * 0.015, 0, -side * 0.06]}>
-            <boxGeometry args={[0.018, 0.018, 0.12]} />
-            <meshStandardMaterial color="#b8b8b8" roughness={0.15} metalness={0.9} />
-          </mesh>
-        </group>
-      ))}
+      {/* Toilet door handle — chrome cylinder (same style as BLOQ Flow) */}
+      <mesh
+        position={[partX + partT / 2 + 0.04, toiletDoorH * 0.48 + floorThick, toiletDoorCZ + toiletDoorW / 2 - 0.06]}
+        rotation={[0, 0, Math.PI / 2]}
+      >
+        <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+        <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+      </mesh>
 
       {/* ── TOILET FIXTURES — against right exterior wall ── */}
       {(() => {
