@@ -65,6 +65,28 @@ export function FloorPlanSection({ config, updateConfig }: Props) {
           )} />
         </button>
       </div>
+
+      {/* Door position swap toggle (HUB only) */}
+      {config.model === "hub" && (
+        <div className="option-card flex items-center justify-between mt-4">
+          <div>
+            <p className="text-sm font-medium">Deur positie</p>
+            <p className="text-xs text-muted-foreground">Verplaats de deur naar de voorgevel</p>
+          </div>
+          <button
+            onClick={() => updateConfig("hubDoorSwap", !config.hubDoorSwap)}
+            className={cn(
+              "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+              config.hubDoorSwap ? "bg-accent" : "bg-muted"
+            )}
+          >
+            <span className={cn(
+              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+              config.hubDoorSwap ? "translate-x-5" : "translate-x-0"
+            )} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
