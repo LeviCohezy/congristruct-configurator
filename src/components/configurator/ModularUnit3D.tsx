@@ -3589,17 +3589,17 @@ function HubWalls({
           const bigDeskStartX = tussenmuurX + partT / 2;
           const bigDeskEndX = bigDeskStartX + smallDeskLength;
           const bigDeskCX = (bigDeskStartX + bigDeskEndX) / 2;
-          // Table +Z edge aligns with door border (tmDoorZ2)
-          const bigDeskCZ = tmDoorZ2 - tableW / 2;
+          // Table +Z edge aligns with back edge of tussenmuur door (tmDoorZ1)
+          const bigDeskCZ = tmDoorZ1 - tableW / 2;
 
-          // Closet behind table (toward back wall), 60cm longer than table
+          // Closet against back wall, 60cm longer than table
           const closetLength = smallDeskLength + 0.60;
           const closetD2 = 0.45;
           const closetStartX = bigDeskStartX;
           const closetEndX = closetStartX + closetLength;
           const closetCX = (closetStartX + closetEndX) / 2;
-          // Closet sits behind desk in Z (toward back wall)
-          const closetCZ = bigDeskCZ - tableW / 2 - closetD2 / 2 - 0.05;
+          // Closet flush against back wall
+          const closetCZ = -halfD + wallThick + closetD2 / 2;
           const closetFrontX2 = closetCX; // for door lines
 
           // Helper: render a desk (top + 4 legs)
