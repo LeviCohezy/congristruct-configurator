@@ -3696,7 +3696,7 @@ function HubWalls({
             {/* Table top */}
             <mesh position={[tableCenterX, tableLegH2 + tableH2 / 2 + floorThick, tableCenterZ]}>
               <boxGeometry args={[tableLength, tableH2, tableW2]} />
-              <meshStandardMaterial {...tableMatProps} />
+              <meshStandardMaterial {...planATableMatProps} />
             </mesh>
             {/* 4 legs */}
             {[
@@ -3707,7 +3707,7 @@ function HubWalls({
             ].map(([lx, lz], i) => (
               <mesh key={`tleg${i}`} position={[lx, tableLegH2 / 2 + floorThick, lz]}>
                 <boxGeometry args={[legSize, tableLegH2, legSize]} />
-                <meshStandardMaterial {...tableMatProps} />
+                <meshStandardMaterial {...planATableMatProps} />
               </mesh>
             ))}
             {/* Chairs — front side (+Z), rotated 180° */}
