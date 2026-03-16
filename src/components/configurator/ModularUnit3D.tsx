@@ -4000,11 +4000,73 @@ function BaseWalls({
       {/* ── Plan B: Interior rooms (WC + Technical room) ── */}
       {hasPlanB && (
         <group>
-          {/* Left partition wall */}
-          <mesh position={[blockLeftX, height / 2 + floorThick, -halfD + wallThick + (techDepth + wcDepth) / 2]}>
-            <boxGeometry args={[partT, height, techDepth + wcDepth]} />
+          {/* Left partition wall — WC portion (solid) */}
+          <mesh position={[blockLeftX, height / 2 + floorThick, techBottomZ + wcDepth / 2]}>
+            <boxGeometry args={[partT, height, wcDepth]} />
             <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
           </mesh>
+          {/* Left partition wall — Tech room portion (with door) */}
+          {(() => {
+            const techDoorW = 0.70;
+            const techDoorH = 2.1;
+            const wallX = blockLeftX;
+            const techMidZ = -halfD + wallThick + techDepth / 2;
+            const doorCZ = techMidZ; // centered in tech room depth
+            const doorFrontZ = doorCZ + techDoorW / 2;
+            const doorBackZ = doorCZ - techDoorW / 2;
+            const backSegD = doorBackZ - (-halfD + wallThick);
+            const frontSegD = techBottomZ - doorFrontZ;
+            const headerH = height - techDoorH;
+
+            return (
+              <>
+                {/* Back segment of left wall (behind door) */}
+                {backSegD > 0.01 && (
+                  <mesh position={[wallX, height / 2 + floorThick, -halfD + wallThick + backSegD / 2]}>
+                    <boxGeometry args={[partT, height, backSegD]} />
+                    <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                  </mesh>
+                )}
+                {/* Front segment of left wall (in front of door) */}
+                {frontSegD > 0.01 && (
+                  <mesh position={[wallX, height / 2 + floorThick, doorFrontZ + frontSegD / 2]}>
+                    <boxGeometry args={[partT, height, frontSegD]} />
+                    <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                  </mesh>
+                )}
+                {/* Door header */}
+                {headerH > 0 && (
+                  <mesh position={[wallX, techDoorH + headerH / 2 + floorThick, doorCZ]}>
+                    <boxGeometry args={[partT, headerH, techDoorW]} />
+                    <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+                  </mesh>
+                )}
+                {/* Door frame */}
+                <mesh position={[wallX, techDoorH / 2 + floorThick, doorBackZ - 0.015]}>
+                  <boxGeometry args={[partT + 0.01, techDoorH, 0.03]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                <mesh position={[wallX, techDoorH / 2 + floorThick, doorFrontZ + 0.015]}>
+                  <boxGeometry args={[partT + 0.01, techDoorH, 0.03]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                <mesh position={[wallX, techDoorH + floorThick + 0.015, doorCZ]}>
+                  <boxGeometry args={[partT + 0.01, 0.03, techDoorW + 0.06]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+                </mesh>
+                {/* White door panel */}
+                <mesh position={[wallX, techDoorH / 2 + floorThick, doorCZ]}>
+                  <boxGeometry args={[0.035, techDoorH - 0.02, techDoorW - 0.04]} />
+                  <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
+                </mesh>
+                {/* Handle */}
+                <mesh position={[wallX - 0.04, techDoorH * 0.48 + floorThick, doorCZ + techDoorW / 2 - 0.06]} rotation={[0, 0, Math.PI / 2]}>
+                  <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+                  <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+                </mesh>
+              </>
+            );
+          })()}
           {/* Right partition wall */}
           <mesh position={[blockRightX, height / 2 + floorThick, -halfD + wallThick + (techDepth + wcDepth) / 2]}>
             <boxGeometry args={[partT, height, techDepth + wcDepth]} />
