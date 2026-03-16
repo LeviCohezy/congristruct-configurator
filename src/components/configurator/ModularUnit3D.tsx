@@ -3061,16 +3061,36 @@ function HubWalls({
           <CladMaterial {...woodBase} wallWidth={seg[2]} />
         </mesh>
 
-        {/* Segment 3: 100cm window */}
-        <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
-          <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
-        </mesh>
-        <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
-          <boxGeometry args={[seg[3], height - winTop, wallThick]} />
-          <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
-        </mesh>
-        <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+        {/* Segment 3: 100cm — window OR door (if doorSwap) */}
+        {doorSwap ? (
+          <>
+            {/* Door at segment 3 position */}
+            <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+              <boxGeometry args={[seg[3], height - winTop, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+            </mesh>
+            <DoorPane
+              posX={cumX[3] + seg[3] / 2}
+              posY={winCY + floorThick}
+              width={seg[3]}
+              height={winH}
+              frameColor={frameColor}
+              z={0}
+            />
+          </>
+        ) : (
+          <>
+            <mesh position={[cumX[3] + seg[3] / 2, (winBot + floorThick) / 2, 0]} castShadow>
+              <boxGeometry args={[seg[3], winBot + floorThick, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
+            </mesh>
+            <mesh position={[cumX[3] + seg[3] / 2, winTop + (height - winTop) / 2 + floorThick, 0]} castShadow>
+              <boxGeometry args={[seg[3], height - winTop, wallThick]} />
+              <CladMaterial {...woodBase} wallWidth={seg[3]} wallHeight={height - winTop} fullWallHeight={extWallH} />
+            </mesh>
+            <GlassPane posX={cumX[3] + seg[3] / 2} posY={winCY + floorThick} width={seg[3]} height={winH} frameColor={frameColor} />
+          </>
+        )}
 
         {/* Segment 4: 150cm solid wall */}
         <mesh position={[cumX[4] + seg[4] / 2, extWallCY, 0]} castShadow>
