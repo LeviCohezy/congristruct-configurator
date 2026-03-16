@@ -3954,7 +3954,7 @@ function BaseWalls({
         {/* Seg 0: 100cm wall */}
         {renderFrontWall(0)}
         {/* Seg 1: 200cm window */}
-        {renderFrontWindow(1, true)}
+        {renderFrontWindow(1)}
         {/* Seg 2: 125cm wall */}
         {renderFrontWall(2)}
         {/* Seg 3: 100cm entrance door */}
@@ -3982,7 +3982,7 @@ function BaseWalls({
         {/* Seg 6: 180cm wall */}
         {renderFrontWall(6)}
         {/* Seg 7: 200cm window */}
-        {renderFrontWindow(7, true)}
+        {renderFrontWindow(7)}
         {/* Seg 8: 95cm wall */}
         {renderFrontWall(8)}
       </group>
