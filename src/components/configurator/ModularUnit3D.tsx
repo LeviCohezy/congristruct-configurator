@@ -3643,11 +3643,11 @@ function HubWalls({
 
               {/* Big room desk (against tussenmuur) */}
               {renderDesk(bigDeskCX, bigDeskCZ, smallDeskLength, tableW)}
-              {/* Big room: 2 chairs behind table (wall side, facing -Z) */}
+              {/* Big room: 2 chairs behind table (window side, +Z) */}
               {[1, 2].map(i => renderSimpleChair(
                 bigDeskStartX + smallChairSpacing * i,
                 bigDeskCZ + chairUnderOffset,
-                -1
+                1
               ))}
 
               {/* Closet behind desk in big room */}
@@ -3709,10 +3709,10 @@ function HubWalls({
                 <meshStandardMaterial {...tableMatProps} />
               </mesh>
             ))}
-            {/* Chairs — front side (+Z) */}
-            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, 1))}
-            {/* Chairs — back side (-Z) */}
-            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, -1))}
+            {/* Chairs — front side (+Z), rotated 180° */}
+            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, -1))}
+            {/* Chairs — back side (-Z), rotated 180° */}
+            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, 1))}
           </group>
         );
       })()}
