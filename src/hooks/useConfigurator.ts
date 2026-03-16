@@ -111,37 +111,61 @@ const facadePricesByModel: Record<string, Record<string, number>> = {
     "composite-white": 335, "composite-black": 335,
     "aluminium": 935, "brick-grey": 1335,
   },
+  hub: {
+    "thermowood-natural": 0, "thermowood-black": 475,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
 const finishPricesByModel: Record<string, Record<string, number>> = {
   start: { shell: 0, finished: 3780, "fully-finished": 7500 },
   flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
+  hub:   { shell: 0, finished: 9900, "fully-finished": 16860 },
 };
 
 const shelfPricesByModel: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
+  hub:   { brown: 350, "light-oak": 200, white: 0 },
 };
 
 const windowPriceByModel: Record<string, number> = {
   start: 180,
   flow: 300, // €150 × 2 windows
+  hub: 180,
 };
 
 const insulationPriceByModel: Record<string, number> = {
   start: 900,
   flow: 1450,
+  hub: 1145,
 };
 
 const ledKeukenPriceByModel: Record<string, number> = {
   start: 350,
   flow: 150,
+  hub: 150,
 };
 
 const ledKastPriceByModel: Record<string, number> = {
   start: 300,
   flow: 530,
 };
+
+const lightingPackagePriceByModel: Record<string, number> = {
+  start: 1500,
+  flow: 1500,
+  hub: 1990,
+};
+
+const heatPumpPriceByModel: Record<string, number> = {
+  start: 2500,
+  flow: 2500,
+  hub: 3150,
+};
+
+const extraClosetPrice = 4000;
 
 /** Roof is auto-derived: white facades → white roof, else black */
 export function getRoofColor(facade: ConfigState["facade"]) {
