@@ -4345,14 +4345,34 @@ function BaseWalls({
                         <boxGeometry args={[shelfW / 6, nicheH, shelfD]} />
                         <meshStandardMaterial {...matProps} />
                       </mesh>
-                      {/* Niche back dark panel */}
-                      <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
-                        <boxGeometry args={[shelfW * 4 / 6 - 0.02, nicheH - 0.06, 0.01]} />
+                      {/* Niche back dark panel - LEFT */}
+                      <mesh position={[shelfCX - 0.30 - (shelfW * 2 / 6 - 0.30) / 2, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
+                        <boxGeometry args={[shelfW * 2 / 6 - 0.30 - 0.01, nicheH - 0.06, 0.01]} />
                         <meshStandardMaterial color="#0e0a08" roughness={0.95} />
                       </mesh>
-                      {/* Niche middle shelf */}
+                      {/* Niche back dark panel - RIGHT */}
+                      <mesh position={[shelfCX + 0.30 + (shelfW * 2 / 6 - 0.30) / 2, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
+                        <boxGeometry args={[shelfW * 2 / 6 - 0.30 - 0.01, nicheH - 0.06, 0.01]} />
+                        <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+                      </mesh>
+                      {/* Center closed section (60cm wide) */}
                       <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
-                        <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
+                        <boxGeometry args={[0.60, nicheH, shelfD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Door line on center closed section */}
+                      <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                        <boxGeometry args={[0.008, nicheH - 0.02, 0.004]} />
+                        <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                      </mesh>
+                      {/* Niche middle shelf - LEFT */}
+                      <mesh position={[shelfCX - 0.30 - (shelfW * 2 / 6 - 0.30) / 2, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW * 2 / 6 - 0.30 - 0.02, 0.025, shelfD - 0.02]} />
+                        <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+                      </mesh>
+                      {/* Niche middle shelf - RIGHT */}
+                      <mesh position={[shelfCX + 0.30 + (shelfW * 2 / 6 - 0.30) / 2, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW * 2 / 6 - 0.30 - 0.02, 0.025, shelfD - 0.02]} />
                         <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
                       </mesh>
                       {/* Upper door lines */}
