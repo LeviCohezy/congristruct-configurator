@@ -145,26 +145,12 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     </div>
                   </div>
                 </button>
-                {/* Color picker for aluminium */}
+                {/* RAL color slider for aluminium */}
                 {isActive && family.hasColorPicker && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={config.aluminiumColor}
-                        onChange={(e) => updateConfig("aluminiumColor", e.target.value)}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-border bg-transparent p-0.5"
-                      />
-                      <div>
-                        <p className="text-xs font-medium">Kies een kleur</p>
-                        <p className="text-[11px] font-mono text-muted-foreground">{config.aluminiumColor}</p>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <RalColorSlider
+                    value={config.aluminiumColor}
+                    onChange={(hex) => updateConfig("aluminiumColor", hex)}
+                  />
                 )}
               </div>
             );
