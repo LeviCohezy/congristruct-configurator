@@ -192,9 +192,9 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     </div>
                   </div>
                 </button>
-                {/* RAL color slider for aluminium */}
+                {/* RAL color swatch for aluminium */}
                 {isActive && family.hasColorPicker && (
-                  <RalColorSlider
+                  <RalSwatchPicker
                     value={config.aluminiumColor}
                     onChange={(hex) => updateConfig("aluminiumColor", hex)}
                   />
