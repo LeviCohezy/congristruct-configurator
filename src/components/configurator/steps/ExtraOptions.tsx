@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { Flame, Battery, Layers } from "lucide-react";
+import { Flame, Battery, Layers, Archive } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 
@@ -10,25 +10,37 @@ interface Props {
   onPriceClick?: () => void;
 }
 
-const getExtras = (model: string) => [
-  { key: "heatPump" as const, label: "Luchtwarmtepomp", icon: Flame, price: "2.500", desc: "Efficiënte verwarming & koeling" },
-  { key: "solarBattery" as const, label: "Solar batterij", icon: Battery, price: "4.500", desc: "Energieopslag" },
-  { key: "insulation" as const, label: "Houtvezelplaat isolatie", icon: Layers, price: model === "flow" ? "1.450" : "900", desc: "Extra isolatie met houtvezelplaat" },
-];
+const getExtras = (model: string, floorPlan: string) => {
+  const isHub = model === "hub";
+  const extras: { key: keyof ConfigState; label: string; icon: any; price: string; desc: string; condition?: boolean }[] = [
+    { key: "heatPump", label: "Luchtwarmtepomp", icon: Flame, price: isHub ? "3.150" : "2.500", desc: "Efficiënte verwarming & koeling" },
+  ];
+  if (isHub) {
+    extras.push({ key: "extraHeatPump", label: "Extra luchtwarmtepomp", icon: Flame, price: "1.050", desc: "Tweede warmtepomp voor extra capaciteit" });
+  }
+  extras.push(
+    { key: "solarBattery", label: "Solar batterij", icon: Battery, price: "4.500", desc: "Energieopslag" },
+    { key: "insulation", label: "Houtvezelplaat isolatie", icon: Layers, price: isHub ? "1.145" : model === "flow" ? "1.450" : "900", desc: "Extra isolatie met houtvezelplaat" },
+  );
+  if (isHub && floorPlan === "b") {
+    extras.push({ key: "extraCloset", label: "Extra 6-deurs kast", icon: Archive, price: "4.000", desc: "Grote kast achter bureau in de grote kamer" });
+  }
+  return extras;
+};
 
 export function ExtraOptions({ config, updateConfig, onPriceClick }: Props) {
-  const extras = getExtras(config.model);
+  const extras = getExtras(config.model, config.floorPlan);
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Extra opties</h3>
       <p className="text-sm text-muted-foreground mb-5">Voeg optionele features toe</p>
       <div className="grid gap-6">
         {extras.map((e) => {
-          const active = config[e.key];
+          const active = config[e.key] as boolean;
           return (
             <button
               key={e.key}
-              onClick={() => updateConfig(e.key, !active)}
+              onClick={() => updateConfig(e.key, !active as any)}
               className={cn("option-card text-left", active && "option-card-active")}
             >
               <div className="flex items-center gap-3">

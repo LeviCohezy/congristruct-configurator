@@ -762,6 +762,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           shelfColor={config.shelfColor}
           ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
+          extraCloset={config.extraCloset}
         />
       ) : (
         <GenericWalls
@@ -2887,7 +2888,7 @@ function HubWalls({
   winH, winBot, winTop, winCY, woodBase, frameColor,
   interiorColor, interiorRoughness, osbTex, isShell,
   floorPlan, hubDoorSwap, finishLevel,
-  shelfColor, ledStrip, lightOakTex,
+  shelfColor, ledStrip, lightOakTex, extraCloset,
 }: any) {
   const halfW = width / 2;   // 5.0
   const halfD = depth / 2;   // 1.75
@@ -3706,23 +3707,25 @@ function HubWalls({
                 );
               })}
 
-              {/* Closet behind desk in big room */}
-              <mesh position={[closetCX, height / 2 + floorThick, closetCZ]}>
-                <boxGeometry args={[closetLength, height, closetD2]} />
-                <meshStandardMaterial {...tableMatProps} />
-              </mesh>
-              {/* Closet back panel */}
-              <mesh position={[closetCX, height / 2 + floorThick, closetCZ - closetD2 / 2 - 0.01]}>
-                <boxGeometry args={[closetLength, height, 0.02]} />
-                <meshStandardMaterial {...tableMatProps} />
-              </mesh>
-              {/* Closet door lines (3 doors) */}
-              {[0.33, 0.67].map((frac, i) => (
-                <mesh key={`bcd${i}`} position={[closetStartX + closetLength * frac, height / 2 + floorThick, closetCZ + closetD2 / 2 + 0.002]}>
-                  <boxGeometry args={[0.008, height - 0.02, 0.004]} />
-                  <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
-                </mesh>
-              ))}
+              {/* Closet behind desk in big room (only when extraCloset enabled) */}
+              {extraCloset && (
+                <>
+                  <mesh position={[closetCX, height / 2 + floorThick, closetCZ]}>
+                    <boxGeometry args={[closetLength, height, closetD2]} />
+                    <meshStandardMaterial {...tableMatProps} />
+                  </mesh>
+                  <mesh position={[closetCX, height / 2 + floorThick, closetCZ - closetD2 / 2 - 0.01]}>
+                    <boxGeometry args={[closetLength, height, 0.02]} />
+                    <meshStandardMaterial {...tableMatProps} />
+                  </mesh>
+                  {[0.33, 0.67].map((frac, i) => (
+                    <mesh key={`bcd${i}`} position={[closetStartX + closetLength * frac, height / 2 + floorThick, closetCZ + closetD2 / 2 + 0.002]}>
+                      <boxGeometry args={[0.008, height - 0.02, 0.004]} />
+                      <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                    </mesh>
+                  ))}
+                </>
+              )}
             </group>
           );
         }

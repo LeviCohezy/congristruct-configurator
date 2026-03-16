@@ -18,6 +18,7 @@ interface Props {
 const finishPrices: Record<string, Record<string, number>> = {
   start: { shell: 0, finished: 3780, "fully-finished": 7500 },
   flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
+  hub:   { shell: 0, finished: 9900, "fully-finished": 16860 },
 };
 
 const finishLevels = [
@@ -35,6 +36,7 @@ const floorOptions = [
 const shelfPrices: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
+  hub:   { brown: 350, "light-oak": 200, white: 0 },
 };
 
 const shelfColors = [

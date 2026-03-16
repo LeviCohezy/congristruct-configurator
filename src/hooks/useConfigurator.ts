@@ -24,7 +24,9 @@ export interface ConfigState {
   keukenLedStrip: boolean;
   kastLedStrip: boolean;
   lightingPackage: "base" | "full";
+  extraCloset: boolean;
   heatPump: boolean;
+  extraHeatPump: boolean;
   solarBattery: boolean;
   insulation: boolean;
   transportDistance: number;
@@ -80,7 +82,9 @@ const defaultConfig: ConfigState = {
   keukenLedStrip: false,
   kastLedStrip: false,
   lightingPackage: "base",
+  extraCloset: true,
   heatPump: false,
+  extraHeatPump: false,
   solarBattery: false,
   insulation: false,
   transportDistance: 0,
@@ -92,7 +96,7 @@ const defaultConfig: ConfigState = {
 const basePrices: Record<string, Record<string, number>> = {
   start: { a: 16700, b: 18470 },
   flow:  { a: 22550, b: 29470 },
-  hub:   { a: 42000, b: 42000 }, // placeholder
+  hub:   { a: 31550, b: 32500 },
   base:  { a: 42000, b: 42000 }, // placeholder
 };
 
@@ -107,37 +111,61 @@ const facadePricesByModel: Record<string, Record<string, number>> = {
     "composite-white": 335, "composite-black": 335,
     "aluminium": 935, "brick-grey": 1335,
   },
+  hub: {
+    "thermowood-natural": 0, "thermowood-black": 475,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
 const finishPricesByModel: Record<string, Record<string, number>> = {
   start: { shell: 0, finished: 3780, "fully-finished": 7500 },
   flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
+  hub:   { shell: 0, finished: 9900, "fully-finished": 16860 },
 };
 
 const shelfPricesByModel: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
+  hub:   { brown: 350, "light-oak": 200, white: 0 },
 };
 
 const windowPriceByModel: Record<string, number> = {
   start: 180,
   flow: 300, // €150 × 2 windows
+  hub: 180,
 };
 
 const insulationPriceByModel: Record<string, number> = {
   start: 900,
   flow: 1450,
+  hub: 1145,
 };
 
 const ledKeukenPriceByModel: Record<string, number> = {
   start: 350,
   flow: 150,
+  hub: 150,
 };
 
 const ledKastPriceByModel: Record<string, number> = {
   start: 300,
   flow: 530,
 };
+
+const lightingPackagePriceByModel: Record<string, number> = {
+  start: 1500,
+  flow: 1500,
+  hub: 1990,
+};
+
+const heatPumpPriceByModel: Record<string, number> = {
+  start: 2500,
+  flow: 2500,
+  hub: 3150,
+};
+
+const extraClosetPrice = 4000;
 
 /** Roof is auto-derived: white facades → white roof, else black */
 export function getRoofColor(facade: ConfigState["facade"]) {
@@ -185,6 +213,8 @@ export function useConfigurator() {
     if (config.tiltTurnWindow > 0) {
       if (m === "flow") {
         price += config.tiltTurnWindow * 150;
+      } else if (m === "hub") {
+        price += config.tiltTurnWindow * 180;
       } else {
         price += 180;
       }
@@ -192,7 +222,7 @@ export function useConfigurator() {
 
     // Lighting
     if (config.lightingPackage === "full") {
-      price += 1500;
+      price += lightingPackagePriceByModel[m] ?? 1500;
       if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") {
         price += 10;
       } else {
@@ -203,8 +233,14 @@ export function useConfigurator() {
     if (config.keukenLedStrip) price += (ledKeukenPriceByModel[m] ?? 350);
     if (config.kastLedStrip) price += (ledKastPriceByModel[m] ?? 300);
 
+    // Extra closet (Hub tussenmuur only)
+    if (config.extraCloset && m === "hub" && config.floorPlan === "b") {
+      price += extraClosetPrice;
+    }
+
     // Extras
-    if (config.heatPump) price += 2500;
+    if (config.heatPump) price += (heatPumpPriceByModel[m] ?? 2500);
+    if (config.extraHeatPump) price += 1050;
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += (insulationPriceByModel[m] ?? 900);
 

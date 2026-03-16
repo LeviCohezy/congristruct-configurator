@@ -16,6 +16,9 @@ const countOptions: { value: 0 | 1 | 2; label: string }[] = [
 
 export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
+  const isHub = config.model === "hub";
+  const useNumericSelector = isFlow || isHub;
+  const perUnitPrice = isFlow ? "150" : "180";
 
   return (
     <div className="config-section">
@@ -27,16 +30,16 @@ export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
           <div>
             <p className="text-sm font-medium">Kiepraam</p>
             <p className="text-xs text-muted-foreground">Upgrade naar kiepramen voor betere ventilatie</p>
-            {isFlow ? (
+            {useNumericSelector ? (
               <div className="flex items-center gap-0.5 mt-1">
-                <BlurredPrice text="150" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent" prefix="+€" />
+                <BlurredPrice text={perUnitPrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent" prefix="+€" />
                 <span className="text-xs text-muted-foreground">/stuk</span>
               </div>
             ) : (
               <BlurredPrice text="180" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
             )}
           </div>
-          {isFlow ? (
+          {useNumericSelector ? (
             <div className="flex gap-1.5 ml-3">
               {countOptions.map((o) => (
                 <button

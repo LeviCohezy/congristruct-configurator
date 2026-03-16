@@ -129,11 +129,13 @@ function CircleGrid<T extends string>({
 
 export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
   const isFlow = config.model === "flow";
+  const isHub = config.model === "hub";
   const packageOn = config.lightingPackage === "full";
   const hasToilet = config.floorPlan === "b";
   const [flickerCard, setFlickerCard] = useState(false);
 
-  const keukenPrice = isFlow ? "150" : "350";
+  const packagePrice = isHub ? "1.990" : "1.500";
+  const keukenPrice = (isFlow || isHub) ? "150" : "350";
   const kastPrice = isFlow ? "530" : "300";
 
   const handleDisabledClick = () => {
@@ -148,7 +150,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
         <span className="flex items-center gap-2">
           Verlichtingspunten inbegrepen
           <span className="text-xs text-muted-foreground/70">|</span>
-          <BlurredPrice text="1.500" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium" prefix="Verlichtingspakket +€" />
+          <BlurredPrice text={packagePrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium" prefix="Verlichtingspakket +€" />
         </span>
       </p>
 
