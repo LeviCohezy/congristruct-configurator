@@ -3567,8 +3567,9 @@ function HubWalls({
                 <boxGeometry args={[baseW, baseH, baseD]} />
                 <meshStandardMaterial color="#2a2a2a" roughness={0.4} metalness={0.3} />
               </mesh>
+              {/* Screen hinges at back edge of base (-baseD/2) */}
               <group position={[0, baseH, -baseD / 2]}>
-                <mesh position={[0, screenH / 2 * Math.cos(screenAngle), -screenH / 2 * Math.sin(screenAngle)]} rotation={[screenAngle, 0, 0]}>
+                <mesh position={[0, screenH / 2 * Math.cos(screenAngle), screenH / 2 * Math.sin(screenAngle)]} rotation={[screenAngle, 0, 0]}>
                   <boxGeometry args={[screenW, screenH, screenT]} />
                   <meshStandardMaterial color="#1a1a1a" roughness={0.3} metalness={0.4} />
                 </mesh>
