@@ -213,6 +213,8 @@ export function useConfigurator() {
     if (config.tiltTurnWindow > 0) {
       if (m === "flow") {
         price += config.tiltTurnWindow * 150;
+      } else if (m === "hub") {
+        price += config.tiltTurnWindow * 180;
       } else {
         price += 180;
       }
@@ -220,7 +222,7 @@ export function useConfigurator() {
 
     // Lighting
     if (config.lightingPackage === "full") {
-      price += 1500;
+      price += lightingPackagePriceByModel[m] ?? 1500;
       if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") {
         price += 10;
       } else {
@@ -231,8 +233,14 @@ export function useConfigurator() {
     if (config.keukenLedStrip) price += (ledKeukenPriceByModel[m] ?? 350);
     if (config.kastLedStrip) price += (ledKastPriceByModel[m] ?? 300);
 
+    // Extra closet (Hub tussenmuur only)
+    if (config.extraCloset && m === "hub" && config.floorPlan === "b") {
+      price += extraClosetPrice;
+    }
+
     // Extras
-    if (config.heatPump) price += 2500;
+    if (config.heatPump) price += (heatPumpPriceByModel[m] ?? 2500);
+    if (config.extraHeatPump) price += 1050;
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += (insulationPriceByModel[m] ?? 900);
 
