@@ -757,6 +757,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           interiorColor={interiorColor} interiorRoughness={interiorRoughness}
           osbTex={osbTex} isShell={isShell}
           floorPlan={config.floorPlan}
+          hubDoorSwap={config.hubDoorSwap}
           finishLevel={config.finishLevel}
           shelfColor={config.shelfColor}
           ledStrip={config.kastLedStrip}

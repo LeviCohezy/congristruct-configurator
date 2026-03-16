@@ -73,6 +73,7 @@ const defaultConfig: ConfigState = {
   floorOption: "light-vinyl",
   shelfColor: "brown",
   tiltTurnWindow: false,
+  hubDoorSwap: false,
   spotType: "spot-zwart",
   railType: "rail-vast-zwart",
   toiletLamp: "wc-spot-zwart",
