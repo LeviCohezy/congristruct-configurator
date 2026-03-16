@@ -3982,7 +3982,7 @@ function BaseWalls({
         {/* Seg 6: 180cm wall */}
         {renderFrontWall(6)}
         {/* Seg 7: 200cm window */}
-        {renderFrontWindow(7, true)}
+        {renderFrontWindow(7)}
         {/* Seg 8: 95cm wall */}
         {renderFrontWall(8)}
       </group>
