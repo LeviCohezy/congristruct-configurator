@@ -3401,6 +3401,11 @@ function HubWalls({
         const kitchenEndZ = -halfD + wallThick + wcLength - partT;
         const kitchenW = kitchenEndZ - kitchenStartZ;
         const kitchenCZ = (kitchenStartZ + kitchenEndZ) / 2;
+        // Open kitchen section (excluding 40cm closed border at closet side)
+        const kitchenBorder = 0.40;
+        const kitchenOpenEndZ = kitchenEndZ - kitchenBorder;
+        const kitchenOpenW = kitchenOpenEndZ - kitchenStartZ;
+        const kitchenOpenCZ = (kitchenStartZ + kitchenOpenEndZ) / 2;
 
         const counterH = height * 0.25;
         const upperBottom = height * 0.65;
@@ -3413,7 +3418,7 @@ function HubWalls({
 
         return (
           <group>
-            {/* Back panel on WC partition */}
+            {/* Back panel on WC partition (full width for border section) */}
             <mesh position={[kitchenBackX, height / 2 + floorThick, kitchenCZ]}>
               <boxGeometry args={[0.04, height, kitchenW]} />
               <meshStandardMaterial {...matProps} />
@@ -3428,64 +3433,77 @@ function HubWalls({
               <boxGeometry args={[kitchenD, height, 0.02]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Lower cabinet */}
-            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD, counterH, kitchenW]} />
+            {/* 40cm closed border panel at closet side */}
+            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD, counterH, 0.40]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
-            {/* Countertop */}
+            <mesh position={[kitchenCX, counterH + 0.015 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD + 0.02, 0.03, 0.42]} />
+              <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+            </mesh>
+            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenEndZ - 0.20]}>
+              <boxGeometry args={[kitchenD, upperH, 0.40]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Lower cabinet (open section) */}
+            <mesh position={[kitchenCX, counterH / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD, counterH, kitchenOpenW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
+            {/* Countertop (full width) */}
             <mesh position={[kitchenCX, counterH + 0.015 + floorThick, kitchenCZ]}>
               <boxGeometry args={[kitchenD + 0.02, 0.03, kitchenW + 0.02]} />
               <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
-            {/* Upper cabinet */}
-            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD, upperH, kitchenW]} />
+            {/* Upper cabinet (open section) */}
+            <mesh position={[kitchenCX, upperBottom + upperH / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD, upperH, kitchenOpenW]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Open niche back panel */}
-            <mesh position={[kitchenBackX - 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[0.01, (upperBottom - counterH) - 0.06, kitchenW - 0.04]} />
+            <mesh position={[kitchenBackX - 0.005, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[0.01, (upperBottom - counterH) - 0.06, kitchenOpenW - 0.04]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
             {/* Middle shelf in niche */}
-            <mesh position={[kitchenCX, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD - 0.02, 0.025, kitchenW - 0.04]} />
+            <mesh position={[kitchenCX, counterH + (upperBottom - counterH) / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD - 0.02, 0.025, kitchenOpenW - 0.04]} />
               <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
             {/* Door lines lower */}
             {[0.33, 0.67].map((frac, i) => (
-              <mesh key={`hkl${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, counterH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+              <mesh key={`hkl${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, counterH / 2 + floorThick, kitchenStartZ + kitchenOpenW * frac]}>
                 <boxGeometry args={[0.004, counterH - 0.02, 0.008]} />
                 <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
               </mesh>
             ))}
             {/* Door lines upper */}
             {[0.33, 0.67].map((frac, i) => (
-              <mesh key={`hku${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, upperBottom + upperH / 2 + floorThick, kitchenStartZ + kitchenW * frac]}>
+              <mesh key={`hku${i}`} position={[kitchenCX - kitchenD / 2 - 0.002, upperBottom + upperH / 2 + floorThick, kitchenStartZ + kitchenOpenW * frac]}>
                 <boxGeometry args={[0.004, upperH - 0.02, 0.008]} />
                 <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
               </mesh>
             ))}
             {/* Integrated sink */}
-            <mesh position={[kitchenCX, counterH + 0.03 + 0.001 + floorThick, kitchenCZ]}>
+            <mesh position={[kitchenCX, counterH + 0.03 + 0.001 + floorThick, kitchenOpenCZ]}>
               <boxGeometry args={[sinkD, 0.003, sinkW]} />
               <meshStandardMaterial color="#e8e8e8" roughness={0.1} metalness={0.6} />
             </mesh>
-            <mesh position={[kitchenCX, counterH + 0.03 - sinkDepth / 2 + floorThick, kitchenCZ]}>
+            <mesh position={[kitchenCX, counterH + 0.03 - sinkDepth / 2 + floorThick, kitchenOpenCZ]}>
               <boxGeometry args={[sinkD - 0.02, sinkDepth, sinkW - 0.02]} />
               <meshStandardMaterial color="#d0d0d0" roughness={0.15} metalness={0.5} />
             </mesh>
             {/* Faucet */}
-            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.01 + floorThick, kitchenCZ]}>
+            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.01 + floorThick, kitchenOpenCZ]}>
               <cylinderGeometry args={[0.015, 0.02, 0.02, 8]} />
               <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
             </mesh>
-            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.12 + floorThick, kitchenCZ]}>
+            <mesh position={[kitchenCX + sinkD / 2 - 0.02, counterH + 0.03 + 0.12 + floorThick, kitchenOpenCZ]}>
               <cylinderGeometry args={[0.008, 0.008, 0.20, 8]} />
               <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
             </mesh>
-            <mesh position={[kitchenCX + sinkD / 2 - 0.08, counterH + 0.03 + 0.21 + floorThick, kitchenCZ]} rotation={[0, 0, Math.PI / 6]}>
+            <mesh position={[kitchenCX + sinkD / 2 - 0.08, counterH + 0.03 + 0.21 + floorThick, kitchenOpenCZ]} rotation={[0, 0, Math.PI / 6]}>
               <cylinderGeometry args={[0.006, 0.008, 0.12, 8]} />
               <meshStandardMaterial color="#c0c0c0" roughness={0.1} metalness={0.8} />
             </mesh>
@@ -3509,26 +3527,26 @@ function HubWalls({
               </mesh>
             </group>
             {/* Shelf under upper cabinet */}
-            <mesh position={[kitchenCX, upperBottom - 0.30 + floorThick, kitchenCZ]}>
-              <boxGeometry args={[kitchenD + 0.01, 0.02, kitchenW - 0.02]} />
+            <mesh position={[kitchenCX, upperBottom - 0.30 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[kitchenD + 0.01, 0.02, kitchenOpenW - 0.02]} />
               <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
             </mesh>
             {/* LED strips */}
             {ledStrip && <>
-              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.01 + floorThick, kitchenCZ]}>
-                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.01 + floorThick, kitchenOpenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenOpenW - 0.04]} />
                 <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
               </mesh>
-              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.30 - 0.01 + floorThick, kitchenCZ]}>
-                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+              <mesh position={[kitchenBackX - 0.03, upperBottom - 0.30 - 0.01 + floorThick, kitchenOpenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenOpenW - 0.04]} />
                 <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
               </mesh>
-              <mesh position={[kitchenBackX - 0.03, counterH + 0.03 - 0.01 + floorThick, kitchenCZ]}>
-                <boxGeometry args={[0.012, 0.008, kitchenW - 0.04]} />
+              <mesh position={[kitchenBackX - 0.03, counterH + 0.03 - 0.01 + floorThick, kitchenOpenCZ]}>
+                <boxGeometry args={[0.012, 0.008, kitchenOpenW - 0.04]} />
                 <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
               </mesh>
-              <pointLight position={[kitchenCX, upperBottom - 0.05 + floorThick, kitchenCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
-              <pointLight position={[kitchenCX, counterH + floorThick, kitchenCZ]} intensity={0.25} distance={0.5} color="#fffde8" />
+              <pointLight position={[kitchenCX, upperBottom - 0.05 + floorThick, kitchenOpenCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+              <pointLight position={[kitchenCX, counterH + floorThick, kitchenOpenCZ]} intensity={0.25} distance={0.5} color="#fffde8" />
             </>}
           </group>
         );
