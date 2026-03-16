@@ -3423,6 +3423,11 @@ function HubWalls({
               <boxGeometry args={[0.04, height, kitchenW]} />
               <meshStandardMaterial {...matProps} />
             </mesh>
+            {/* Back panel full height (only open section) */}
+            <mesh position={[kitchenBackX, height / 2 + floorThick, kitchenOpenCZ]}>
+              <boxGeometry args={[0.04, height, kitchenOpenW]} />
+              <meshStandardMaterial {...matProps} />
+            </mesh>
             {/* Side panel — back wall side */}
             <mesh position={[kitchenCX, height / 2 + floorThick, kitchenStartZ - 0.01]}>
               <boxGeometry args={[kitchenD, height, 0.02]} />
