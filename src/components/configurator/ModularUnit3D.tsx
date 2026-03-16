@@ -4292,13 +4292,13 @@ function BaseWalls({
 
                 {/* ── 3 chairs on front side (+Z, facing table) ── */}
                 {[1, 2, 3].map(i => renderSimpleChair(
-                  deskEndX + chairSpacing * i,
+                  deskCX - deskLength / 2 + chairSpacing * i,
                   deskCZ + chairUnderOffset,
                   -1
                 ))}
-                {/* ── 3 chairs on back side (-Z, facing table) ── */}
-                {[1, 2, 3].map(i => renderSimpleChair(
-                  deskEndX + chairSpacing * i,
+                {/* ── 3 chairs on back side (-Z, staggered) ── */}
+                {[0.5, 1.5, 2.5].map(i => renderSimpleChair(
+                  deskCX - deskLength / 2 + chairSpacing * (i + 0.5),
                   deskCZ - chairUnderOffset,
                   1
                 ))}
