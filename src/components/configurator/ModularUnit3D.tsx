@@ -2947,62 +2947,93 @@ function HubWalls({
         <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
       </mesh>
 
-      {/* ── Left wall (with entrance door) ── */}
+      {/* ── Left wall ── */}
       {(() => {
-        // Door: 100cm wide, 45cm from front wall, on left side wall
-        const doorBot = 0; // door starts at floor
-        const doorTop = winH; // full-height glass door
-        const doorZ1 = halfD - wallThick - 0.45 - DOOR_W; // back edge of door
-        const doorZ2 = halfD - wallThick - 0.45; // front edge of door
         const wallCenterX = -halfW + wallThick / 2;
         
-        // Section behind the door (from back wall to door back edge)
-        const backSectionD = doorZ1 - (-halfD + sideInset);
-        const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
-        
-        // Section in front of the door (from door front edge to front wall)  
-        const frontSectionD = (halfD - sideInset) - doorZ2;
-        const frontSectionZ = doorZ2 + frontSectionD / 2;
-        
-        // Above door section (full width, above door height)
-        const aboveDoorH = extWallH - doorTop - floorThick;
-        const doorMidZ = (doorZ1 + doorZ2) / 2;
-        
-        return (
-          <group>
-            {/* Wall section behind door */}
-            {backSectionD > 0 && (
-              <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
-                <boxGeometry args={[wallThick, extWallH, backSectionD]} />
-                <CladMaterial {...woodBase} wallWidth={backSectionD} />
+        if (doorSwap) {
+          // Door swapped to front: left wall has a 100cm window instead (same position as where door was)
+          const winW = 1.0;
+          const winZ1 = halfD - wallThick - 0.45 - winW;
+          const winZ2 = halfD - wallThick - 0.45;
+          const backSectionD = winZ1 - (-halfD + sideInset);
+          const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
+          const frontSectionD = (halfD - sideInset) - winZ2;
+          const frontSectionZ = winZ2 + frontSectionD / 2;
+          const winMidZ = (winZ1 + winZ2) / 2;
+          
+          return (
+            <group>
+              {backSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, backSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={backSectionD} />
+                </mesh>
+              )}
+              {frontSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+                </mesh>
+              )}
+              {/* Below window */}
+              <mesh position={[wallCenterX, (winBot + floorThick) / 2, winMidZ]} castShadow>
+                <boxGeometry args={[wallThick, winBot + floorThick, winW]} />
+                <CladMaterial {...woodBase} wallWidth={winW} wallHeight={winBot + floorThick} fullWallHeight={extWallH} />
               </mesh>
-            )}
-            {/* Wall section in front of door */}
-            {frontSectionD > 0 && (
-              <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
-                <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
-                <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+              {/* Above window */}
+              <mesh position={[wallCenterX, winTop + (height - winTop) / 2 + floorThick, winMidZ]} castShadow>
+                <boxGeometry args={[wallThick, height - winTop, winW]} />
+                <CladMaterial {...woodBase} wallWidth={winW} wallHeight={height - winTop} fullWallHeight={extWallH} />
               </mesh>
-            )}
-            {/* Wall section above door */}
-            {aboveDoorH > 0 && (
-              <mesh position={[wallCenterX, doorTop + floorThick + aboveDoorH / 2, doorMidZ]} castShadow>
-                <boxGeometry args={[wallThick, aboveDoorH, DOOR_W]} />
-                <CladMaterial {...woodBase} wallWidth={DOOR_W} />
-              </mesh>
-            )}
-            {/* Door */}
-            <DoorPane
-              posX={wallCenterX}
-              posY={winCY + floorThick}
-              width={DOOR_W}
-              height={doorTop}
-              frameColor={frameColor}
-              z={doorMidZ}
-              rotate={true}
-            />
-          </group>
-        );
+              <GlassPane posX={wallCenterX} posY={winCY + floorThick} width={winW} height={winH} frameColor={frameColor} z={winMidZ} rotate={true} />
+            </group>
+          );
+        } else {
+          // Default: entrance door on left wall
+          const doorBot = 0;
+          const doorTop = winH;
+          const doorZ1 = halfD - wallThick - 0.45 - DOOR_W;
+          const doorZ2 = halfD - wallThick - 0.45;
+          const backSectionD = doorZ1 - (-halfD + sideInset);
+          const backSectionZ = (-halfD + sideInset) + backSectionD / 2;
+          const frontSectionD = (halfD - sideInset) - doorZ2;
+          const frontSectionZ = doorZ2 + frontSectionD / 2;
+          const aboveDoorH = extWallH - doorTop - floorThick;
+          const doorMidZ = (doorZ1 + doorZ2) / 2;
+          
+          return (
+            <group>
+              {backSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, backSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, backSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={backSectionD} />
+                </mesh>
+              )}
+              {frontSectionD > 0 && (
+                <mesh position={[wallCenterX, extWallCY, frontSectionZ]} castShadow>
+                  <boxGeometry args={[wallThick, extWallH, frontSectionD]} />
+                  <CladMaterial {...woodBase} wallWidth={frontSectionD} />
+                </mesh>
+              )}
+              {aboveDoorH > 0 && (
+                <mesh position={[wallCenterX, doorTop + floorThick + aboveDoorH / 2, doorMidZ]} castShadow>
+                  <boxGeometry args={[wallThick, aboveDoorH, DOOR_W]} />
+                  <CladMaterial {...woodBase} wallWidth={DOOR_W} />
+                </mesh>
+              )}
+              <DoorPane
+                posX={wallCenterX}
+                posY={winCY + floorThick}
+                width={DOOR_W}
+                height={doorTop}
+                frameColor={frameColor}
+                z={doorMidZ}
+                rotate={true}
+              />
+            </group>
+          );
+        }
       })()}
 
       {/* ── Front facade ── */}
