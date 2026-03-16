@@ -10,10 +10,10 @@ interface Props {
   onPriceClick?: () => void;
 }
 
-const extras = [
+const getExtras = (model: string) => [
   { key: "heatPump" as const, label: "Luchtwarmtepomp", icon: Flame, price: "2.500", desc: "Efficiënte verwarming & koeling" },
   { key: "solarBattery" as const, label: "Solar batterij", icon: Battery, price: "4.500", desc: "Energieopslag" },
-  { key: "insulation" as const, label: "Houtvezelplaat isolatie", icon: Layers, price: "900", desc: "Extra isolatie met houtvezelplaat" },
+  { key: "insulation" as const, label: "Houtvezelplaat isolatie", icon: Layers, price: model === "flow" ? "1.450" : "900", desc: "Extra isolatie met houtvezelplaat" },
 ];
 
 export function ExtraOptions({ config, updateConfig, onPriceClick }: Props) {
