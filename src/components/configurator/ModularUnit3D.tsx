@@ -3743,7 +3743,7 @@ function HubWalls({
             {backChairX.map((cx, i) => (
               <group key={`back-${i}`}>
                 {renderSimpleChair(cx, tableCenterZ - chairOffset, 1)}
-                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, 0)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, Math.PI)}
               </group>
             ))}
           </group>
