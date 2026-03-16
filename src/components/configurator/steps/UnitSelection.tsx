@@ -12,7 +12,7 @@ interface Props {
 const models = [
   { id: "start" as const, label: "BLOQ START", size: "14 m²", people: "1 pers.", desc: "Geschikt als thuiskantoor of kleine vergaderruimte", price: "16.700" },
   { id: "flow" as const, label: "BLOQ FLOW", size: "21–28 m²", people: "1–2 pers.", desc: "Ideaal als praktijkruimte of refter voor meerdere personen", price: "22.550" },
-  { id: "hub" as const, label: "BLOQ HUB", size: "35 m²", people: "4–6 pers.", desc: "Voor kleine teams of gedeelde kantoren. Functioneel en goed ingedeeld.", price: "58.500" },
+  { id: "hub" as const, label: "BLOQ HUB", size: "35 m²", people: "4–6 pers.", desc: "Voor kleine teams of gedeelde kantoren. Functioneel en goed ingedeeld.", price: "31.550" },
   { id: "base" as const, label: "BLOQ BASE", size: "50 m²", people: "6 pers.", desc: "Onze grootste unit. Stevig, uitbreidbaar en klaar voor intensief gebruik.", price: "79.000" },
 ];
 
