@@ -497,7 +497,7 @@ export function WindowsPlan({ config, updateConfig }: Props) {
               onClick={() => updateConfig("floorPlan", plan)}
               className={cn("option-card text-center py-4", config.floorPlan === plan && "option-card-active")}
             >
-              <FloorPlanSVG model={config.model} plan={plan} mirrored={config.mirrorPlan} />
+              <FloorPlanSVG model={config.model} plan={plan} mirrored={config.mirrorPlan} hubDoorSwap={config.hubDoorSwap} />
               <p className="font-medium text-sm mt-2">{plans[plan].label}</p>
               <p className="text-[11px] text-muted-foreground mt-0.5">{plans[plan].desc}</p>
             </button>
