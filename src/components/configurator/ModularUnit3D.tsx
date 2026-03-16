@@ -3629,16 +3629,16 @@ function HubWalls({
             <group>
               {/* Small room desk */}
               {renderDesk(smallDeskCX, smallDeskCZ, smallDeskLength, tableW)}
-              {/* Small room: 2 chairs on each side (front +Z, back -Z), 50% under */}
+              {/* Small room: 2 chairs on each side, facing inward (rotated 180°) */}
               {[1, 2].map(i => renderSimpleChair(
                 smallDeskEndX + smallChairSpacing * i,
                 smallDeskCZ + chairUnderOffset,
-                1
+                -1
               ))}
               {[1, 2].map(i => renderSimpleChair(
                 smallDeskEndX + smallChairSpacing * i,
                 smallDeskCZ - chairUnderOffset,
-                -1
+                1
               ))}
 
               {/* Big room desk (against tussenmuur) */}
