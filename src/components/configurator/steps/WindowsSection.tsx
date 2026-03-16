@@ -39,7 +39,7 @@ export function WindowsSection({ config, updateConfig, onPriceClick }: Props) {
               <BlurredPrice text="180" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-1" prefix="+€" />
             )}
           </div>
-          {isFlow ? (
+          {useNumericSelector ? (
             <div className="flex gap-1.5 ml-3">
               {countOptions.map((o) => (
                 <button

@@ -36,6 +36,7 @@ const floorOptions = [
 const shelfPrices: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
+  hub:   { brown: 350, "light-oak": 200, white: 0 },
 };
 
 const shelfColors = [
