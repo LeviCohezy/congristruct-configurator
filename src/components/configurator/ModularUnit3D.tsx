@@ -3902,6 +3902,11 @@ function BaseWalls({
         <boxGeometry args={[wallThick, extWallH, sideFlatD]} />
         <CladMaterial {...woodBase} wallWidth={sideFlatD} />
       </mesh>
+      {/* Interior left wall */}
+      <mesh position={[-halfW + wallThick + 0.005, height / 2 + floorThick, 0]}>
+        <boxGeometry args={[0.01, height, sideFlatD]} />
+        <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} />
+      </mesh>
 
       {/* ── Right wall — with window ── */}
       {(() => {
