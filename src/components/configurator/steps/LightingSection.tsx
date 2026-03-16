@@ -29,22 +29,22 @@ interface Props {
 }
 
 const spotOptions = [
-  { id: "spot-wit" as const, tooltip: "Inbouwspot (+€5)", img: spotWit },
-  { id: "spot-zwart" as const, tooltip: "Inbouwspot (+€5)", img: spotZwart },
-  { id: "opbouw-spot-wit" as const, tooltip: "Opbouwspot (+€10)", img: opbouwSpotWit },
-  { id: "opbouw-spot-zwart" as const, tooltip: "Opbouwspot (+€10)", img: opbouwSpotZwart },
+  { id: "spot-wit" as const, label: "Inbouwspot wit", img: spotWit, price: 5 },
+  { id: "spot-zwart" as const, label: "Inbouwspot zwart", img: spotZwart, price: 5 },
+  { id: "opbouw-spot-wit" as const, label: "Opbouwspot wit", img: opbouwSpotWit, price: 10 },
+  { id: "opbouw-spot-zwart" as const, label: "Opbouwspot zwart", img: opbouwSpotZwart, price: 10 },
 ];
 
 const railOptions = [
-  { id: "rail-vast-wit" as const, tooltip: "Vaste rail (+€5)", img: railVastWit },
-  { id: "rail-vast-zwart" as const, tooltip: "Vaste rail (+€5)", img: railVastZwart },
-  { id: "rail-wit-hangend" as const, tooltip: "Hangende rail (+€5)", img: railWitHangend },
-  { id: "rail-zwart-hangend" as const, tooltip: "Hangende rail (+€5)", img: railZwartHangend },
+  { id: "rail-vast-wit" as const, label: "Vaste rail wit", img: railVastWit, price: 5 },
+  { id: "rail-vast-zwart" as const, label: "Vaste rail zwart", img: railVastZwart, price: 5 },
+  { id: "rail-wit-hangend" as const, label: "Hangende rail wit", img: railWitHangend, price: 5 },
+  { id: "rail-zwart-hangend" as const, label: "Hangende rail zwart", img: railZwartHangend, price: 5 },
 ];
 
 const toiletOptions = [
-  { id: "wc-spot-wit" as const, tooltip: "WC spot wit", img: wcSpotWit },
-  { id: "wc-spot-zwart" as const, tooltip: "WC spot zwart", img: wcSpotZwart },
+  { id: "wc-spot-wit" as const, label: "WC spot wit", img: wcSpotWit, price: 0 },
+  { id: "wc-spot-zwart" as const, label: "WC spot zwart", img: wcSpotZwart, price: 0 },
 ];
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
