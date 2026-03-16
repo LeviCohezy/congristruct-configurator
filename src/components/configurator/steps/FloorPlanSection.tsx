@@ -87,6 +87,28 @@ export function FloorPlanSection({ config, updateConfig }: Props) {
           </button>
         </div>
       )}
+
+      {/* Kitchen toggle (BASE Plan B only) */}
+      {config.model === "base" && config.floorPlan === "b" && (
+        <div className="option-card flex items-center justify-between mt-4">
+          <div>
+            <p className="text-sm font-medium">Keuken</p>
+            <p className="text-xs text-muted-foreground">Voeg een keuken toe tegen de toiletmuur</p>
+          </div>
+          <button
+            onClick={() => updateConfig("hasKitchen", !config.hasKitchen)}
+            className={cn(
+              "w-11 h-6 rounded-full transition-all duration-200 relative shrink-0 ml-3",
+              config.hasKitchen ? "bg-accent" : "bg-muted"
+            )}
+          >
+            <span className={cn(
+              "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-card shadow transition-transform duration-200",
+              config.hasKitchen ? "translate-x-5" : "translate-x-0"
+            )} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
