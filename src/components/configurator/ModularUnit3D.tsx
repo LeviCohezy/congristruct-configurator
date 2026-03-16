@@ -3848,9 +3848,9 @@ function BaseWalls({
   const blockWidth = 1.0; // ~100cm wide, same as other toilet blocks
   const blockRightX = doorMidX;
   const blockLeftX = blockRightX - blockWidth;
-  const totalBlockDepth = 1.5; // 150cm total depth from back wall
-  const techDepth = 0.85; // tech room at back
-  const wcDepth = totalBlockDepth - techDepth; // WC in front
+  const totalBlockDepth = 2.40; // 240cm total (tech room + WC)
+  const wcDepth = 1.10; // WC: front part, leaves ≥110cm to front wall
+  const techDepth = totalBlockDepth - wcDepth; // tech room: back part (130cm)
   const techBottomZ = -halfD + wallThick + techDepth;
   const wcBottomZ = techBottomZ + wcDepth;
 
