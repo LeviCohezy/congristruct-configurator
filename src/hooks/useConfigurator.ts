@@ -17,6 +17,7 @@ export interface ConfigState {
   floorOption: "light-vinyl" | "dark-vinyl" | "stone-vinyl";
   shelfColor: "brown" | "light-oak" | "white";
   tiltTurnWindow: boolean;
+  hubDoorSwap: boolean;
   spotType: "spot-wit" | "spot-zwart" | "opbouw-spot-wit" | "opbouw-spot-zwart";
   railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend" | "rail-zwart-hangend";
   toiletLamp: "wc-spot-wit" | "wc-spot-zwart";
