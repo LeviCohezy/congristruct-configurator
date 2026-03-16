@@ -779,6 +779,7 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
           shelfColor={config.shelfColor}
           ledStrip={config.kastLedStrip}
           lightOakTex={lightOakTex}
+          hasKitchen={config.hasKitchen}
         />
       ) : (
         <GenericWalls
