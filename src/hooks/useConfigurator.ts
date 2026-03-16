@@ -72,7 +72,7 @@ const defaultConfig: ConfigState = {
   finishLevel: "shell",
   floorOption: "light-vinyl",
   shelfColor: "white",
-  tiltTurnWindow: false,
+  tiltTurnWindow: 0,
   hubDoorSwap: false,
   spotType: "spot-zwart",
   railType: "rail-vast-zwart",
