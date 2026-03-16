@@ -3573,7 +3573,7 @@ function HubWalls({
           // ── SMALL ROOM (left of tussenmuur) ──
           // Desk runs from tussenmuur toward left, ending just before start of big window
           const smallDeskStartX = tussenmuurX - partT / 2; // at tussenmuur
-          const smallDeskEndX = cumX[1] + 0.05; // just past start of big window
+          const smallDeskEndX = cumX[1] + 0.30; // pulled back from window edge
           const smallDeskLength = smallDeskStartX - smallDeskEndX;
           const smallDeskCX = (smallDeskStartX + smallDeskEndX) / 2;
           // Centered on the wall section next to the door (back wall to door opening)
