@@ -216,11 +216,13 @@ export function useConfigurator() {
         setPriceJustIncreased(true);
         setPriceJustDecreased(false);
         const t = setTimeout(() => setPriceJustIncreased(false), 1200);
+        prevPriceRef.current = totalPrice;
         return () => clearTimeout(t);
       } else if (totalPrice < prevPriceRef.current) {
         setPriceJustDecreased(true);
         setPriceJustIncreased(false);
         const t = setTimeout(() => setPriceJustDecreased(false), 1200);
+        prevPriceRef.current = totalPrice;
         return () => clearTimeout(t);
       }
     }
