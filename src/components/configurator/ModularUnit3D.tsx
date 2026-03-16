@@ -4301,7 +4301,94 @@ function BaseWalls({
                   1
                 ))}
 
-              </group>
+                {/* ═══ BACK WALL SHELF/CABINET (same as FLOW 28m²) ═══ */}
+                {(() => {
+                  const shelfW = closetWidth;
+                  const shelfD = closetD;
+                  const shelfCX = closetCX;
+                  const shelfCZ = closetCZ;
+                  const backPanelZ = -halfD + wallThick + 0.02;
+
+                  const counterTop = height * 0.25;
+                  const upperBottom = height * 0.65;
+                  const upperH = height - upperBottom;
+                  const nicheH = upperBottom - counterTop;
+
+                  return (
+                    <>
+                      {/* Back panel */}
+                      <mesh position={[shelfCX, height / 2 + floorThick, backPanelZ]}>
+                        <boxGeometry args={[shelfW, height, 0.04]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Lower cabinet */}
+                      <mesh position={[shelfCX, counterTop / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW, counterTop, shelfD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Countertop */}
+                      <mesh position={[shelfCX, counterTop + 0.015 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW + 0.02, 0.03, shelfD + 0.02]} />
+                        <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+                      </mesh>
+                      {/* Upper cabinet */}
+                      <mesh position={[shelfCX, upperBottom + upperH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW, upperH, shelfD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Niche side panels */}
+                      <mesh position={[shelfCX - shelfW / 2 + shelfW / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW / 6, nicheH, shelfD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      <mesh position={[shelfCX + shelfW / 2 - shelfW / 12, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW / 6, nicheH, shelfD]} />
+                        <meshStandardMaterial {...matProps} />
+                      </mesh>
+                      {/* Niche back dark panel */}
+                      <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, backPanelZ + 0.005]}>
+                        <boxGeometry args={[shelfW * 4 / 6 - 0.02, nicheH - 0.06, 0.01]} />
+                        <meshStandardMaterial color="#0e0a08" roughness={0.95} />
+                      </mesh>
+                      {/* Niche middle shelf */}
+                      <mesh position={[shelfCX, counterTop + nicheH / 2 + floorThick, shelfCZ]}>
+                        <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.025, shelfD - 0.02]} />
+                        <meshStandardMaterial color={sc.counterTop} roughness={0.4} metalness={0.1} />
+                      </mesh>
+                      {/* Upper door lines */}
+                      {[0.25, 0.5, 0.75].map((frac, i) => (
+                        <mesh key={`su${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, upperBottom + upperH / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                          <boxGeometry args={[0.008, upperH - 0.02, 0.004]} />
+                          <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                        </mesh>
+                      ))}
+                      {/* Lower door lines */}
+                      {[0.25, 0.5, 0.75].map((frac, i) => (
+                        <mesh key={`sl${i}`} position={[shelfCX - shelfW / 2 + shelfW * frac, counterTop / 2 + floorThick, shelfCZ + shelfD / 2 + 0.002]}>
+                          <boxGeometry args={[0.008, counterTop - 0.02, 0.004]} />
+                          <meshStandardMaterial color={sc.doorLine} roughness={0.5} />
+                        </mesh>
+                      ))}
+                      {/* LED strips */}
+                      {ledStrip && <>
+                        <mesh position={[shelfCX, upperBottom - 0.005 + floorThick, backPanelZ + 0.04]}>
+                          <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.01, 0.015]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+                        </mesh>
+                        <mesh position={[shelfCX, counterTop + nicheH / 2 - 0.018 + floorThick, backPanelZ + 0.04]}>
+                          <boxGeometry args={[shelfW * 4 / 6 - 0.02, 0.01, 0.015]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+                        </mesh>
+                        <mesh position={[shelfCX, counterTop + 0.03 - 0.005 + floorThick, backPanelZ + 0.04]}>
+                          <boxGeometry args={[shelfW - 0.02, 0.01, 0.015]} />
+                          <meshStandardMaterial color="#fffde8" emissive="#fffde8" emissiveIntensity={4} roughness={0.1} toneMapped={false} />
+                        </mesh>
+                        <pointLight position={[shelfCX, upperBottom - 0.05 + floorThick, shelfCZ]} intensity={0.5} distance={1.0} color="#fffde8" />
+                        <pointLight position={[shelfCX, counterTop + nicheH / 4 + floorThick, shelfCZ]} intensity={0.4} distance={0.8} color="#fffde8" />
+                      </>}
+                    </>
+                  );
+                })()}
             );
           })()}
         </group>
