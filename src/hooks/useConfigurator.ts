@@ -182,7 +182,13 @@ export function useConfigurator() {
     }
 
     if (config.roundedCorners) price += 1500;
-    if (config.tiltTurnWindow > 0) price += config.tiltTurnWindow * 150;
+    if (config.tiltTurnWindow > 0) {
+      if (m === "flow") {
+        price += config.tiltTurnWindow * 150;
+      } else {
+        price += 180;
+      }
+    }
 
     // Lighting
     if (config.lightingPackage === "full") {
