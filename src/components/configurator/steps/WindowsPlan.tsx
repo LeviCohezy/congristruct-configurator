@@ -533,7 +533,6 @@ export function WindowsPlan({ config, updateConfig }: Props) {
             <p className="text-sm font-medium">Draai-kiepraam</p>
             <p className="text-xs text-muted-foreground">Vervang vast raam door draai-kiepraam · +€450</p>
           </div>
-          <button
           <div className="flex gap-1.5 ml-3">
             {([0, 1, 2] as const).map((v) => (
               <button
