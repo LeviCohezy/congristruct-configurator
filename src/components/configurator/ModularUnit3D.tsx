@@ -3556,6 +3556,27 @@ function HubWalls({
           );
         };
 
+        // Helper: render a laptop (base + angled screen)
+        const renderLaptop = (cx: number, tableTopY: number, cz: number, rotY: number) => {
+          const baseW = 0.32, baseD = 0.22, baseH = 0.012;
+          const screenW = 0.30, screenH = 0.20, screenT = 0.006;
+          const screenAngle = -Math.PI / 6; // 30° tilt
+          return (
+            <group position={[cx, tableTopY, cz]} rotation={[0, rotY, 0]}>
+              <mesh position={[0, baseH / 2, 0]}>
+                <boxGeometry args={[baseW, baseH, baseD]} />
+                <meshStandardMaterial color="#2a2a2a" roughness={0.4} metalness={0.3} />
+              </mesh>
+              <group position={[0, baseH, -baseD / 2]}>
+                <mesh position={[0, screenH / 2 * Math.cos(screenAngle), -screenH / 2 * Math.sin(screenAngle)]} rotation={[screenAngle, 0, 0]}>
+                  <boxGeometry args={[screenW, screenH, screenT]} />
+                  <meshStandardMaterial color="#1a1a1a" roughness={0.3} metalness={0.4} />
+                </mesh>
+              </group>
+            </group>
+          );
+        };
+
         if (hasTussenmuur) {
           // ── Plan B: two separate desks in small & big rooms ──
 
@@ -3710,10 +3731,20 @@ function HubWalls({
                 <meshStandardMaterial {...planATableMatProps} />
               </mesh>
             ))}
-            {/* Chairs — front side (+Z), rotated 180° */}
-            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, -1))}
-            {/* Chairs — back side (-Z), rotated 180° */}
-            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, 1))}
+            {/* Laptops + Chairs — front side (+Z) */}
+            {frontChairX.map((cx, i) => (
+              <group key={`front-${i}`}>
+                {renderSimpleChair(cx, tableCenterZ + chairOffset, -1)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, Math.PI)}
+              </group>
+            ))}
+            {/* Laptops + Chairs — back side (-Z) */}
+            {backChairX.map((cx, i) => (
+              <group key={`back-${i}`}>
+                {renderSimpleChair(cx, tableCenterZ - chairOffset, 1)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, 0)}
+              </group>
+            ))}
           </group>
         );
       })()}
