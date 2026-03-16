@@ -16,7 +16,7 @@ export interface ConfigState {
   finishLevel: "shell" | "finished" | "fully-finished";
   floorOption: "light-vinyl" | "dark-vinyl" | "stone-vinyl";
   shelfColor: "brown" | "light-oak" | "white";
-  tiltTurnWindow: boolean;
+  tiltTurnWindow: 0 | 1 | 2;
   hubDoorSwap: boolean;
   spotType: "spot-wit" | "spot-zwart" | "opbouw-spot-wit" | "opbouw-spot-zwart";
   railType: "rail-vast-wit" | "rail-vast-zwart" | "rail-wit-hangend" | "rail-zwart-hangend";
