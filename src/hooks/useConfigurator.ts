@@ -24,6 +24,7 @@ export interface ConfigState {
   keukenLedStrip: boolean;
   kastLedStrip: boolean;
   lightingPackage: "base" | "full";
+  hasKitchen: boolean;
   extraCloset: boolean;
   heatPump: boolean;
   extraHeatPump: boolean;
@@ -82,6 +83,7 @@ const defaultConfig: ConfigState = {
   keukenLedStrip: false,
   kastLedStrip: false,
   lightingPackage: "base",
+  hasKitchen: false,
   extraCloset: false,
   heatPump: false,
   extraHeatPump: false,
