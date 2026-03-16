@@ -3736,7 +3736,7 @@ function HubWalls({
             {frontChairX.map((cx, i) => (
               <group key={`front-${i}`}>
                 {renderSimpleChair(cx, tableCenterZ + chairOffset, -1)}
-                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, Math.PI)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, 0)}
               </group>
             ))}
             {/* Laptops + Chairs — back side (-Z) */}
