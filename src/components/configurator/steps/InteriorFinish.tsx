@@ -6,9 +6,8 @@ import { RelativePrice } from "@/components/configurator/RelativePrice";
 import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
 import darkWoodFloorTexture from "@/assets/dark-wood-floor-texture.png";
 import stoneFloorTexture from "@/assets/stone-floor-texture.png";
-import thermowoodNaturalTexture from "@/assets/thermowood-natural-texture.png";
+import darkCabinetTexture from "@/assets/dark-cabinet-texture.png";
 import lightOakTexture from "@/assets/light-oak-texture.png";
-import brickStripsTexture from "@/assets/brick-strips-texture.png";
 
 interface Props {
   config: ConfigState;
@@ -39,9 +38,9 @@ const shelfPrices: Record<string, Record<string, number>> = {
 };
 
 const shelfColors = [
-  { id: "brown" as const, label: "Donkere kasten", texture: thermowoodNaturalTexture },
-  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture },
   { id: "white" as const, label: "Wit", texture: null, color: "#f5f5f0" },
+  { id: "light-oak" as const, label: "Eiken kasten", texture: lightOakTexture },
+  { id: "brown" as const, label: "Donkere kasten", texture: darkCabinetTexture },
 ];
 
 const showFloor = (level: ConfigState["finishLevel"]) => level === "finished" || level === "fully-finished";
