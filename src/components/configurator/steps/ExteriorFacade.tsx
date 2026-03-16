@@ -101,8 +101,55 @@ function getActiveFamily(facade: FacadeId): string {
   }
   return materials[0].id;
 }
+function RalColorSlider({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+  const currentIndex = useMemo(() => {
+    const idx = RAL_COLORS.findIndex((c) => c.hex === value);
+    return idx >= 0 ? idx : 0;
+  }, [value]);
 
-export function ExteriorFacade({ config, updateConfig }: Props) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div
+          className="w-10 h-10 rounded-lg shrink-0 border border-border"
+          style={{ backgroundColor: RAL_COLORS[currentIndex].hex }}
+        />
+        <div>
+          <p className="text-xs font-medium">{RAL_COLORS[currentIndex].code}</p>
+          <p className="text-[11px] text-muted-foreground">{RAL_COLORS[currentIndex].name}</p>
+        </div>
+      </div>
+      <Slider
+        min={0}
+        max={RAL_COLORS.length - 1}
+        step={1}
+        value={[currentIndex]}
+        onValueChange={([i]) => onChange(RAL_COLORS[i].hex)}
+        className="w-full"
+      />
+      <div className="flex justify-between mt-1.5 gap-0.5">
+        {RAL_COLORS.map((c, i) => (
+          <button
+            key={c.code}
+            onClick={() => onChange(c.hex)}
+            className={cn(
+              "flex-1 h-3 rounded-sm border transition-all",
+              i === currentIndex ? "border-primary scale-y-150" : "border-transparent"
+            )}
+            style={{ backgroundColor: c.hex }}
+            title={`${c.code} — ${c.name}`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+
   const [expandedFamily, setExpandedFamily] = useState(() => getActiveFamily(config.facade));
 
   const selectFamily = (family: MaterialFamily) => {
