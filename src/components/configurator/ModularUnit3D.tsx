@@ -3560,7 +3560,7 @@ function HubWalls({
 
           const tableH = 0.04;
           const tableLegH = 0.72;
-          const tableW = 1.20; // depth of desk (Z direction)
+          const tableW = 0.84; // depth of desk (Z direction), 30% less wide
           const legInsetX = 0.08;
           const legInsetZ = 0.06;
           const legSize = 0.05;
