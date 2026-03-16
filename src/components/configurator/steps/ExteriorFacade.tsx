@@ -1,7 +1,26 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { Slider } from "@/components/ui/slider";
+
+const RAL_COLORS: { code: string; name: string; hex: string }[] = [
+  { code: "RAL 9005", name: "Gitzwart", hex: "#0e0e10" },
+  { code: "RAL 7016", name: "Antracietgrijs", hex: "#383e42" },
+  { code: "RAL 7021", name: "Zwartgrijs", hex: "#2f3234" },
+  { code: "RAL 7039", name: "Kwartsgrijs", hex: "#6b6b5e" },
+  { code: "RAL 7035", name: "Lichtgrijs", hex: "#c5c7c4" },
+  { code: "RAL 9006", name: "Wit aluminium", hex: "#a1a1a0" },
+  { code: "RAL 9007", name: "Grijs aluminium", hex: "#878581" },
+  { code: "RAL 9010", name: "Zuiver wit", hex: "#f1ece1" },
+  { code: "RAL 9016", name: "Verkeerswit", hex: "#f1f0ea" },
+  { code: "RAL 8019", name: "Grijsbruin", hex: "#3b3332" },
+  { code: "RAL 6009", name: "Dennengroen", hex: "#27352a" },
+  { code: "RAL 5011", name: "Staalblauw", hex: "#1a2b3c" },
+  { code: "RAL 3005", name: "Wijnrood", hex: "#5e2028" },
+  { code: "RAL 1015", name: "Licht ivoor", hex: "#e6d2b5" },
+  { code: "RAL 8014", name: "Sepiabruin", hex: "#49392d" },
+];
 import thermowoodBlackImg from "@/assets/thermowood-black-texture.png";
 import thermowoodNaturalImg from "@/assets/thermowood-natural-texture.png";
 import brickStripsImg from "@/assets/brick-strips-texture.png";
@@ -82,6 +101,54 @@ function getActiveFamily(facade: FacadeId): string {
   }
   return materials[0].id;
 }
+function RalColorSlider({ value, onChange }: { value: string; onChange: (hex: string) => void }) {
+  const currentIndex = useMemo(() => {
+    const idx = RAL_COLORS.findIndex((c) => c.hex === value);
+    return idx >= 0 ? idx : 0;
+  }, [value]);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        <div
+          className="w-10 h-10 rounded-lg shrink-0 border border-border"
+          style={{ backgroundColor: RAL_COLORS[currentIndex].hex }}
+        />
+        <div>
+          <p className="text-xs font-medium">{RAL_COLORS[currentIndex].code}</p>
+          <p className="text-[11px] text-muted-foreground">{RAL_COLORS[currentIndex].name}</p>
+        </div>
+      </div>
+      <Slider
+        min={0}
+        max={RAL_COLORS.length - 1}
+        step={1}
+        value={[currentIndex]}
+        onValueChange={([i]) => onChange(RAL_COLORS[i].hex)}
+        className="w-full"
+      />
+      <div className="flex justify-between mt-1.5 gap-0.5">
+        {RAL_COLORS.map((c, i) => (
+          <button
+            key={c.code}
+            onClick={() => onChange(c.hex)}
+            className={cn(
+              "flex-1 h-3 rounded-sm border transition-all",
+              i === currentIndex ? "border-primary scale-y-150" : "border-transparent"
+            )}
+            style={{ backgroundColor: c.hex }}
+            title={`${c.code} — ${c.name}`}
+          />
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 
 export function ExteriorFacade({ config, updateConfig }: Props) {
   const [expandedFamily, setExpandedFamily] = useState(() => getActiveFamily(config.facade));
@@ -126,26 +193,12 @@ export function ExteriorFacade({ config, updateConfig }: Props) {
                     </div>
                   </div>
                 </button>
-                {/* Color picker for aluminium */}
+                {/* RAL color slider for aluminium */}
                 {isActive && family.hasColorPicker && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    className="mt-2 ml-2 p-3 rounded-lg border border-border bg-card/50"
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="color"
-                        value={config.aluminiumColor}
-                        onChange={(e) => updateConfig("aluminiumColor", e.target.value)}
-                        className="w-10 h-10 rounded-lg cursor-pointer border border-border bg-transparent p-0.5"
-                      />
-                      <div>
-                        <p className="text-xs font-medium">Kies een kleur</p>
-                        <p className="text-[11px] font-mono text-muted-foreground">{config.aluminiumColor}</p>
-                      </div>
-                    </div>
-                  </motion.div>
+                  <RalColorSlider
+                    value={config.aluminiumColor}
+                    onChange={(hex) => updateConfig("aluminiumColor", hex)}
+                  />
                 )}
               </div>
             );

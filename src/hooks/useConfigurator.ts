@@ -68,7 +68,7 @@ const defaultConfig: ConfigState = {
   floorPlan: "a",
   mirrorPlan: false,
   facade: "thermowood-natural",
-  aluminiumColor: "#383a3b",
+  aluminiumColor: "#383e42",
   finishLevel: "shell",
   floorOption: "light-vinyl",
   shelfColor: "brown",
