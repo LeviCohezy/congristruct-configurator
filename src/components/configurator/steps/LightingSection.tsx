@@ -231,7 +231,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">Kast LED</p>
-                <BlurredPrice text="300" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
+                <BlurredPrice text={kastPrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium text-accent mt-0.5" prefix="+€" />
               </div>
               <Toggle
                 on={config.kastLedStrip}
