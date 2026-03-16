@@ -3401,6 +3401,11 @@ function HubWalls({
         const kitchenEndZ = -halfD + wallThick + wcLength - partT;
         const kitchenW = kitchenEndZ - kitchenStartZ;
         const kitchenCZ = (kitchenStartZ + kitchenEndZ) / 2;
+        // Open kitchen section (excluding 40cm closed border at closet side)
+        const kitchenBorder = 0.40;
+        const kitchenOpenEndZ = kitchenEndZ - kitchenBorder;
+        const kitchenOpenW = kitchenOpenEndZ - kitchenStartZ;
+        const kitchenOpenCZ = (kitchenStartZ + kitchenOpenEndZ) / 2;
 
         const counterH = height * 0.25;
         const upperBottom = height * 0.65;
