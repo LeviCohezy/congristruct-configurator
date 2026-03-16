@@ -3709,10 +3709,10 @@ function HubWalls({
                 <meshStandardMaterial {...tableMatProps} />
               </mesh>
             ))}
-            {/* Chairs — front side (+Z) */}
-            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, 1))}
-            {/* Chairs — back side (-Z) */}
-            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, -1))}
+            {/* Chairs — front side (+Z), rotated 180° */}
+            {frontChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ + chairOffset, -1))}
+            {/* Chairs — back side (-Z), rotated 180° */}
+            {backChairX.map((cx, i) => renderSimpleChair(cx, tableCenterZ - chairOffset, 1))}
           </group>
         );
       })()}
