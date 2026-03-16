@@ -4389,9 +4389,9 @@ function BaseWalls({
                     </>
                   );
                 })()}
+              </group>
             );
           })()}
-        </group>
       )}
     </group>
   );
