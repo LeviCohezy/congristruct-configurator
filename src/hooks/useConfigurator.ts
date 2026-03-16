@@ -189,9 +189,9 @@ export function useConfigurator() {
       if (config.spotType === "opbouw-spot-wit" || config.spotType === "opbouw-spot-zwart") {
         price += 10;
       } else {
-        price += 5;
+        price += m === "start" ? 10 : 5;
       }
-      price += 5;
+      price += m === "start" ? 10 : 5;
     }
     if (config.keukenLedStrip) price += (ledKeukenPriceByModel[m] ?? 350);
     if (config.kastLedStrip) price += (ledKastPriceByModel[m] ?? 300);
