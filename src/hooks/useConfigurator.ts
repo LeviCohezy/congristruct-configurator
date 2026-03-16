@@ -88,31 +88,55 @@ const defaultConfig: ConfigState = {
   priceRevealed: hasStoredContact,
 };
 
-// ── START model pricing ──
-const startBasePrices: Record<string, number> = {
-  a: 16700, // without WC
-  b: 18470, // with WC
+// ── Per-model pricing tables ──
+const basePrices: Record<string, Record<string, number>> = {
+  start: { a: 16700, b: 18470 },
+  flow:  { a: 22550, b: 29470 },
+  hub:   { a: 42000, b: 42000 }, // placeholder
+  base:  { a: 42000, b: 42000 }, // placeholder
 };
 
-const facadePrices: Record<string, number> = {
-  "thermowood-natural": 0,
-  "thermowood-black": 265,
-  "composite-white": 335,
-  "composite-black": 335,
-  "aluminium": 935,
-  "brick-grey": 1335,
+const facadePricesByModel: Record<string, Record<string, number>> = {
+  start: {
+    "thermowood-natural": 0, "thermowood-black": 265,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
+  flow: {
+    "thermowood-natural": 0, "thermowood-black": 335,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
-const finishPrices: Record<string, number> = {
-  shell: 0,
-  finished: 3780,
-  "fully-finished": 7500,
+const finishPricesByModel: Record<string, Record<string, number>> = {
+  start: { shell: 0, finished: 3780, "fully-finished": 7500 },
+  flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
 };
 
-const shelfPrices: Record<string, number> = {
-  brown: 160,
-  "light-oak": 141,
-  white: 0,
+const shelfPricesByModel: Record<string, Record<string, number>> = {
+  start: { brown: 160, "light-oak": 141, white: 0 },
+  flow:  { brown: 330, "light-oak": 260, white: 0 },
+};
+
+const windowPriceByModel: Record<string, number> = {
+  start: 180,
+  flow: 300, // €150 × 2 windows
+};
+
+const insulationPriceByModel: Record<string, number> = {
+  start: 900,
+  flow: 1450,
+};
+
+const ledKeukenPriceByModel: Record<string, number> = {
+  start: 350,
+  flow: 150,
+};
+
+const ledKastPriceByModel: Record<string, number> = {
+  start: 300,
+  flow: 530,
 };
 
 /** Roof is auto-derived: white facades → white roof, else black */
