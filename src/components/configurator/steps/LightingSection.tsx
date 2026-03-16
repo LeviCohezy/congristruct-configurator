@@ -150,7 +150,7 @@ export function LightingSection({ config, updateConfig, onPriceClick }: Props) {
         <span className="flex items-center gap-2">
           Verlichtingspunten inbegrepen
           <span className="text-xs text-muted-foreground/70">|</span>
-          <BlurredPrice text="1.500" revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium" prefix="Verlichtingspakket +€" />
+          <BlurredPrice text={packagePrice} revealed={config.priceRevealed} onClick={onPriceClick} className="text-xs font-medium" prefix="Verlichtingspakket +€" />
         </span>
       </p>
 
