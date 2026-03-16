@@ -3520,8 +3520,8 @@ function HubWalls({
       {finishLevel === "fully-finished" && (() => {
         const sc = getShelfColors(shelfColor || "brown");
         const tableMatProps = { color: shelfColor === "light-oak" ? "#ffffff" : sc.cabinet, roughness: 0.75, metalness: 0.05, ...(shelfColor === "light-oak" && lightOakTex ? { map: lightOakTex } : {}) };
-        // Desk color: 30% less white → warm light grey
-        const deskColor = "#d5d5d0";
+        const chairMatProps = { color: "#1a1a1a", roughness: 0.6, metalness: 0.1 };
+        const planATableMatProps = { color: "#ffffff", roughness: 0.7, metalness: 0.05 };
         const deskMatProps = { color: deskColor, roughness: 0.3, metalness: 0.05 };
 
         const chairSeatW = 0.42;
