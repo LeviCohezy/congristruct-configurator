@@ -3567,8 +3567,9 @@ function HubWalls({
                 <boxGeometry args={[baseW, baseH, baseD]} />
                 <meshStandardMaterial color="#2a2a2a" roughness={0.4} metalness={0.3} />
               </mesh>
+              {/* Screen hinges at back edge of base (-baseD/2) */}
               <group position={[0, baseH, -baseD / 2]}>
-                <mesh position={[0, screenH / 2 * Math.cos(screenAngle), -screenH / 2 * Math.sin(screenAngle)]} rotation={[screenAngle, 0, 0]}>
+                <mesh position={[0, screenH / 2 * Math.cos(screenAngle), screenH / 2 * Math.sin(screenAngle)]} rotation={[screenAngle, 0, 0]}>
                   <boxGeometry args={[screenW, screenH, screenT]} />
                   <meshStandardMaterial color="#1a1a1a" roughness={0.3} metalness={0.4} />
                 </mesh>
@@ -3735,14 +3736,14 @@ function HubWalls({
             {frontChairX.map((cx, i) => (
               <group key={`front-${i}`}>
                 {renderSimpleChair(cx, tableCenterZ + chairOffset, -1)}
-                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, Math.PI)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ + tableW2 / 2 - 0.35, 0)}
               </group>
             ))}
             {/* Laptops + Chairs — back side (-Z) */}
             {backChairX.map((cx, i) => (
               <group key={`back-${i}`}>
                 {renderSimpleChair(cx, tableCenterZ - chairOffset, 1)}
-                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, 0)}
+                {renderLaptop(cx, tableLegH2 + tableH2 + floorThick, tableCenterZ - tableW2 / 2 + 0.35, Math.PI)}
               </group>
             ))}
           </group>
