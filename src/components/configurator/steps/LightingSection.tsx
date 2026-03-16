@@ -70,43 +70,58 @@ function CircleGrid<T extends string>({
   onSelect,
   disabled,
   onDisabledClick,
+  priceRevealed,
+  onPriceClick,
 }: {
-  options: { id: T; tooltip: string; img: string }[];
+  options: { id: T; label: string; img: string; price: number }[];
   selected: T;
   onSelect: (id: T) => void;
   disabled?: boolean;
   onDisabledClick?: () => void;
+  priceRevealed?: boolean;
+  onPriceClick?: () => void;
 }) {
+  const selectedPrice = options.find((o) => o.id === selected)?.price ?? 0;
+
   return (
     <TooltipProvider delayDuration={200}>
       <div className={cn("flex gap-4 flex-wrap", disabled && "opacity-40")}>
-        {options.map((o) => (
-          <Tooltip key={o.id}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => {
-                  if (disabled) {
-                    onDisabledClick?.();
-                  } else {
-                    onSelect(o.id);
-                  }
-                }}
-                className={cn(
-                  "w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150",
-                  disabled ? "cursor-not-allowed" : "cursor-pointer",
-                  !disabled && selected === o.id
-                    ? "border-accent ring-2 ring-accent/30"
-                    : "border-border/60 bg-secondary hover:border-accent/40"
-                )}
-              >
-                <img src={o.img} alt={o.tooltip} className="w-full h-full object-cover" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" className="text-xs">
-              {disabled ? "Activeer eerst het verlichtingspakket" : o.tooltip}
-            </TooltipContent>
-          </Tooltip>
-        ))}
+        {options.map((o) => {
+          const diff = o.price - selectedPrice;
+          const diffLabel = o.id === selected
+            ? o.label
+            : diff === 0
+              ? o.label
+              : `${o.label} (${diff > 0 ? "+" : "-"}€${Math.abs(diff)})`;
+
+          return (
+            <Tooltip key={o.id}>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={() => {
+                    if (disabled) {
+                      onDisabledClick?.();
+                    } else {
+                      onSelect(o.id);
+                    }
+                  }}
+                  className={cn(
+                    "w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-150",
+                    disabled ? "cursor-not-allowed" : "cursor-pointer",
+                    !disabled && selected === o.id
+                      ? "border-accent ring-2 ring-accent/30"
+                      : "border-border/60 bg-secondary hover:border-accent/40"
+                  )}
+                >
+                  <img src={o.img} alt={o.label} className="w-full h-full object-cover" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="text-xs">
+                {disabled ? "Activeer eerst het verlichtingspakket" : diffLabel}
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
       </div>
     </TooltipProvider>
   );
