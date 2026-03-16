@@ -3217,6 +3217,72 @@ function HubWalls({
         </group>
       )}
 
+      {/* ── Tussenmuur (Plan B only) ── */}
+      {hasTussenmuur && (() => {
+        // Partition wall across the full depth at tussenmuurX (middle of segment 2)
+        const tmDoorW = 0.84; // 84cm door
+        const tmDoorH = 2.1;
+        // Door positioned 45cm from the front wall (glass side)
+        const tmDoorCZ = halfD - wallThick - 0.45 - tmDoorW / 2;
+        const tmDoorZ1 = halfD - wallThick - 0.45 - tmDoorW; // back edge
+        const tmDoorZ2 = halfD - wallThick - 0.45; // front edge
+
+        // Wall segments: back section, door gap, front section
+        const wallBackZ = -halfD + wallThick;
+        const wallFrontZ = halfD - wallThick;
+        const backSegD = tmDoorZ1 - wallBackZ;
+        const frontSegD = wallFrontZ - tmDoorZ2;
+
+        return (
+          <group>
+            {/* Back wall section (from back wall to door) */}
+            {backSegD > 0.01 && (
+              <mesh position={[tussenmuurX, height / 2 + floorThick, wallBackZ + backSegD / 2]}>
+                <boxGeometry args={[partT, height, backSegD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Front wall section (from door to front wall) */}
+            {frontSegD > 0.01 && (
+              <mesh position={[tussenmuurX, height / 2 + floorThick, tmDoorZ2 + frontSegD / 2]}>
+                <boxGeometry args={[partT, height, frontSegD]} />
+                <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+              </mesh>
+            )}
+            {/* Header above door */}
+            <mesh position={[tussenmuurX, tmDoorH + (height - tmDoorH) / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[partT, height - tmDoorH, tmDoorW]} />
+              <InteriorMat osbTex={osbTex} isShell={isShell} color={interiorColor} roughness={interiorRoughness} side={THREE.DoubleSide} />
+            </mesh>
+            {/* White door panel with black frame */}
+            <mesh position={[tussenmuurX - tmDoorW / 2 - 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX + tmDoorW / 2 + 0.015, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[0.03, tmDoorH, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX, tmDoorH + floorThick + 0.015, tmDoorCZ]}>
+              <boxGeometry args={[tmDoorW + 0.06, 0.03, partT + 0.01]} />
+              <meshStandardMaterial color="#1a1a1a" roughness={0.4} metalness={0.3} />
+            </mesh>
+            <mesh position={[tussenmuurX, tmDoorH / 2 + floorThick, tmDoorCZ]}>
+              <boxGeometry args={[tmDoorW - 0.04, tmDoorH - 0.02, 0.035]} />
+              <meshStandardMaterial color="#f5f5f5" roughness={0.85} />
+            </mesh>
+            {/* Handle */}
+            <mesh
+              position={[tussenmuurX - 0.04, tmDoorH * 0.48 + floorThick, tmDoorCZ + 0.04]}
+              rotation={[Math.PI / 2, 0, 0]}
+            >
+              <cylinderGeometry args={[0.012, 0.012, 0.04, 8]} />
+              <meshStandardMaterial color="#aaa" roughness={0.25} metalness={0.8} />
+            </mesh>
+          </group>
+        );
+      })()}
+
       {/* Interior left wall — split around door opening */}
       {(() => {
         const ilX = -halfW + wallThick + 0.01;
