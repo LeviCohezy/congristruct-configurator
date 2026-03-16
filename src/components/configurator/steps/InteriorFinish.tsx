@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { Archive } from "lucide-react";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 import { RelativePrice } from "@/components/configurator/RelativePrice";
 
 import lightWoodFloorTexture from "@/assets/light-wood-floor-texture.png";
@@ -149,6 +151,34 @@ export function InteriorFinish({ config, updateConfig, onPriceClick }: Props) {
                   ))}
                 </div>
               </div>
+
+              {/* Extra 6-deurs kast – Hub Plan B only */}
+              {config.model === "hub" && config.floorPlan === "b" && (
+                <div>
+                  <p className="config-label mb-4">Extra kast</p>
+                  <button
+                    onClick={() => updateConfig("extraCloset", !config.extraCloset)}
+                    className={cn("option-card text-left w-full", config.extraCloset && "option-card-active")}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Archive className="w-5 h-5 text-muted-foreground" />
+                      <div className="flex-1">
+                        <div className="flex justify-between">
+                          <p className="font-medium text-sm">Extra 6-deurs kast</p>
+                          <BlurredPrice text="4.000" revealed={config.priceRevealed} onClick={onPriceClick} className="text-sm font-medium" prefix="+€" />
+                        </div>
+                        <p className="text-xs text-muted-foreground">Grote kast achter bureau in de grote kamer</p>
+                      </div>
+                      <div className={cn(
+                        "w-5 h-5 rounded-full border-2 transition-all flex items-center justify-center",
+                        config.extraCloset ? "bg-accent border-accent" : "border-muted-foreground/30"
+                      )}>
+                        {config.extraCloset && <span className="w-2 h-2 rounded-full bg-accent-foreground" />}
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
