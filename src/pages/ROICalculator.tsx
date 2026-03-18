@@ -1,4 +1,57 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+const formatNumber = (num: number, decimals = 0) => {
+  return new Intl.NumberFormat('nl-NL', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  }).format(num);
+};
+
+function CustomSlider({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 1,
+  prefix = '',
+  suffix = '',
+}: {
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  prefix?: string;
+  suffix?: string;
+}) {
+  const percentage = ((value - min) / (max - min)) * 100;
+  return (
+    <div className="mb-6">
+      <div className="flex justify-between items-center mb-3">
+        <label className="text-sm font-medium text-foreground/80">{label}</label>
+        <span className="text-lg font-semibold text-foreground">
+          {prefix}{formatNumber(value)}{suffix}
+        </span>
+      </div>
+      <div className="slider-container">
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="custom-slider"
+          style={{
+            background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${percentage}%, hsl(var(--muted)) ${percentage}%, hsl(var(--muted)) 100%)`
+          }}
+        />
+      </div>
+    </div>
+  );
+}
 
 export default function ROICalculator() {
   const [units, setUnits] = useState(5);
@@ -34,65 +87,15 @@ export default function ROICalculator() {
     setTotalROIPercent(roiPercent);
   }, [units, costPerUnit, pricePerPeriod, occupancy, operationalCost, generalOverhead, years]);
 
-  const formatNumber = (num: number, decimals = 0) => {
-    return new Intl.NumberFormat('nl-NL', {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(num);
-  };
-
-  const handleModeToggle = () => {
-    setIsNightMode(!isNightMode);
-    setOccupancy(isNightMode ? 6 : 200);
-    setPricePerPeriod(isNightMode ? 2000 : 150);
-    setOperationalCost(isNightMode ? 800 : 50);
-  };
-
-  const CustomSlider = ({
-    label,
-    value,
-    onChange,
-    min,
-    max,
-    step = 1,
-    prefix = '',
-    suffix = '',
-  }: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    min: number;
-    max: number;
-    step?: number;
-    prefix?: string;
-    suffix?: string;
-  }) => {
-    const percentage = ((value - min) / (max - min)) * 100;
-    return (
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-3">
-          <label className="text-sm font-medium text-foreground/80">{label}</label>
-          <span className="text-lg font-semibold text-foreground">
-            {prefix}{formatNumber(value)}{suffix}
-          </span>
-        </div>
-        <div className="slider-container">
-          <input
-            type="range"
-            min={min}
-            max={max}
-            step={step}
-            value={value}
-            onChange={(e) => onChange(Number(e.target.value))}
-            className="custom-slider"
-            style={{
-              background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${percentage}%, hsl(var(--muted)) ${percentage}%, hsl(var(--muted)) 100%)`
-            }}
-          />
-        </div>
-      </div>
-    );
-  };
+  const handleModeToggle = useCallback(() => {
+    setIsNightMode(prev => {
+      const wasNight = prev;
+      setOccupancy(wasNight ? 6 : 200);
+      setPricePerPeriod(wasNight ? 2000 : 150);
+      setOperationalCost(wasNight ? 800 : 50);
+      return !wasNight;
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
