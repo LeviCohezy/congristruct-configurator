@@ -137,12 +137,12 @@ export default function ROICalculator() {
               <label className="text-sm font-medium text-foreground/80 mb-3 block">
                 Pricing Mode
               </label>
-              <div className="bg-muted rounded-xl p-1 inline-flex w-full">
+              <div className="bg-muted rounded-lg p-0.5 inline-flex w-full">
                 <button
                   onClick={() => !isNightMode && handleModeToggle()}
-                  className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
+                  className={`flex-1 py-1.5 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
                     isNightMode
-                      ? 'bg-primary text-primary-foreground shadow-md'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-foreground/60 hover:text-foreground'
                   }`}
                 >
@@ -150,9 +150,9 @@ export default function ROICalculator() {
                 </button>
                 <button
                   onClick={() => isNightMode && handleModeToggle()}
-                  className={`flex-1 py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
+                  className={`flex-1 py-1.5 px-4 rounded-md text-sm font-medium transition-all duration-300 ${
                     !isNightMode
-                      ? 'bg-primary text-primary-foreground shadow-md'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'text-foreground/60 hover:text-foreground'
                   }`}
                 >
