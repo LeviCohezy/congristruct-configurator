@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Check, X, ImageIcon, Upload, Trash2, RefreshCw } from "lucide-react";
+import { Check, X, ImageIcon, Upload, Trash2, RefreshCw, Camera, Euro } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PriceEditor } from "@/components/editor/PriceEditor";
 
+type EditorTab = "photos" | "prices";
 type Model = "start" | "flow" | "hub" | "base";
 type Plan = "a" | "b";
 type Floor = "light-vinyl" | "dark-vinyl" | "stone-vinyl";
