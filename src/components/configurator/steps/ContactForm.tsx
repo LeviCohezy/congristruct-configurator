@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
-import { Send } from "lucide-react";
+import { Send, Loader2 } from "lucide-react";
+import { useState } from "react";
 import type { ConfigState } from "@/hooks/useConfigurator";
+import { getConfigLineItems } from "@/hooks/useConfigSummary";
 import { toast } from "sonner";
 import { BlurredPrice } from "@/components/configurator/BlurredPrice";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   config: ConfigState;
@@ -11,6 +14,13 @@ interface Props {
   onPriceClick?: () => void;
 }
 
+const modelLabels: Record<string, string> = {
+  start: "BLOQ Start",
+  flow: "BLOQ Flow",
+  hub: "BLOQ Hub",
+  base: "BLOQ Base",
+};
+
 const fields: { key: keyof ConfigState["contact"]; label: string; type: string; placeholder?: string }[] = [
   { key: "fullName", label: "Volledige naam", type: "text", placeholder: "Jan Janssens" },
   { key: "email", label: "E-mailadres", type: "email", placeholder: "jan@voorbeeld.be" },
@@ -18,13 +28,39 @@ const fields: { key: keyof ConfigState["contact"]; label: string; type: string; 
 ];
 
 export function ContactForm({ config, updateContact, totalPrice, onPriceClick }: Props) {
-  const handleSubmit = () => {
+  const [sending, setSending] = useState(false);
+
+  const handleSubmit = async () => {
     const c = config.contact;
     if (!c.fullName || !c.email) {
       toast.error("Vul alle velden in");
       return;
     }
-    toast.success("Je configuratie-aanvraag is verstuurd!");
+
+    setSending(true);
+    try {
+      const lineItems = getConfigLineItems(config);
+      const { data, error } = await supabase.functions.invoke("send-quote", {
+        body: {
+          lineItems,
+          totalPrice,
+          contact: c,
+          model: modelLabels[config.model] || config.model,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.success) {
+        toast.success("Je offerte-aanvraag is verstuurd!");
+      } else {
+        throw new Error(data?.error || "Verzenden mislukt");
+      }
+    } catch (err: unknown) {
+      console.error("Quote send error:", err);
+      toast.error("Er ging iets mis bij het verzenden. Probeer opnieuw.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -60,10 +96,11 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
 
       <button
         onClick={handleSubmit}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:opacity-90 transition-opacity"
+        disabled={sending}
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
       >
-        <Send className="w-4 h-4" />
-        Offerte aanvragen
+        {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+        {sending ? "Versturen..." : "Offerte aanvragen"}
       </button>
     </motion.div>
   );
