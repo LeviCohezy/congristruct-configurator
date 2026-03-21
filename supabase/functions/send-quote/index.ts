@@ -205,7 +205,7 @@ Deno.serve(async (req) => {
 
     const resendPayload: Record<string, unknown> = {
       from: "BLOQ Configurator <configurator@congristruct.be>",
-      to: ["levi.soubry@gmail.com"],
+      to: ["levi.soubry@gmail.com", "warre@congristruct.be"],
       reply_to: contact.email,
       subject: `Nieuwe configuratie — ${model} — ${contact.fullName}`,
       html: htmlEmail,
