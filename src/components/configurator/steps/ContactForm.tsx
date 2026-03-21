@@ -52,6 +52,7 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
               value={config.contact[f.key]}
               onChange={(e) => updateContact(f.key, e.target.value)}
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-card text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+              placeholder={f.placeholder}
             />
           </div>
         ))}
