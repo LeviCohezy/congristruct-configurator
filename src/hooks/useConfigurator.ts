@@ -118,6 +118,11 @@ const facadePricesByModel: Record<string, Record<string, number>> = {
     "composite-white": 335, "composite-black": 335,
     "aluminium": 935, "brick-grey": 1335,
   },
+  base: {
+    "thermowood-natural": 0, "thermowood-black": 880,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
 const finishPricesByModel: Record<string, Record<string, number>> = {
