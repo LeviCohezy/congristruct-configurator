@@ -265,8 +265,9 @@ export function useConfigurator() {
     }
 
     // Extras
+    if (config.hasKitchen) price += (kitchenPriceByModel[m] ?? 0);
     if (config.heatPump) price += (heatPumpPriceByModel[m] ?? 2500);
-    if (config.extraHeatPump) price += 1050;
+    if (config.extraHeatPump) price += (extraHeatPumpPriceByModel[m] ?? 1050);
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += (insulationPriceByModel[m] ?? 900);
 
