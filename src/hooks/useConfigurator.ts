@@ -143,6 +143,7 @@ const windowPriceByModel: Record<string, number> = {
   start: 180,
   flow: 300, // €150 × 2 windows
   hub: 180,
+  base: 180,
 };
 
 const insulationPriceByModel: Record<string, number> = {
