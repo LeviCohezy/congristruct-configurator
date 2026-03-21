@@ -150,6 +150,7 @@ const insulationPriceByModel: Record<string, number> = {
   start: 900,
   flow: 1450,
   hub: 1145,
+  base: 3050,
 };
 
 const ledKeukenPriceByModel: Record<string, number> = {
