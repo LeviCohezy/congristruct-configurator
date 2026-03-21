@@ -1,4 +1,4 @@
-import { Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 interface Props {
   text: string;
@@ -8,7 +8,19 @@ interface Props {
   prefix?: string;
 }
 
+function arePricesHidden(): boolean {
+  try {
+    return localStorage.getItem("bloq-hide-prices") === "true";
+  } catch {
+    return false;
+  }
+}
+
 export function BlurredPrice({ text, revealed, onClick, className = "", prefix = "€" }: Props) {
+  if (arePricesHidden()) {
+    return null;
+  }
+
   if (revealed) {
     return <span className={className}>{prefix}{text}</span>;
   }

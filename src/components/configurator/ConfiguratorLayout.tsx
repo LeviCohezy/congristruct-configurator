@@ -41,6 +41,7 @@ export function ConfiguratorLayout() {
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
+  const pricesHidden = (() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } })();
 
   const handleRevealPrice = useCallback(() => {
     const c = config.contact;
@@ -136,7 +137,7 @@ export function ConfiguratorLayout() {
         </div>
 
         {/* Sticky price bar */}
-        <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
+        {!pricesHidden && <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
           <div className="relative pointer-events-auto">
             <button
               onClick={() => !priceRevealed && setShowPriceGate(true)}
@@ -192,11 +193,11 @@ export function ConfiguratorLayout() {
               )}
             </AnimatePresence>
           </div>
-        </div>
+        </div>}
 
         {/* Price gate modal */}
         <AnimatePresence>
-          {showPriceGate && (
+          {showPriceGate && !pricesHidden && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

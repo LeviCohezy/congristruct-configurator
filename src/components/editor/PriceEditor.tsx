@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 type Model = "start" | "flow" | "hub" | "base";
@@ -158,8 +158,36 @@ export function PriceEditor() {
     console.log("Saved prices:", prices);
   };
 
+  const [hidePrices, setHidePrices] = useState(() => {
+    try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; }
+  });
+
+  const toggleHidePrices = () => {
+    const next = !hidePrices;
+    setHidePrices(next);
+    localStorage.setItem("bloq-hide-prices", String(next));
+    toast.success(next ? "Prijzen verborgen in configurator" : "Prijzen zichtbaar in configurator");
+  };
+
   return (
     <div>
+      {/* Hide prices toggle */}
+      <div className="mb-6 p-4 rounded-xl bg-surface border border-border flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          {hidePrices ? <EyeOff className="w-5 h-5 text-muted-foreground" /> : <Eye className="w-5 h-5 text-accent" />}
+          <div>
+            <p className="text-sm font-medium text-foreground">Prijzen in configurator</p>
+            <p className="text-xs text-muted-foreground">{hidePrices ? "Verborgen voor bezoekers" : "Zichtbaar voor bezoekers"}</p>
+          </div>
+        </div>
+        <button
+          onClick={toggleHidePrices}
+          className={`relative w-12 h-7 rounded-full transition-colors ${hidePrices ? "bg-muted" : "bg-accent"}`}
+        >
+          <span className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow transition-transform ${hidePrices ? "left-0.5" : "left-[calc(100%-1.625rem)]"}`} />
+        </button>
+      </div>
+
       {/* Model selector */}
       <div className="mb-6">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Model</p>
