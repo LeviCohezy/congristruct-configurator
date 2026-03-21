@@ -193,7 +193,7 @@ export function ConfiguratorLayout() {
               )}
             </AnimatePresence>
           </div>
-        </div>
+        </div>}
 
         {/* Price gate modal */}
         <AnimatePresence>
