@@ -136,6 +136,7 @@ const shelfPricesByModel: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
   hub:   { brown: 350, "light-oak": 200, white: 0 },
+  base:  { brown: 590, "light-oak": 520, white: 0 },
 };
 
 const windowPriceByModel: Record<string, number> = {
