@@ -170,12 +170,25 @@ const lightingPackagePriceByModel: Record<string, number> = {
   start: 1500,
   flow: 1500,
   hub: 1990,
+  base: 3500,
 };
 
 const heatPumpPriceByModel: Record<string, number> = {
   start: 2500,
   flow: 2500,
   hub: 3150,
+  base: 4400,
+};
+
+const kitchenPriceByModel: Record<string, number> = {
+  base: 595,
+};
+
+const extraHeatPumpPriceByModel: Record<string, number> = {
+  start: 1050,
+  flow: 1050,
+  hub: 1050,
+  base: 1095,
 };
 
 const extraClosetPrice = 4000;
