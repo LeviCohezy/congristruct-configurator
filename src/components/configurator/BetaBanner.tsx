@@ -18,7 +18,7 @@ export function BetaBanner() {
 
   return (
     <div
-      className="w-full text-center py-1.5 text-xs font-medium text-white z-50 overflow-hidden"
+      className="w-full text-center py-1.5 text-xs font-medium text-white z-50 overflow-hidden sticky top-0"
       style={{ backgroundColor: "#5c6b6a" }}
     >
       <AnimatePresence mode="wait">
