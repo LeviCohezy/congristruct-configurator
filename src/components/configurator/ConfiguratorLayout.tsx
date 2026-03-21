@@ -137,7 +137,7 @@ export function ConfiguratorLayout() {
         </div>
 
         {/* Sticky price bar */}
-        <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
+        {!pricesHidden && <div className="sticky bottom-0 z-30 flex justify-center py-3 pointer-events-none">
           <div className="relative pointer-events-auto">
             <button
               onClick={() => !priceRevealed && setShowPriceGate(true)}
