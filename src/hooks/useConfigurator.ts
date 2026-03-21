@@ -99,7 +99,7 @@ const basePrices: Record<string, Record<string, number>> = {
   start: { a: 16700, b: 18470 },
   flow:  { a: 22550, b: 29470 },
   hub:   { a: 31550, b: 32500 },
-  base:  { a: 42000, b: 42000 }, // placeholder
+  base:  { a: 40985, b: 40985 },
 };
 
 const facadePricesByModel: Record<string, Record<string, number>> = {
@@ -118,53 +118,77 @@ const facadePricesByModel: Record<string, Record<string, number>> = {
     "composite-white": 335, "composite-black": 335,
     "aluminium": 935, "brick-grey": 1335,
   },
+  base: {
+    "thermowood-natural": 0, "thermowood-black": 880,
+    "composite-white": 335, "composite-black": 335,
+    "aluminium": 935, "brick-grey": 1335,
+  },
 };
 
 const finishPricesByModel: Record<string, Record<string, number>> = {
   start: { shell: 0, finished: 3780, "fully-finished": 7500 },
   flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
   hub:   { shell: 0, finished: 9900, "fully-finished": 16860 },
+  base:  { shell: 0, finished: 12520, "fully-finished": 23420 },
 };
 
 const shelfPricesByModel: Record<string, Record<string, number>> = {
   start: { brown: 160, "light-oak": 141, white: 0 },
   flow:  { brown: 330, "light-oak": 260, white: 0 },
   hub:   { brown: 350, "light-oak": 200, white: 0 },
+  base:  { brown: 590, "light-oak": 520, white: 0 },
 };
 
 const windowPriceByModel: Record<string, number> = {
   start: 180,
   flow: 300, // €150 × 2 windows
   hub: 180,
+  base: 180,
 };
 
 const insulationPriceByModel: Record<string, number> = {
   start: 900,
   flow: 1450,
   hub: 1145,
+  base: 3050,
 };
 
 const ledKeukenPriceByModel: Record<string, number> = {
   start: 350,
   flow: 150,
   hub: 150,
+  base: 150,
 };
 
 const ledKastPriceByModel: Record<string, number> = {
   start: 300,
   flow: 530,
+  base: 50,
 };
 
 const lightingPackagePriceByModel: Record<string, number> = {
   start: 1500,
   flow: 1500,
   hub: 1990,
+  base: 3500,
 };
 
 const heatPumpPriceByModel: Record<string, number> = {
   start: 2500,
   flow: 2500,
   hub: 3150,
+  base: 4400,
+};
+
+const kitchenPriceByModel: Record<string, number> = {
+  base: 595,
+};
+
+const extraHeatPumpPriceByModel: Record<string, number> = {
+  start: 1050,
+  flow: 1050,
+  hub: 1050,
+  base: 1095,
 };
 
 const extraClosetPrice = 4000;
@@ -241,8 +265,9 @@ export function useConfigurator() {
     }
 
     // Extras
+    if (config.hasKitchen) price += (kitchenPriceByModel[m] ?? 0);
     if (config.heatPump) price += (heatPumpPriceByModel[m] ?? 2500);
-    if (config.extraHeatPump) price += 1050;
+    if (config.extraHeatPump) price += (extraHeatPumpPriceByModel[m] ?? 1050);
     if (config.solarBattery) price += 4500;
     if (config.insulation) price += (insulationPriceByModel[m] ?? 900);
 
