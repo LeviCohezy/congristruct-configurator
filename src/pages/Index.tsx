@@ -1,7 +1,13 @@
 import { ConfiguratorLayout } from "@/components/configurator/ConfiguratorLayout";
+import { BetaBanner } from "@/components/configurator/BetaBanner";
 
 const Index = () => {
-  return <ConfiguratorLayout />;
+  return (
+    <>
+      <BetaBanner />
+      <ConfiguratorLayout />
+    </>
+  );
 };
 
 export default Index;
