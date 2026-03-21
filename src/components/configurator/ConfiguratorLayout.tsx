@@ -197,7 +197,7 @@ export function ConfiguratorLayout() {
 
         {/* Price gate modal */}
         <AnimatePresence>
-          {showPriceGate && (
+          {showPriceGate && !pricesHidden && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
