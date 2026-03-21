@@ -11,9 +11,10 @@ interface Props {
   onPriceClick?: () => void;
 }
 
-const fields: { key: keyof ConfigState["contact"]; label: string; type: string }[] = [
-  { key: "fullName", label: "Volledige naam", type: "text" },
-  { key: "email", label: "E-mailadres", type: "email" },
+const fields: { key: keyof ConfigState["contact"]; label: string; type: string; placeholder?: string }[] = [
+  { key: "fullName", label: "Volledige naam", type: "text", placeholder: "Jan Janssens" },
+  { key: "email", label: "E-mailadres", type: "email", placeholder: "jan@voorbeeld.be" },
+  { key: "phone", label: "Telefoonnummer", type: "tel", placeholder: "+32 470 00 00 00" },
 ];
 
 export function ContactForm({ config, updateContact, totalPrice, onPriceClick }: Props) {
@@ -51,6 +52,7 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
               value={config.contact[f.key]}
               onChange={(e) => updateContact(f.key, e.target.value)}
               className="w-full px-3 py-2.5 rounded-lg border border-border bg-card text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all"
+              placeholder={f.placeholder}
             />
           </div>
         ))}

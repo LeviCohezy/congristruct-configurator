@@ -246,6 +246,16 @@ export function ConfiguratorLayout() {
                         placeholder="jan@voorbeeld.be"
                       />
                     </div>
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground mb-1 block">Telefoonnummer</label>
+                      <input
+                        type="tel"
+                        value={config.contact.phone}
+                        onChange={(e) => updateContact("phone", e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all text-base sm:text-sm"
+                        placeholder="+32 470 00 00 00"
+                      />
+                    </div>
                   </div>
                 )}
                 <button
