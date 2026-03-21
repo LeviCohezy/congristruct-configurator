@@ -99,7 +99,7 @@ const basePrices: Record<string, Record<string, number>> = {
   start: { a: 16700, b: 18470 },
   flow:  { a: 22550, b: 29470 },
   hub:   { a: 31550, b: 32500 },
-  base:  { a: 42000, b: 42000 }, // placeholder
+  base:  { a: 40985, b: 40985 },
 };
 
 const facadePricesByModel: Record<string, Record<string, number>> = {
