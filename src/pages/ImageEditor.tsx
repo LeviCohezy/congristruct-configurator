@@ -1,8 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import { Check, X, ImageIcon, Upload, Trash2, RefreshCw } from "lucide-react";
+import { Check, X, ImageIcon, Upload, Trash2, RefreshCw, Camera, Euro } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { PriceEditor } from "@/components/editor/PriceEditor";
 
+type EditorTab = "photos" | "prices";
 type Model = "start" | "flow" | "hub" | "base";
 type Plan = "a" | "b";
 type Floor = "light-vinyl" | "dark-vinyl" | "stone-vinyl";
@@ -176,6 +178,7 @@ function CombinationRow({
 }
 
 export default function ImageEditor() {
+  const [activeTab, setActiveTab] = useState<EditorTab>("photos");
   const [selectedModel, setSelectedModel] = useState<Model>("start");
   const [selectedPlan, setSelectedPlan] = useState<Plan>("a");
   const [records, setRecords] = useState<ImageRecord[]>([]);
@@ -232,7 +235,6 @@ export default function ImageEditor() {
     const publicUrl = urlData.publicUrl;
     const field = slot === 1 ? "image1_url" : "image2_url";
 
-    // Check if record exists
     const existing = getRecord(finish, floor as Floor | undefined, kast as Kast | undefined);
 
     if (existing) {
@@ -271,7 +273,6 @@ export default function ImageEditor() {
     fetchRecords();
   }, [records, fetchRecords]);
 
-  // Count filled
   let filled = 0;
   const total = (1 + 3 + 9) * 2;
   for (const r of records) {
@@ -282,13 +283,40 @@ export default function ImageEditor() {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-display font-bold text-foreground">Interior Image Editor</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage all interior image combinations per BLOQ model. Hover images to replace or delete.
-          </p>
+        <div className="mb-6">
+          <h1 className="text-2xl font-display font-bold text-foreground">Editor</h1>
         </div>
 
+        {/* Tabs */}
+        <div className="flex gap-1 p-1 rounded-xl bg-surface border border-border mb-8">
+          <button
+            onClick={() => setActiveTab("photos")}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              activeTab === "photos"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Camera className="w-4 h-4" />
+            Foto's
+          </button>
+          <button
+            onClick={() => setActiveTab("prices")}
+            className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              activeTab === "prices"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Euro className="w-4 h-4" />
+            Prijzen
+          </button>
+        </div>
+
+        {activeTab === "prices" ? (
+          <PriceEditor />
+        ) : (
+          <>
         {/* Model selector */}
         <div className="mb-6">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Model</p>
@@ -373,6 +401,8 @@ export default function ImageEditor() {
               ))}
             </Section>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>
