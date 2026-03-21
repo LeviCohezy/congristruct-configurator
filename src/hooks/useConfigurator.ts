@@ -129,6 +129,7 @@ const finishPricesByModel: Record<string, Record<string, number>> = {
   start: { shell: 0, finished: 3780, "fully-finished": 7500 },
   flow:  { shell: 0, finished: 6600, "fully-finished": 16180 },
   hub:   { shell: 0, finished: 9900, "fully-finished": 16860 },
+  base:  { shell: 0, finished: 12520, "fully-finished": 23420 },
 };
 
 const shelfPricesByModel: Record<string, Record<string, number>> = {
