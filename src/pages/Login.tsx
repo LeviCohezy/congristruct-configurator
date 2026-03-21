@@ -2,7 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Lock } from "lucide-react";
+import logoIcon from "@/assets/logo-icon.png";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,13 +23,11 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "#5c6b6a" }}>
       <form onSubmit={handleLogin} className="w-full max-w-sm space-y-6">
         <div className="text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <Lock className="w-5 h-5 text-primary" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">Editor Login</h1>
+          <img src={logoIcon} alt="Logo" className="mx-auto w-16 h-16 rounded-xl mb-4" />
+          <h1 className="text-2xl font-bold text-white">Inloggen bij configurator</h1>
         </div>
         <div className="space-y-4">
           <input
@@ -38,7 +36,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
           />
           <input
             type="password"
@@ -46,13 +44,13 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-4 py-3 rounded-lg border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-white/30"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-lg bg-primary text-primary-foreground font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+          className="w-full py-3 rounded-lg bg-white text-[#5c6b6a] font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
         >
           {loading ? "Laden..." : "Inloggen"}
         </button>
