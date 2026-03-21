@@ -402,6 +402,8 @@ export default function ImageEditor() {
             </Section>
           </div>
         )}
+          </>
+        )}
       </div>
     </div>
   );
