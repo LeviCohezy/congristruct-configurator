@@ -157,11 +157,13 @@ const ledKeukenPriceByModel: Record<string, number> = {
   start: 350,
   flow: 150,
   hub: 150,
+  base: 150,
 };
 
 const ledKastPriceByModel: Record<string, number> = {
   start: 300,
   flow: 530,
+  base: 50,
 };
 
 const lightingPackagePriceByModel: Record<string, number> = {
