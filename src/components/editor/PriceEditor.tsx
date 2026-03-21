@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Save, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 
 type Model = "start" | "flow" | "hub" | "base";
