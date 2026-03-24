@@ -52,6 +52,13 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
       if (error) throw error;
       if (data?.success) {
         toast.success("Je offerte-aanvraag is verstuurd!");
+        // Push form submit event to GTM dataLayer
+        (window as any).dataLayer = (window as any).dataLayer || [];
+        (window as any).dataLayer.push({
+          event: "quote_request",
+          model: modelLabels[config.model] || config.model,
+          totalPrice,
+        });
       } else {
         throw new Error(data?.error || "Verzenden mislukt");
       }
