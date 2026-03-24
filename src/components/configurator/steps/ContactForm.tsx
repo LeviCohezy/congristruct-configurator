@@ -56,6 +56,7 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
         (window as any).dataLayer = (window as any).dataLayer || [];
         (window as any).dataLayer.push({
           event: "quote_request",
+          form_id: "configurator-form",
           model: modelLabels[config.model] || config.model,
           totalPrice,
         });
