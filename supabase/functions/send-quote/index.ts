@@ -221,6 +221,28 @@ Deno.serve(async (req) => {
     const resData = await res.json();
     if (!res.ok) throw new Error(`Resend API error [${res.status}]: ${JSON.stringify(resData)}`);
 
+    // Send to Odoo CRM webhook
+    try {
+      const configSummary = lineItems.map((i: LineItem) => `${i.name}: ${i.option}${i.price !== null ? ` (${fmt(i.price)})` : ""}`).join("\n");
+      await fetch("https://congristruct-staging-29860488.dev.odoo.com/df_lead_webhook/incoming/GKWd-jEcmjO_wERGHF7qgnvpSoI22DlwM_tWEEr5VKQ", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-Key": "8535067df68fc6267e38346325aaca4b46f6c97071d48ab0c1512d2083c1f15f",
+        },
+        body: JSON.stringify({
+          name: contact.fullName,
+          email: contact.email,
+          phone: contact.phone || "",
+          message: `Configuratie: ${model}\n\n${configSummary}\n\nTotaal (excl. BTW): ${fmt(totalPrice)}`,
+          form_type: "configurator",
+          source: "configurator",
+        }),
+      });
+    } catch (e) {
+      console.warn("Odoo webhook failed:", e);
+    }
+
     return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0 }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
