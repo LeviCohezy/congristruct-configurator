@@ -15,19 +15,22 @@ export function PriceSummary({ totalPrice, currentStep, totalSteps, onNext, onPr
 
   return (
     <div className="border-t border-border bg-card p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <p className="config-label">Price indication</p>
-          <motion.p
-            key={totalPrice}
-            initial={{ opacity: 0, y: 4 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-2xl sm:text-3xl font-display font-bold text-foreground"
-          >
-            €{totalPrice.toLocaleString("nl-NL")}
-          </motion.p>
-          <p className="text-xs text-muted-foreground mt-0.5">excl. VAT · indicative</p>
+      {!arePricesHidden() && (
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="config-label">Price indication</p>
+            <motion.p
+              key={totalPrice}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-2xl sm:text-3xl font-display font-bold text-foreground"
+            >
+              €{totalPrice.toLocaleString("nl-NL")}
+            </motion.p>
+            <p className="text-xs text-muted-foreground mt-0.5">excl. VAT · indicative</p>
+          </div>
         </div>
+      )}
       </div>
       <div className="flex gap-3">
         {!isFirstStep && (
