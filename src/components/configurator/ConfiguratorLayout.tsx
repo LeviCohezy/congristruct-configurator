@@ -93,7 +93,7 @@ export function ConfiguratorLayout() {
             {/* 4. Interieur */}
             <div ref={interiorRef}>
               <Section delay={0.15}>
-                <InteriorFinish config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+                <InteriorFinish config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
               </Section>
             </div>
 
