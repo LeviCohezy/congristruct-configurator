@@ -120,7 +120,7 @@ export function ConfiguratorLayout() {
 
             {/* 7. Transport */}
             <Section delay={0.3}>
-              <Transport config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <Transport config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
