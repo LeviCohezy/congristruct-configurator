@@ -106,7 +106,7 @@ export function ConfiguratorLayout() {
 
             <Divider />
             <Section delay={0.2}>
-              <WindowsSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <WindowsSection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
