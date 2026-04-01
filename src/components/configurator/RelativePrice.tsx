@@ -1,4 +1,4 @@
-import { BlurredPrice } from "./BlurredPrice";
+import { BlurredPrice, arePricesHidden } from "./BlurredPrice";
 
 interface Props {
   /** Numeric prices keyed by option id */
