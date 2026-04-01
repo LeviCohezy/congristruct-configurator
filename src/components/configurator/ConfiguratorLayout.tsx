@@ -113,7 +113,7 @@ export function ConfiguratorLayout() {
 
             {/* 6. Extra's */}
             <Section delay={0.25}>
-              <ExtraOptions config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <ExtraOptions config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
