@@ -31,7 +31,6 @@ export function PriceSummary({ totalPrice, currentStep, totalSteps, onNext, onPr
           </div>
         </div>
       )}
-      </div>
       <div className="flex gap-3">
         {!isFirstStep && (
           <button

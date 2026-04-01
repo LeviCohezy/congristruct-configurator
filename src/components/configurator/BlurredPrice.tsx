@@ -8,7 +8,7 @@ interface Props {
   prefix?: string;
 }
 
-function arePricesHidden(): boolean {
+export function arePricesHidden(): boolean {
   try {
     return localStorage.getItem("bloq-hide-prices") === "true";
   } catch {

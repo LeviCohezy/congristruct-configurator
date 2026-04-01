@@ -128,7 +128,7 @@ export function ConfiguratorLayout() {
             {/* 8. Contact */}
             <div id="contact-section">
               <Section delay={0.35}>
-                <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={() => setShowPriceGate(true)} />
+                <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={safeOnPriceClick} />
               </Section>
             </div>
 
