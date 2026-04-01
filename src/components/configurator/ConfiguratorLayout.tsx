@@ -41,7 +41,8 @@ export function ConfiguratorLayout() {
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
-  const pricesHidden = (() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } })();
+  const [pricesHidden] = useState(() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } });
+  const safeOnPriceClick = pricesHidden ? undefined : () => setShowPriceGate(true);
 
   const handleRevealPrice = useCallback(() => {
     const c = config.contact;
