@@ -1,4 +1,4 @@
-import { BlurredPrice } from "./BlurredPrice";
+import { BlurredPrice, arePricesHidden } from "./BlurredPrice";
 
 interface Props {
   /** Numeric prices keyed by option id */
@@ -18,6 +18,8 @@ interface Props {
  * cheaper shows "-€X", more expensive shows "+€X".
  */
 export function RelativePrice({ prices, selected, optionId, revealed, onPriceClick, className = "" }: Props) {
+  if (arePricesHidden()) return null;
+
   const currentPrice = prices[selected] ?? 0;
   const optionPrice = prices[optionId] ?? 0;
   const diff = optionPrice - currentPrice;

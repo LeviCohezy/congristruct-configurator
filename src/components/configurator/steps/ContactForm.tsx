@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { getConfigLineItems } from "@/hooks/useConfigSummary";
 import { toast } from "sonner";
-import { BlurredPrice } from "@/components/configurator/BlurredPrice";
+import { BlurredPrice, arePricesHidden } from "@/components/configurator/BlurredPrice";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
@@ -76,16 +76,18 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
       <h3 className="text-xl font-display font-light mb-1">Contact</h3>
       <p className="text-sm text-muted-foreground mb-4">Laat je gegevens achter voor een gedetailleerde offerte</p>
 
-      <div className="bg-surface rounded-xl p-4 mb-6">
-        <p className="config-label">Jouw prijsindicatie</p>
-        <BlurredPrice
-          text={totalPrice.toLocaleString("nl-NL")}
-          revealed={config.priceRevealed}
-          onClick={onPriceClick}
-          className="text-2xl font-display font-bold mt-1"
-        />
-        <p className="text-xs text-muted-foreground mt-1">excl. BTW · onder voorbehoud van finale configuratie</p>
-      </div>
+      {!arePricesHidden() && (
+        <div className="bg-surface rounded-xl p-4 mb-6">
+          <p className="config-label">Jouw prijsindicatie</p>
+          <BlurredPrice
+            text={totalPrice.toLocaleString("nl-NL")}
+            revealed={config.priceRevealed}
+            onClick={onPriceClick}
+            className="text-2xl font-display font-bold mt-1"
+          />
+          <p className="text-xs text-muted-foreground mt-1">excl. BTW · onder voorbehoud van finale configuratie</p>
+        </div>
+      )}
 
       <div className="grid gap-4 mb-6">
         {fields.map((f) => (

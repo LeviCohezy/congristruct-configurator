@@ -41,7 +41,8 @@ export function ConfiguratorLayout() {
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
-  const pricesHidden = (() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } })();
+  const [pricesHidden] = useState(() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } });
+  const safeOnPriceClick = pricesHidden ? undefined : () => setShowPriceGate(true);
 
   const handleRevealPrice = useCallback(() => {
     const c = config.contact;
@@ -70,7 +71,7 @@ export function ConfiguratorLayout() {
           <div className="px-5 sm:px-8 py-12 space-y-16">
             {/* 1. Unit */}
             <Section delay={0}>
-              <UnitSelection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <UnitSelection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
@@ -92,7 +93,7 @@ export function ConfiguratorLayout() {
             {/* 4. Interieur */}
             <div ref={interiorRef}>
               <Section delay={0.15}>
-                <InteriorFinish config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+                <InteriorFinish config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
               </Section>
             </div>
 
@@ -100,26 +101,26 @@ export function ConfiguratorLayout() {
 
             {/* 4b. Verlichting */}
             <Section delay={0.17}>
-              <LightingSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <LightingSection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
             <Section delay={0.2}>
-              <WindowsSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <WindowsSection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
 
             {/* 6. Extra's */}
             <Section delay={0.25}>
-              <ExtraOptions config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <ExtraOptions config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
 
             {/* 7. Transport */}
             <Section delay={0.3}>
-              <Transport config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <Transport config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
@@ -127,7 +128,7 @@ export function ConfiguratorLayout() {
             {/* 8. Contact */}
             <div id="contact-section">
               <Section delay={0.35}>
-                <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={() => setShowPriceGate(true)} />
+                <ContactForm config={config} updateContact={updateContact} totalPrice={totalPrice} onPriceClick={safeOnPriceClick} />
               </Section>
             </div>
 
