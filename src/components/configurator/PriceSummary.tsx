@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { arePricesHidden } from "./BlurredPrice";
 
 interface PriceSummaryProps {
   totalPrice: number;
