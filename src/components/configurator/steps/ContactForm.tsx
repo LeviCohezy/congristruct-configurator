@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { ConfigState } from "@/hooks/useConfigurator";
 import { getConfigLineItems } from "@/hooks/useConfigSummary";
 import { toast } from "sonner";
-import { BlurredPrice } from "@/components/configurator/BlurredPrice";
+import { BlurredPrice, arePricesHidden } from "@/components/configurator/BlurredPrice";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
