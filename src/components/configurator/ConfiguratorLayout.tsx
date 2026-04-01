@@ -71,7 +71,7 @@ export function ConfiguratorLayout() {
           <div className="px-5 sm:px-8 py-12 space-y-16">
             {/* 1. Unit */}
             <Section delay={0}>
-              <UnitSelection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <UnitSelection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
