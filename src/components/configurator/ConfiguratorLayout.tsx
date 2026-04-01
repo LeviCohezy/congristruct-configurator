@@ -101,7 +101,7 @@ export function ConfiguratorLayout() {
 
             {/* 4b. Verlichting */}
             <Section delay={0.17}>
-              <LightingSection config={config} updateConfig={updateConfig} onPriceClick={() => setShowPriceGate(true)} />
+              <LightingSection config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />
