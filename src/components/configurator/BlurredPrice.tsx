@@ -8,12 +8,42 @@ interface Props {
   prefix?: string;
 }
 
-export function arePricesHidden(): boolean {
+const PRICE_VISIBILITY_KEY = "bloq-hide-prices";
+const PRICE_VISIBILITY_VERSION_KEY = "bloq-hide-prices-version";
+const PRICE_VISIBILITY_VERSION = "2";
+
+function readPricesHidden(): boolean {
   try {
-    return localStorage.getItem("bloq-hide-prices") !== "false";
+    const version = localStorage.getItem(PRICE_VISIBILITY_VERSION_KEY);
+    if (version !== PRICE_VISIBILITY_VERSION) {
+      localStorage.setItem(PRICE_VISIBILITY_KEY, "true");
+      localStorage.setItem(PRICE_VISIBILITY_VERSION_KEY, PRICE_VISIBILITY_VERSION);
+      return true;
+    }
+
+    const value = localStorage.getItem(PRICE_VISIBILITY_KEY);
+    if (value === null) {
+      localStorage.setItem(PRICE_VISIBILITY_KEY, "true");
+      return true;
+    }
+
+    return value !== "false";
   } catch {
     return true;
   }
+}
+
+export function setPricesHiddenInStorage(hidden: boolean) {
+  try {
+    localStorage.setItem(PRICE_VISIBILITY_KEY, String(hidden));
+    localStorage.setItem(PRICE_VISIBILITY_VERSION_KEY, PRICE_VISIBILITY_VERSION);
+  } catch {
+    // Ignore storage failures and keep prices hidden by default.
+  }
+}
+
+export function arePricesHidden(): boolean {
+  return readPricesHidden();
 }
 
 export function BlurredPrice({ text, revealed, onClick, className = "", prefix = "€" }: Props) {
