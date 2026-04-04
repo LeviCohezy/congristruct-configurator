@@ -161,9 +161,14 @@ export function PriceEditor() {
   const [hidePrices, setHidePrices] = useState(() => {
     try {
       const stored = localStorage.getItem("bloq-hide-prices");
-      if (stored === null) { localStorage.setItem("bloq-hide-prices", "true"); return true; }
-      return stored === "true";
-    } catch { return true; }
+      if (stored === null) {
+        localStorage.setItem("bloq-hide-prices", "true");
+        return true;
+      }
+      return stored !== "false";
+    } catch {
+      return true;
+    }
   });
 
   const toggleHidePrices = () => {
