@@ -159,7 +159,11 @@ export function PriceEditor() {
   };
 
   const [hidePrices, setHidePrices] = useState(() => {
-    try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; }
+    try {
+      const stored = localStorage.getItem("bloq-hide-prices");
+      if (stored === null) { localStorage.setItem("bloq-hide-prices", "true"); return true; }
+      return stored === "true";
+    } catch { return true; }
   });
 
   const toggleHidePrices = () => {

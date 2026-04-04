@@ -10,9 +10,10 @@ interface Props {
 
 export function arePricesHidden(): boolean {
   try {
-    return localStorage.getItem("bloq-hide-prices") === "true";
+    const v = localStorage.getItem("bloq-hide-prices");
+    return v === null ? true : v === "true";
   } catch {
-    return false;
+    return true;
   }
 }
 
