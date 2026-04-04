@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Save, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import { arePricesHidden, setPricesHiddenInStorage } from "@/components/configurator/BlurredPrice";

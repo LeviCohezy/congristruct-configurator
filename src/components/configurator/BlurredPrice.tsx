@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from "lucide-react";
+import { Eye } from "lucide-react";
 
 interface Props {
   text: string;
