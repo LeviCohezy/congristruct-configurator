@@ -41,7 +41,19 @@ export function ConfiguratorLayout() {
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
-  const [pricesHidden] = useState(() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } });
+  const [pricesHidden, setPricesHidden] = useState(() => { try { return localStorage.getItem("bloq-hide-prices") === "true"; } catch { return false; } });
+
+  // Listen for localStorage changes (from editor toggle or other tabs)
+  useEffect(() => {
+    const sync = () => {
+      try { setPricesHidden(localStorage.getItem("bloq-hide-prices") === "true"); } catch {}
+    };
+    // Cross-tab
+    window.addEventListener("storage", sync);
+    // Same-tab: poll every 500ms since storage event doesn't fire in same tab
+    const id = setInterval(sync, 500);
+    return () => { window.removeEventListener("storage", sync); clearInterval(id); };
+  }, []);
   const safeOnPriceClick = pricesHidden ? undefined : () => setShowPriceGate(true);
 
   const handleRevealPrice = useCallback(() => {
