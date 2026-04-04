@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Save, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { arePricesHidden, setPricesHiddenInStorage } from "@/components/configurator/BlurredPrice";
 
 type Model = "start" | "flow" | "hub" | "base";
 
@@ -158,18 +159,12 @@ export function PriceEditor() {
     console.log("Saved prices:", prices);
   };
 
-  const [hidePrices, setHidePrices] = useState(() => {
-    try {
-      const stored = localStorage.getItem("bloq-hide-prices");
-      if (stored === null) { localStorage.setItem("bloq-hide-prices", "true"); return true; }
-      return stored === "true";
-    } catch { return true; }
-  });
+  const [hidePrices, setHidePrices] = useState(arePricesHidden);
 
   const toggleHidePrices = () => {
     const next = !hidePrices;
     setHidePrices(next);
-    localStorage.setItem("bloq-hide-prices", String(next));
+    setPricesHiddenInStorage(next);
     toast.success(next ? "Prijzen verborgen in configurator" : "Prijzen zichtbaar in configurator");
   };
 

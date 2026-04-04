@@ -13,7 +13,7 @@ import { Transport } from "./steps/Transport";
 import { ContactForm } from "./steps/ContactForm";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { X, MousePointerClick } from "lucide-react";
-import { BlurredPrice } from "./BlurredPrice";
+import { BlurredPrice, arePricesHidden } from "./BlurredPrice";
 
 export function ConfiguratorLayout() {
   const { config, updateConfig, updateContact, totalPrice, priceJustIncreased, priceJustDecreased } = useConfigurator();
@@ -41,18 +41,20 @@ export function ConfiguratorLayout() {
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
   const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
   const priceRevealed = config.priceRevealed;
-  const [pricesHidden, setPricesHidden] = useState(() => { try { return localStorage.getItem("bloq-hide-prices") !== "false"; } catch { return true; } });
+  const [pricesHidden, setPricesHidden] = useState(arePricesHidden);
 
   // Listen for localStorage changes (from editor toggle or other tabs)
   useEffect(() => {
     const sync = () => {
-      try { setPricesHidden(localStorage.getItem("bloq-hide-prices") === "true"); } catch {}
+      setPricesHidden(arePricesHidden());
     };
-    // Cross-tab
+    sync();
     window.addEventListener("storage", sync);
-    // Same-tab: poll every 500ms since storage event doesn't fire in same tab
     const id = setInterval(sync, 500);
-    return () => { window.removeEventListener("storage", sync); clearInterval(id); };
+    return () => {
+      window.removeEventListener("storage", sync);
+      clearInterval(id);
+    };
   }, []);
   const safeOnPriceClick = pricesHidden ? undefined : () => setShowPriceGate(true);
 
