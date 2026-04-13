@@ -83,23 +83,21 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
 
-  const pageW = 595.28; // A4
+  const pageW = 595.28;
   const pageH = 841.89;
   const margin = 50;
-  const colWidths = [180, 180, 100]; // name, option, price
+  const colWidths = [180, 180, 100];
   const rowH = 20;
-  const headerColor = rgb(0.36, 0.42, 0.42); // #5c6b6a
+  const headerColor = rgb(0.36, 0.42, 0.42);
 
   let page = doc.addPage([pageW, pageH]);
   let y = pageH - margin;
 
-  // Header block
   page.drawRectangle({ x: 0, y: y - 30, width: pageW, height: 60, color: headerColor });
   page.drawText("Configuratie Overzicht", { x: margin, y: y - 10, size: 18, font: fontBold, color: rgb(1, 1, 1) });
   page.drawText(`${data.model} — ${new Date().toLocaleDateString("nl-BE")}`, { x: margin, y: y - 26, size: 10, font, color: rgb(0.85, 0.85, 0.85) });
   y -= 60;
 
-  // Contact
   y -= 20;
   page.drawText("Klant:", { x: margin, y, size: 9, font, color: rgb(0.5, 0.5, 0.5) });
   y -= 14;
@@ -108,7 +106,6 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
   page.drawText(`${data.contact.email}${data.contact.phone ? "  ·  " + data.contact.phone : ""}`, { x: margin, y, size: 10, font, color: rgb(0.4, 0.4, 0.4) });
   y -= 24;
 
-  // Table header
   const tableX = margin;
   page.drawRectangle({ x: tableX, y: y - 4, width: colWidths[0] + colWidths[1] + colWidths[2], height: 18, color: rgb(0.94, 0.94, 0.94) });
   page.drawText("ONDERDEEL", { x: tableX + 6, y: y, size: 8, font: fontBold, color: rgb(0.5, 0.5, 0.5) });
@@ -116,7 +113,6 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
   page.drawText("PRIJS", { x: tableX + colWidths[0] + colWidths[1] + colWidths[2] - 40, y: y, size: 8, font: fontBold, color: rgb(0.5, 0.5, 0.5) });
   y -= 22;
 
-  // Table rows
   for (const item of data.lineItems) {
     if (y < margin + 40) {
       page = doc.addPage([pageW, pageH]);
@@ -142,13 +138,11 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
       color: item.price !== null ? rgb(0.2, 0.2, 0.2) : rgb(0.75, 0.75, 0.75),
     });
 
-    // Separator line
     y -= 4;
     page.drawLine({ start: { x: tableX, y }, end: { x: tableX + colWidths[0] + colWidths[1] + colWidths[2], y }, thickness: 0.5, color: rgb(0.88, 0.88, 0.88) });
     y -= rowH - 4;
   }
 
-  // Total row
   y -= 4;
   page.drawLine({ start: { x: tableX, y: y + 16 }, end: { x: tableX + colWidths[0] + colWidths[1] + colWidths[2], y: y + 16 }, thickness: 1.5, color: rgb(0.2, 0.2, 0.2) });
   page.drawText("Totaal (excl. BTW)", { x: tableX + 6, y, size: 12, font: fontBold, color: rgb(0.2, 0.2, 0.2) });
@@ -156,7 +150,6 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
   const totalWidth = fontBold.widthOfTextAtSize(totalText, 12);
   page.drawText(totalText, { x: tableX + colWidths[0] + colWidths[1] + colWidths[2] - totalWidth - 6, y, size: 12, font: fontBold, color: rgb(0.2, 0.2, 0.2) });
 
-  // Footer
   y -= 40;
   page.drawText("Automatisch gegenereerde prijsindicatie · Onder voorbehoud van finale configuratie", { x: tableX, y, size: 8, font, color: rgb(0.65, 0.65, 0.65) });
 
@@ -171,6 +164,73 @@ function base64Encode(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
+// ── Google Drive Upload ──
+async function getGoogleAccessToken(): Promise<string> {
+  const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
+  const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
+  const refreshToken = Deno.env.get("GOOGLE_REFRESH_TOKEN")!;
+
+  const res = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Google token refresh failed: ${JSON.stringify(data)}`);
+  return data.access_token;
+}
+
+const DRIVE_FOLDER_ID = "1sq_4D6S0VkJp_iDwZgCl5WSQ1lD3UVd2";
+
+async function uploadToDrive(pdfBytes: Uint8Array, fileName: string): Promise<string> {
+  const accessToken = await getGoogleAccessToken();
+
+  const metadata = {
+    name: fileName,
+    mimeType: "application/pdf",
+    parents: [DRIVE_FOLDER_ID],
+  };
+
+  const boundary = "----EdgeFunctionBoundary";
+  const metaPart = JSON.stringify(metadata);
+
+  const encoder = new TextEncoder();
+  const parts = [
+    encoder.encode(`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metaPart}\r\n`),
+    encoder.encode(`--${boundary}\r\nContent-Type: application/pdf\r\n\r\n`),
+    pdfBytes,
+    encoder.encode(`\r\n--${boundary}--`),
+  ];
+
+  const totalLength = parts.reduce((s, p) => s + p.length, 0);
+  const body = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const part of parts) {
+    body.set(part, offset);
+    offset += part.length;
+  }
+
+  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": `multipart/related; boundary=${boundary}`,
+    },
+    body,
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(`Drive upload failed: ${JSON.stringify(data)}`);
+  console.log(`PDF uploaded to Drive: ${data.id} (${fileName})`);
+  return data.id;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -182,7 +242,6 @@ Deno.serve(async (req) => {
 
     const body: QuoteRequest = await req.json();
     const { lineItems, totalPrice, contact, model } = body;
-    const submissionId = crypto.randomUUID();
 
     if (!contact?.email || !contact?.fullName || !lineItems?.length) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -196,18 +255,16 @@ Deno.serve(async (req) => {
     // Generate PDF
     let attachments: { filename: string; content: string }[] = [];
     let pdfBytes: Uint8Array | null = null;
+    const pdfFileName = `configuratie-${model.toLowerCase().replace(/\s+/g, "-")}-${contact.fullName.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
     try {
       pdfBytes = await generatePdf(body);
       attachments = [{
-        filename: `configuratie-${model.toLowerCase().replace(/\s+/g, "-")}.pdf`,
+        filename: pdfFileName,
         content: base64Encode(pdfBytes),
       }];
     } catch (e) {
       console.warn("PDF generation failed:", e);
     }
-
-    // Encode PDF as base64 for webhook
-    const pdfBase64 = pdfBytes ? base64Encode(pdfBytes) : "";
 
     const resendPayload: Record<string, unknown> = {
       from: "BLOQ Configurator <configurator@congristruct.be>",
@@ -249,26 +306,17 @@ Deno.serve(async (req) => {
       console.warn("Odoo webhook failed:", e);
     }
 
-    // Send to Google Apps Script webhook (Sheets + Drive)
-    try {
-      await fetch("https://script.google.com/macros/s/AKfycbxsuNmhj3Gi49hty57x4H_e5duGeUnXirsrVpRzBYNy6xkJxkOPp8VoZAjgcM2N_nsT/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: "configurator",
-          submission_id: submissionId,
-          submitted_at: new Date().toISOString(),
-          name: contact.fullName,
-          email: contact.email,
-          phone: contact.phone || "",
-          pdf_base64: pdfBase64,
-        }),
-      });
-    } catch (e) {
-      console.warn("Google Apps Script webhook failed:", e);
+    // Upload PDF to Google Drive
+    let driveFileId: string | null = null;
+    if (pdfBytes) {
+      try {
+        driveFileId = await uploadToDrive(pdfBytes, pdfFileName);
+      } catch (e) {
+        console.warn("Google Drive upload failed:", e);
+      }
     }
 
-    return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0 }), {
+    return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0, driveFileId }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
