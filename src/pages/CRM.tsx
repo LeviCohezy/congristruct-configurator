@@ -28,6 +28,7 @@ interface Submission {
   name: string;
   email: string;
   phone: string;
+  address: string;
   model: string;
   status: string;
   line_items: LineItem[];
