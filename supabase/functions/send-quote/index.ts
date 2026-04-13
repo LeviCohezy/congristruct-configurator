@@ -263,7 +263,7 @@ Deno.serve(async (req) => {
           name: contact.fullName,
           email: contact.email,
           phone: contact.phone || "",
-          pdf_url: pdfUrl,
+          pdf_base64: pdfBase64,
         }),
       });
     } catch (e) {
