@@ -134,7 +134,7 @@ export function ConfiguratorLayout() {
 
             {/* 7. Transport */}
             <Section delay={0.3}>
-              <Transport config={config} updateConfig={updateConfig} onPriceClick={safeOnPriceClick} />
+              <Transport config={config} updateConfig={updateConfig} updateContact={updateContact} onPriceClick={safeOnPriceClick} />
             </Section>
 
             <Divider />

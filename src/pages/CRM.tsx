@@ -141,10 +141,11 @@ export default function CRM() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Datum</TableHead>
-                  <TableHead>Naam</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefoon</TableHead>
-                  <TableHead>Model</TableHead>
+                   <TableHead>Naam</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Telefoon</TableHead>
+                    <TableHead>Adres</TableHead>
+                    <TableHead>Model</TableHead>
                   <TableHead>Totaal</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="w-[80px]"></TableHead>
@@ -161,6 +162,7 @@ export default function CRM() {
                     <TableCell className="font-medium">{sub.name}</TableCell>
                     <TableCell className="text-sm">{sub.email}</TableCell>
                     <TableCell className="text-sm">{sub.phone || "—"}</TableCell>
+                    <TableCell className="text-sm">{sub.address || "—"}</TableCell>
                     <TableCell className="text-sm">{sub.model}</TableCell>
                     <TableCell className="text-sm font-medium whitespace-nowrap">{fmt(sub.total_price)}</TableCell>
                     <TableCell>
@@ -206,6 +208,10 @@ export default function CRM() {
                 <div>
                   <p className="text-muted-foreground text-xs">Telefoon</p>
                   <p>{selected.phone || "—"}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Adres</p>
+                  <p>{selected.address || "—"}</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground text-xs">Model</p>
