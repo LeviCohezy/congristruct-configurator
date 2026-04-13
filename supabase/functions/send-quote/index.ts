@@ -196,14 +196,42 @@ Deno.serve(async (req) => {
 
     // Generate PDF
     let attachments: { filename: string; content: string }[] = [];
+    let pdfBytes: Uint8Array | null = null;
     try {
-      const pdfBytes = await generatePdf(body);
+      pdfBytes = await generatePdf(body);
       attachments = [{
         filename: `configuratie-${model.toLowerCase().replace(/\s+/g, "-")}.pdf`,
         content: base64Encode(pdfBytes),
       }];
     } catch (e) {
       console.warn("PDF generation failed:", e);
+    }
+
+    // Upload PDF to storage for public URL
+    let pdfUrl = "";
+    if (pdfBytes && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const fileName = `${submissionId}.pdf`;
+        const uploadRes = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/quote-pdfs/${fileName}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+              "Content-Type": "application/pdf",
+              "x-upsert": "true",
+            },
+            body: pdfBytes,
+          }
+        );
+        if (uploadRes.ok) {
+          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
+        } else {
+          console.warn("PDF upload failed:", await uploadRes.text());
+        }
+      } catch (e) {
+        console.warn("PDF upload error:", e);
+      }
     }
 
     const resendPayload: Record<string, unknown> = {
