@@ -25,6 +25,14 @@ function fmt(n: number): string {
   return "€ " + n.toLocaleString("nl-NL");
 }
 
+function generateSubmissionId(name: string): string {
+  const now = new Date();
+  const date = now.toISOString().slice(0, 10).replace(/-/g, "");
+  const time = now.toISOString().slice(11, 19).replace(/:/g, "");
+  const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  return `${date}-${time}-${slug}`;
+}
+
 // ── HTML Email ──
 function buildHtmlEmail(data: QuoteRequest): string {
   const rows = data.lineItems
@@ -164,72 +172,7 @@ function base64Encode(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-// ── Google Drive Upload ──
-async function getGoogleAccessToken(): Promise<string> {
-  const clientId = Deno.env.get("GOOGLE_CLIENT_ID")!;
-  const clientSecret = Deno.env.get("GOOGLE_CLIENT_SECRET")!;
-  const refreshToken = Deno.env.get("GOOGLE_REFRESH_TOKEN")!;
-
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: clientId,
-      client_secret: clientSecret,
-      refresh_token: refreshToken,
-      grant_type: "refresh_token",
-    }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(`Google token refresh failed: ${JSON.stringify(data)}`);
-  return data.access_token;
-}
-
-const DRIVE_FOLDER_ID = "1sq_4D6S0VkJp_iDwZgCl5WSQ1lD3UVd2";
-
-async function uploadToDrive(pdfBytes: Uint8Array, fileName: string): Promise<string> {
-  const accessToken = await getGoogleAccessToken();
-
-  const metadata = {
-    name: fileName,
-    mimeType: "application/pdf",
-    parents: [DRIVE_FOLDER_ID],
-  };
-
-  const boundary = "----EdgeFunctionBoundary";
-  const metaPart = JSON.stringify(metadata);
-
-  const encoder = new TextEncoder();
-  const parts = [
-    encoder.encode(`--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metaPart}\r\n`),
-    encoder.encode(`--${boundary}\r\nContent-Type: application/pdf\r\n\r\n`),
-    pdfBytes,
-    encoder.encode(`\r\n--${boundary}--`),
-  ];
-
-  const totalLength = parts.reduce((s, p) => s + p.length, 0);
-  const body = new Uint8Array(totalLength);
-  let offset = 0;
-  for (const part of parts) {
-    body.set(part, offset);
-    offset += part.length;
-  }
-
-  const res = await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": `multipart/related; boundary=${boundary}`,
-    },
-    body,
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(`Drive upload failed: ${JSON.stringify(data)}`);
-  console.log(`PDF uploaded to Drive: ${data.id} (${fileName})`);
-  return data.id;
-}
+const SPREADSHEET_WEBHOOK = "https://script.google.com/macros/s/AKfycbxsuNmhj3Gi49hty57x4H_e5duGeUnXirsrVpRzBYNy6xkJxkOPp8VoZAjgcM2N_nsT/exec";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -250,14 +193,14 @@ Deno.serve(async (req) => {
       });
     }
 
+    const submissionId = generateSubmissionId(contact.fullName);
     const htmlEmail = buildHtmlEmail(body);
 
     // Generate PDF
     let attachments: { filename: string; content: string }[] = [];
-    let pdfBytes: Uint8Array | null = null;
     const pdfFileName = `Configuratie-${contact.fullName.replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
     try {
-      pdfBytes = await generatePdf(body);
+      const pdfBytes = await generatePdf(body);
       attachments = [{
         filename: pdfFileName,
         content: base64Encode(pdfBytes),
@@ -266,6 +209,7 @@ Deno.serve(async (req) => {
       console.warn("PDF generation failed:", e);
     }
 
+    // Send email via Resend
     const resendPayload: Record<string, unknown> = {
       from: "BLOQ Configurator <configurator@congristruct.be>",
       to: ["levi.soubry@gmail.com", "warre@congristruct.be"],
@@ -306,17 +250,23 @@ Deno.serve(async (req) => {
       console.warn("Odoo webhook failed:", e);
     }
 
-    // Upload PDF to Google Drive
-    let driveFileId: string | null = null;
-    if (pdfBytes) {
-      try {
-        driveFileId = await uploadToDrive(pdfBytes, pdfFileName);
-      } catch (e) {
-        console.warn("Google Drive upload failed:", e);
-      }
+    // Send to Google Sheets spreadsheet webhook
+    try {
+      await fetch(SPREADSHEET_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          submission_id: submissionId,
+          name: contact.fullName,
+          email: contact.email,
+          phone: contact.phone || "",
+        }),
+      });
+    } catch (e) {
+      console.warn("Spreadsheet webhook failed:", e);
     }
 
-    return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0, driveFileId }), {
+    return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0, submissionId }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
