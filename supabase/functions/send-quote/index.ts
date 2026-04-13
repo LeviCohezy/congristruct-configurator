@@ -274,6 +274,25 @@ Deno.serve(async (req) => {
       console.warn("Odoo webhook failed:", e);
     }
 
+    // Send to Google Apps Script webhook (Sheets + Drive)
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxsuNmhj3Gi49hty57x4H_e5duGeUnXirsrVpRzBYNy6xkJxkOPp8VoZAjgcM2N_nsT/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "configurator",
+          submission_id: submissionId,
+          submitted_at: new Date().toISOString(),
+          name: contact.fullName,
+          email: contact.email,
+          phone: contact.phone || "",
+          pdf_url: pdfUrl,
+        }),
+      });
+    } catch (e) {
+      console.warn("Google Apps Script webhook failed:", e);
+    }
+
     return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0 }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
