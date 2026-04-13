@@ -208,27 +208,8 @@ Deno.serve(async (req) => {
       console.warn("PDF generation failed:", e);
     }
 
-    // Upload PDF to storage for public URL
-    let pdfUrl = "";
-    if (pdfBytes && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      try {
-        const fileName = `${submissionId}.pdf`;
-        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from("quote-pdfs")
-          .upload(fileName, pdfBytes, {
-            contentType: "application/pdf",
-            upsert: true,
-          });
-        if (uploadError) {
-          console.warn("PDF upload failed:", uploadError.message);
-        } else {
-          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
-        }
-      } catch (e) {
-        console.warn("PDF upload error:", e);
-      }
-    }
+    // Encode PDF as base64 for webhook
+    const pdfBase64 = pdfBytes ? base64Encode(pdfBytes) : "";
 
     const resendPayload: Record<string, unknown> = {
       from: "BLOQ Configurator <configurator@congristruct.be>",
