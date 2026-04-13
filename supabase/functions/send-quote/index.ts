@@ -18,7 +18,7 @@ interface LineItem {
 interface QuoteRequest {
   lineItems: LineItem[];
   totalPrice: number;
-  contact: { fullName: string; email: string; phone: string };
+  contact: { fullName: string; email: string; phone: string; address?: string };
   model: string;
 }
 
@@ -261,6 +261,7 @@ Deno.serve(async (req) => {
           name: contact.fullName,
           email: contact.email,
           phone: contact.phone || "",
+          address: contact.address || "",
         }),
       });
     } catch (e) {
@@ -277,6 +278,7 @@ Deno.serve(async (req) => {
         name: contact.fullName,
         email: contact.email,
         phone: contact.phone || "",
+        address: contact.address || "",
         model: model || "",
         line_items: lineItems,
         total_price: totalPrice,

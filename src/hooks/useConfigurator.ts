@@ -35,6 +35,7 @@ export interface ConfigState {
     fullName: string;
     email: string;
     phone: string;
+    address: string;
   };
   priceRevealed: boolean;
 }
@@ -50,10 +51,11 @@ function loadContactFromStorage(): ConfigState["contact"] {
         fullName: parsed.fullName || "",
         email: parsed.email || "",
         phone: parsed.phone || "",
+        address: parsed.address || "",
       };
     }
   } catch {}
-  return { fullName: "", email: "", phone: "" };
+  return { fullName: "", email: "", phone: "", address: "" };
 }
 
 function saveContactToStorage(contact: ConfigState["contact"]) {

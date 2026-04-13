@@ -9,6 +9,7 @@ import { BlurredPrice } from "@/components/configurator/BlurredPrice";
 interface Props {
   config: ConfigState;
   updateConfig: <K extends keyof ConfigState>(key: K, value: ConfigState[K]) => void;
+  updateContact: (field: keyof ConfigState["contact"], value: string) => void;
   onPriceClick?: () => void;
 }
 
@@ -21,13 +22,13 @@ const MAP_BOUNDS: L.LatLngBoundsExpression = [
   [53.0, 7.5],
 ];
 
-export function Transport({ config, updateConfig, onPriceClick }: Props) {
+export function Transport({ config, updateConfig, updateContact, onPriceClick }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const routeLayerRef = useRef<L.Polyline | null>(null);
   const destMarkerRef = useRef<L.Marker | null>(null);
 
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(config.contact.address || "");
   const [routeDistance, setRouteDistance] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -148,6 +149,7 @@ export function Transport({ config, updateConfig, onPriceClick }: Props) {
 
   const handleAddressChange = (val: string) => {
     setAddress(val);
+    updateContact("address", val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => geocodeAndRoute(val), 800);
   };
