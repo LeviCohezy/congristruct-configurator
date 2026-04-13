@@ -1,42 +1,39 @@
 
 
-## Problem
+## Plan: Add Google Apps Script Webhook + PDF Storage
 
-The "Prijzen verborgen voor bezoekers" toggle in the editor sets `localStorage("bloq-hide-prices") = "true"`, but:
-1. The **sticky total price button** at the bottom still shows (it only checks `pricesHidden` for the wrapper, but the `BlurredPrice` inside returns `null` leaving an empty button visible)
-2. The **price gate modal** can still open via `onPriceClick` callbacks
-3. The **bouncing mouse icon** and **floating euro animations** still render
-4. **`RelativePrice`** still shows "geselecteerd" / "inbegrepen" text labels
-5. The **ContactForm** still shows the total price section
+### What this does
+After the email is sent and PDF is generated, the edge function will:
+1. Upload the PDF to Supabase Storage (a new `quote-pdfs` bucket) to get a public URL
+2. Send the lead data + PDF URL to your Google Apps Script webhook, which handles writing to Google Sheets and uploading to Google Drive
 
-The root issue: `localStorage` is set by the editor but the configurator only partially respects it. The live site (different origin/tab) won't share the same localStorage as the editor preview.
+### Data contract sent to Google Apps Script
+```json
+{
+  "source": "configurator",
+  "submission_id": "<uuid>",
+  "submitted_at": "2026-04-13T12:00:00.000Z",
+  "name": "Jan Janssens",
+  "email": "jan@example.com",
+  "phone": "+32 470 00 00 00",
+  "pdf_url": "https://.../storage/v1/object/public/quote-pdfs/xxx.pdf"
+}
+```
 
-**Wait** — both editor and configurator are on the same domain, so localStorage IS shared. The real issue is that the hiding logic is incomplete.
+### Changes
 
-## Plan
+**1. Database migration — create `quote-pdfs` storage bucket**
+- Public bucket so the Google Apps Script can download the PDF
 
-### 1. Make `BlurredPrice` export the hidden check
-Add an exported `arePricesHidden()` function (already exists, just needs exporting).
+**2. `supabase/functions/send-quote/index.ts`**
+- After PDF generation, upload PDF bytes to the `quote-pdfs` bucket using the Supabase service role key
+- Construct the public URL for the uploaded PDF
+- Add a new webhook call (alongside the existing Odoo one) to `https://script.google.com/macros/s/AKfycbxsuNmhj3Gi49hty57x4H_e5duGeUnXirsrVpRzBYNy6xkJxkOPp8VoZAjgcM2N_nsT/exec` with the data contract above
+- Generate a unique `submission_id` using `crypto.randomUUID()`
+- The Odoo webhook remains untouched
 
-### 2. Hide the entire sticky price bar + modal + animations
-In `ConfiguratorLayout.tsx`, the `pricesHidden` variable already exists at line 44. Changes:
-- The sticky bar wrapper (line 140) already has `!pricesHidden &&` — but also hide the `MousePointerClick` icon and euro animations inside it. Actually the whole block is already gated. Good.
-- **Hide the price gate modal**: line 200 already has `!pricesHidden` check. Good.
-- **Disable `onPriceClick` callbacks**: When `pricesHidden`, don't pass `onPriceClick` to child components so clicking doesn't trigger the modal.
-
-### 3. Hide `RelativePrice` when prices hidden
-In `RelativePrice.tsx`, add the same `arePricesHidden()` check — return `null` when hidden (including the "geselecteerd"/"inbegrepen" labels).
-
-### 4. Hide prices in `ContactForm`
-Check the ContactForm to ensure total price display respects the flag.
-
-### 5. Use React state instead of reading localStorage on every render
-Convert `pricesHidden` to a proper state value (read once on mount) to avoid stale reads and ensure consistency. Pass it down as a prop or use the existing check.
-
-### Files to modify
-- **`src/components/configurator/BlurredPrice.tsx`** — export `arePricesHidden`
-- **`src/components/configurator/RelativePrice.tsx`** — return `null` when prices hidden
-- **`src/components/configurator/ConfiguratorLayout.tsx`** — when `pricesHidden`, don't pass `onPriceClick` to steps (prevents modal from opening)
-- **`src/components/configurator/steps/ContactForm.tsx`** — hide the price display when prices hidden
-- **`src/components/configurator/PriceSummary.tsx`** — hide price when hidden (if used)
+### Technical details
+- The PDF upload uses `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` (both already configured as secrets) to call the Storage API directly via REST
+- The webhook call is fire-and-forget (wrapped in try/catch, won't block the response)
+- If PDF generation failed, `pdf_url` will be sent as an empty string
 
