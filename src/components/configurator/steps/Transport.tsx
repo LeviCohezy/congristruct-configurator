@@ -27,7 +27,7 @@ export function Transport({ config, updateConfig, onPriceClick }: Props) {
   const routeLayerRef = useRef<L.Polyline | null>(null);
   const destMarkerRef = useRef<L.Marker | null>(null);
 
-  const [address, setAddress] = useState("");
+  const [address, setAddress] = useState(config.contact.address || "");
   const [routeDistance, setRouteDistance] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
