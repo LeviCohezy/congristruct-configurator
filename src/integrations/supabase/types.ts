@@ -53,6 +53,48 @@ export type Database = {
         }
         Relationships: []
       }
+      submissions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          line_items: Json
+          model: string
+          name: string
+          phone: string | null
+          status: string
+          submission_id: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          line_items?: Json
+          model?: string
+          name: string
+          phone?: string | null
+          status?: string
+          submission_id: string
+          total_price?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          line_items?: Json
+          model?: string
+          name?: string
+          phone?: string | null
+          status?: string
+          submission_id?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
