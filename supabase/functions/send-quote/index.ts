@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.49.4";
 
 import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
@@ -264,6 +265,25 @@ Deno.serve(async (req) => {
       });
     } catch (e) {
       console.warn("Spreadsheet webhook failed:", e);
+    }
+
+    // Save to database
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const sb = createClient(supabaseUrl, supabaseKey);
+      await sb.from("submissions").insert({
+        submission_id: submissionId,
+        name: contact.fullName,
+        email: contact.email,
+        phone: contact.phone || "",
+        model: model || "",
+        line_items: lineItems,
+        total_price: totalPrice,
+        status: "new",
+      });
+    } catch (e) {
+      console.warn("DB insert failed:", e);
     }
 
     return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0, submissionId }), {
