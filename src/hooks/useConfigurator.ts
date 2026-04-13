@@ -35,6 +35,7 @@ export interface ConfigState {
     fullName: string;
     email: string;
     phone: string;
+    address: string;
   };
   priceRevealed: boolean;
 }
