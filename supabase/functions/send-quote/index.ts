@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "jsr:@supabase/supabase-js@2";
 import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
@@ -212,22 +213,17 @@ Deno.serve(async (req) => {
     if (pdfBytes && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const fileName = `${submissionId}.pdf`;
-        const uploadRes = await fetch(
-          `${SUPABASE_URL}/storage/v1/object/quote-pdfs/${fileName}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-              "Content-Type": "application/pdf",
-              "x-upsert": "true",
-            },
-            body: pdfBytes,
-          }
-        );
-        if (uploadRes.ok) {
-          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        const { error: uploadError } = await supabaseAdmin.storage
+          .from("quote-pdfs")
+          .upload(fileName, pdfBytes, {
+            contentType: "application/pdf",
+            upsert: true,
+          });
+        if (uploadError) {
+          console.warn("PDF upload failed:", uploadError.message);
         } else {
-          console.warn("PDF upload failed:", await uploadRes.text());
+          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
         }
       } catch (e) {
         console.warn("PDF upload error:", e);
