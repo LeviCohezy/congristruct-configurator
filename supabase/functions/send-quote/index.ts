@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "jsr:@supabase/supabase-js@2";
+
 import { PDFDocument, StandardFonts, rgb } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
@@ -179,8 +179,6 @@ Deno.serve(async (req) => {
   try {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     const body: QuoteRequest = await req.json();
     const { lineItems, totalPrice, contact, model } = body;
@@ -208,27 +206,8 @@ Deno.serve(async (req) => {
       console.warn("PDF generation failed:", e);
     }
 
-    // Upload PDF to storage for public URL
-    let pdfUrl = "";
-    if (pdfBytes && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
-      try {
-        const fileName = `${submissionId}.pdf`;
-        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from("quote-pdfs")
-          .upload(fileName, pdfBytes, {
-            contentType: "application/pdf",
-            upsert: true,
-          });
-        if (uploadError) {
-          console.warn("PDF upload failed:", uploadError.message);
-        } else {
-          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
-        }
-      } catch (e) {
-        console.warn("PDF upload error:", e);
-      }
-    }
+    // Encode PDF as base64 for webhook
+    const pdfBase64 = pdfBytes ? base64Encode(pdfBytes) : "";
 
     const resendPayload: Record<string, unknown> = {
       from: "BLOQ Configurator <configurator@congristruct.be>",
@@ -282,7 +261,7 @@ Deno.serve(async (req) => {
           name: contact.fullName,
           email: contact.email,
           phone: contact.phone || "",
-          pdf_url: pdfUrl,
+          pdf_base64: pdfBase64,
         }),
       });
     } catch (e) {
