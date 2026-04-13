@@ -178,9 +178,12 @@ Deno.serve(async (req) => {
   try {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     const body: QuoteRequest = await req.json();
     const { lineItems, totalPrice, contact, model } = body;
+    const submissionId = crypto.randomUUID();
 
     if (!contact?.email || !contact?.fullName || !lineItems?.length) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
@@ -193,14 +196,42 @@ Deno.serve(async (req) => {
 
     // Generate PDF
     let attachments: { filename: string; content: string }[] = [];
+    let pdfBytes: Uint8Array | null = null;
     try {
-      const pdfBytes = await generatePdf(body);
+      pdfBytes = await generatePdf(body);
       attachments = [{
         filename: `configuratie-${model.toLowerCase().replace(/\s+/g, "-")}.pdf`,
         content: base64Encode(pdfBytes),
       }];
     } catch (e) {
       console.warn("PDF generation failed:", e);
+    }
+
+    // Upload PDF to storage for public URL
+    let pdfUrl = "";
+    if (pdfBytes && SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+      try {
+        const fileName = `${submissionId}.pdf`;
+        const uploadRes = await fetch(
+          `${SUPABASE_URL}/storage/v1/object/quote-pdfs/${fileName}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+              "Content-Type": "application/pdf",
+              "x-upsert": "true",
+            },
+            body: pdfBytes,
+          }
+        );
+        if (uploadRes.ok) {
+          pdfUrl = `${SUPABASE_URL}/storage/v1/object/public/quote-pdfs/${fileName}`;
+        } else {
+          console.warn("PDF upload failed:", await uploadRes.text());
+        }
+      } catch (e) {
+        console.warn("PDF upload error:", e);
+      }
     }
 
     const resendPayload: Record<string, unknown> = {
@@ -241,6 +272,25 @@ Deno.serve(async (req) => {
       });
     } catch (e) {
       console.warn("Odoo webhook failed:", e);
+    }
+
+    // Send to Google Apps Script webhook (Sheets + Drive)
+    try {
+      await fetch("https://script.google.com/macros/s/AKfycbxsuNmhj3Gi49hty57x4H_e5duGeUnXirsrVpRzBYNy6xkJxkOPp8VoZAjgcM2N_nsT/exec", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "configurator",
+          submission_id: submissionId,
+          submitted_at: new Date().toISOString(),
+          name: contact.fullName,
+          email: contact.email,
+          phone: contact.phone || "",
+          pdf_url: pdfUrl,
+        }),
+      });
+    } catch (e) {
+      console.warn("Google Apps Script webhook failed:", e);
     }
 
     return new Response(JSON.stringify({ success: true, emailId: resData.id, hasPdf: attachments.length > 0 }), {
