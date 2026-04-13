@@ -255,7 +255,7 @@ Deno.serve(async (req) => {
     // Generate PDF
     let attachments: { filename: string; content: string }[] = [];
     let pdfBytes: Uint8Array | null = null;
-    const pdfFileName = `configuratie-${model.toLowerCase().replace(/\s+/g, "-")}-${contact.fullName.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
+    const pdfFileName = `Configuratie-${contact.fullName.replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
     try {
       pdfBytes = await generatePdf(body);
       attachments = [{
