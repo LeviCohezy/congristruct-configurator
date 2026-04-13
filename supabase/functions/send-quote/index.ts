@@ -124,7 +124,7 @@ async function generatePdf(data: QuoteRequest): Promise<Uint8Array> {
 
     const isIndented = item.name.startsWith("  ");
     const nameX = isIndented ? tableX + 18 : tableX + 6;
-    const nameText = isIndented ? `↳ ${item.name.trim()}` : item.name;
+    const nameText = isIndented ? `> ${item.name.trim()}` : item.name;
     const nameColor = isIndented ? rgb(0.55, 0.55, 0.55) : rgb(0.2, 0.2, 0.2);
     const nameSize = isIndented ? 9 : 10;
 
