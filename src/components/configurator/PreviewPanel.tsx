@@ -155,14 +155,16 @@ export function PreviewPanel({ config, showInteriorImages, onToggleInteriorView,
             className="absolute inset-0 flex flex-col items-center justify-center gap-2 p-4 sm:gap-3 sm:p-6 overflow-hidden sm:overflow-auto"
           >
             <img
-              src={images[0]}
+              src={config.mirrorPlan ? images[1] : images[0]}
               alt="Interieur aanzicht 1"
               className="w-[80%] h-[40%] sm:w-full sm:h-auto sm:max-w-2xl rounded-lg object-contain"
+              style={config.mirrorPlan ? { transform: "scaleX(-1)" } : undefined}
             />
             <img
-              src={images[1]}
+              src={config.mirrorPlan ? images[0] : images[1]}
               alt="Interieur aanzicht 2"
               className="w-[80%] h-[40%] sm:w-full sm:h-auto sm:max-w-2xl rounded-lg object-contain"
+              style={config.mirrorPlan ? { transform: "scaleX(-1)" } : undefined}
             />
           </motion.div>
         )}
