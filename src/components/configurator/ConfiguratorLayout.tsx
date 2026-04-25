@@ -39,7 +39,7 @@ export function ConfiguratorLayout() {
   }, []);
 
   // Keep showing interior images even when finish level changes, as long as we're in the interior section
-  const showImages = !force3D && interiorInView && config.model === "start" && !!interiorImages;
+  const showImages = !force3D && interiorInView && (config.model === "start" || config.model === "base") && !!interiorImages;
   const priceRevealed = config.priceRevealed;
   const [pricesHidden, setPricesHidden] = useState(arePricesHidden);
 
