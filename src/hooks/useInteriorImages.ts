@@ -7,7 +7,8 @@ export function useInteriorImages(config: ConfigState): [string, string] | null 
   const prevImagesRef = useRef<[string, string] | null>(null);
 
   useEffect(() => {
-    if (config.model !== "start" && config.model !== "base") {
+    const supportedModels = ["start", "base", "flow", "hub"];
+    if (!supportedModels.includes(config.model)) {
       setImages(null);
       return;
     }
