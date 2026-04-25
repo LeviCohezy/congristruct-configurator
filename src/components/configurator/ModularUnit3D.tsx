@@ -579,7 +579,10 @@ export function ModularUnit3D({ config }: { config: ConfigState }) {
 
   const floorTex = !isShell ? (config.floorOption === "light-vinyl" ? lightWoodTex : config.floorOption === "dark-vinyl" ? darkWoodTex : config.floorOption === "stone-vinyl" ? stoneTex : null) : null;
 
-  const scaleX = config.mirrorPlan ? -1 : 1;
+  // BLOQ BASE: default orientation places the smaller area (toilet) on the LEFT,
+  // so the base mirror direction is inverted compared to other models.
+  const baseFlip = config.model === "base" ? -1 : 1;
+  const scaleX = (config.mirrorPlan ? -1 : 1) * baseFlip;
 
   /* ── START-specific wall/window/door layout from architectural plan ── */
   /* Back wall:  185 + 80(window) + 135 = 400cm
