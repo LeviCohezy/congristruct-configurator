@@ -31,20 +31,7 @@ export function FloorPlanSection({ config, updateConfig }: Props) {
   return (
     <div className="config-section">
       <h3 className="text-xl font-display font-light mb-1">Indeling</h3>
-      <p className="text-sm text-muted-foreground mb-5">Kies je grondplan</p>
-
-      <div className="grid grid-cols-2 gap-6 mb-6">
-        {(["a", "b"] as const).map((plan) => (
-          <button
-            key={plan}
-            onClick={() => updateConfig("floorPlan", plan)}
-            className={cn("option-card text-left", config.floorPlan === plan && "option-card-active")}
-          >
-            <p className="font-semibold text-sm mb-1">{plans[plan].label}</p>
-            <p className="text-xs text-muted-foreground">{plans[plan].desc}</p>
-          </button>
-        ))}
-      </div>
+      <p className="text-sm text-muted-foreground mb-5">Spiegel je grondplan</p>
 
       {/* Mirror toggle */}
       <div className="option-card flex items-center justify-between">
