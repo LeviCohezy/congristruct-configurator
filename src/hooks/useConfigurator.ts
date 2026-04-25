@@ -209,7 +209,14 @@ export function useConfigurator() {
   const [priceJustDecreased, setPriceJustDecreased] = useState(false);
 
   const updateConfig = useCallback(<K extends keyof ConfigState>(key: K, value: ConfigState[K]) => {
-    setConfig((prev) => ({ ...prev, [key]: value }));
+    setConfig((prev) => {
+      const next = { ...prev, [key]: value };
+      // BLOQ BASE always uses Plan B (with toilet)
+      if (key === "model" && value === "base") {
+        next.floorPlan = "b";
+      }
+      return next;
+    });
   }, []);
 
   const updateContact = useCallback((field: keyof ConfigState["contact"], value: string) => {
