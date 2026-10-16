@@ -14,9 +14,29 @@ import { ContactForm } from "./steps/ContactForm";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { X, MousePointerClick } from "lucide-react";
 import { BlurredPrice, arePricesHidden } from "./BlurredPrice";
+import { trackEvent } from "@/lib/tracking";
 
 export function ConfiguratorLayout() {
-  const { config, updateConfig, updateContact, totalPrice, priceJustIncreased, priceJustDecreased } = useConfigurator();
+  const { config, updateConfig: rawUpdateConfig, updateContact, totalPrice, priceJustIncreased, priceJustDecreased } = useConfigurator();
+  // configurator_start: first time the visitor changes any option
+  const updateConfig = useCallback<typeof rawUpdateConfig>((key, value) => {
+    if (key !== "priceRevealed") trackEvent("configurator_start", { model: config.model }, true);
+    rawUpdateConfig(key, value);
+  }, [rawUpdateConfig, config.model]);
+
+  // configurator_complete: visitor scrolled through all options to the contact section
+  useEffect(() => {
+    const el = document.getElementById("contact-section");
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        trackEvent("configurator_complete", { model: config.model, totalPrice }, true);
+        obs.disconnect();
+      }
+    }, { threshold: 0.3 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [config.model, totalPrice]);
   const interiorImages = useInteriorImages(config);
   const [interiorInView, setInteriorInView] = useState(false);
   const [force3D, setForce3D] = useState(false);

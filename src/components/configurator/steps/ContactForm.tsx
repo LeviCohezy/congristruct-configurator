@@ -6,6 +6,7 @@ import { getConfigLineItems } from "@/hooks/useConfigSummary";
 import { toast } from "sonner";
 import { BlurredPrice, arePricesHidden } from "@/components/configurator/BlurredPrice";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/lib/tracking";
 
 interface Props {
   config: ConfigState;
@@ -52,14 +53,10 @@ export function ContactForm({ config, updateContact, totalPrice, onPriceClick }:
       if (error) throw error;
       if (data?.success) {
         toast.success("Je offerte-aanvraag is verstuurd!");
-        // Push form submit event to GTM dataLayer
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).dataLayer.push({
-          event: "quote_request",
-          form_id: "configurator-form",
-          model: modelLabels[config.model] || config.model,
-          totalPrice,
-        });
+        // Push form submit events to GTM dataLayer
+        const payload = { form_id: "configurator-form", model: modelLabels[config.model] || config.model, totalPrice };
+        trackEvent("quote_request", payload);
+        trackEvent("configurator_contact", payload);
       } else {
         throw new Error(data?.error || "Verzenden mislukt");
       }
